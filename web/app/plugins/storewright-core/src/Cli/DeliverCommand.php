@@ -14,6 +14,6 @@ final class DeliverCommand {
 	public function __invoke( array $args, array $assoc ): void {
 		[ $country, $state, $postcode ] = array_pad( $args, 3, '' );
 		$point                          = isset( $assoc['lat'], $assoc['lng'] ) ? new Point( (float) $assoc['lat'], (float) $assoc['lng'] ) : null;
-		WP_CLI::line( (string) wp_json_encode( DeliveryCheck::answer( new Address( $country, $state, $postcode ), $point )->toArray() ) );
+		WP_CLI::line( (string) wp_json_encode( DeliveryCheck::forShopper( new Address( $country, $state, $postcode ), $point )->toArray() ) );
 	}
 }
