@@ -33,12 +33,15 @@ spl_autoload_register(
 	}
 );
 
+Schema::register();
+
 add_action(
 	'plugins_loaded',
 	static function (): void {
 		if ( ! class_exists( \WooCommerce::class ) ) {
 			return;
 		}
+		Payments\StripeWebhooks::register();
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			\WP_CLI::add_command( 'storewright seed', Cli\SeedCommand::class );
 		}
