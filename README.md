@@ -71,6 +71,11 @@ How areas, shapes and the PIN directory work is in [docs/delivery.md](docs/deliv
 
 Keys, webhooks and local testing for Razorpay and Stripe are in [docs/payments.md](docs/payments.md).
 
+## Console
+
+Store staff work in a full-screen console. Build it with `npm ci && make console`; how it is put
+together is in [docs/console.md](docs/console.md).
+
 ## White label
 
 What staff see in place of WordPress and WooCommerce is in [docs/white-label.md](docs/white-label.md).
