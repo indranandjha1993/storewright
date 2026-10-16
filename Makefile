@@ -51,6 +51,9 @@ e2e: .env ## browser tests in a visible chrome window; E2E_SLOWMO=0 for full spe
 e2e-headless: .env ## browser tests without a window, as ci runs them
 	CI=1 npx playwright test
 
+stripe-listen: .env ## forward stripe sandbox webhooks to the local store
+	@stripe listen --api-key "$$STRIPE_SECRET_KEY" --all-snapshot --forward-to "http://localhost:$${WEB_PORT:-8600}/?wc-api=wc_stripe"
+
 shell: .env ## shell inside the application container
 	$(RUN) bash
 

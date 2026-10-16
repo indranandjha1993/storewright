@@ -54,6 +54,7 @@ make install           # install WordPress and WooCommerce, create the admin use
 make seed              # demo catalogue with physical and digital products
 make lint test         # what CI runs on the php
 make e2e               # browser tests in a visible Chrome window
+make stripe-listen     # forward Stripe sandbox webhooks to the local store
 ```
 
 The store answers on `http://localhost:8600`, caught email on `http://localhost:8601`, and the
