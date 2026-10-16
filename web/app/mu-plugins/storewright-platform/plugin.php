@@ -24,5 +24,6 @@ Hardening::register();
 Mail::register();
 GatewayCredentials::register();
 HttpCertificates::register();
+WhiteLabel\Wording::register();
 WhiteLabel\Login::register();
 WhiteLabel\AdminChrome::register();
