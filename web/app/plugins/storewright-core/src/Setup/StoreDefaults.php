@@ -40,6 +40,13 @@ final class StoreDefaults {
 				'enable_for_virtual' => 'no',
 			]
 		);
+		add_option(
+			'woocommerce_razorpay_settings',
+			[
+				'title'       => 'Razorpay',
+				'description' => __( 'UPI, cards, netbanking, wallets and EMI on Razorpay\'s secure page.', 'storewright' ),
+			]
+		);
 
 		return [
 			'options' => count( self::STORE_OPTIONS ) + 1,
