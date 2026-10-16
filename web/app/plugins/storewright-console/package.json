@@ -15,16 +15,22 @@
     "pages": [
       {
         "id": "storewright",
-        "capability": "manage_woocommerce"
+        "capability": "manage_woocommerce",
+        "init": [
+          "@storewright-console/console-init"
+        ]
       }
     ]
   },
   "devDependencies": {
     "@wordpress/api-fetch": "7.56.0",
+    "@wordpress/boot": "0.23.0",
     "@wordpress/build": "0.24.0",
     "@wordpress/components": "41.0.0",
+    "@wordpress/data": "10.56.0",
     "@wordpress/element": "8.8.0",
     "@wordpress/i18n": "6.29.0",
+    "@wordpress/icons": "17.0.0",
     "@wordpress/url": "4.56.0"
   },
   "dependencies": {

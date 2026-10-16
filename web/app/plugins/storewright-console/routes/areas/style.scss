@@ -1,9 +1,16 @@
+@use '../../lib/screen';
+
 .sw-areas {
 	display: grid;
 	grid-template-columns: minmax(22rem, 30rem) minmax(0, 1fr);
 	height: 100%;
 	font-size: 14px;
 	color: var(--sw-contrast);
+	font-family: var(--sw-font-body);
+	--wp-components-color-accent: var(--sw-accent);
+	--wp-components-color-accent-darker-10: var(--sw-accent-hover);
+	--wp-components-color-accent-darker-20: var(--sw-accent-hover);
+	--wp-components-color-accent-inverted: var(--sw-on-accent);
 }
 
 .sw-areas__panel {
@@ -34,8 +41,11 @@
 
 .sw-areas__title {
 	margin: 0;
-	font-size: 1.5rem;
-	line-height: 1.2;
+	font-family: var(--sw-font-heading);
+	font-size: 1.75rem;
+	font-weight: 600;
+	line-height: 1.1;
+	letter-spacing: -0.01em;
 }
 
 .sw-areas__subtitle {
@@ -69,6 +79,8 @@
 	padding: 1rem;
 	border: 1px solid var(--sw-line);
 	border-radius: var(--sw-radius);
+	background: var(--sw-surface);
+	box-shadow: 0 1px 2px rgb(0 0 0 / 3%);
 
 	&.is-highlighted {
 		border-color: var(--sw-contrast);
@@ -88,7 +100,9 @@
 
 .sw-areas__name {
 	margin: 0 0 0.5rem;
-	font-size: 1rem;
+	font-family: var(--sw-font-heading);
+	font-size: 1.125rem;
+	font-weight: 600;
 }
 
 .sw-areas__facts {
@@ -166,13 +180,16 @@
 	display: grid;
 	gap: 0.75rem;
 	margin: 0;
-	padding: 1rem;
+	padding: 1.25rem;
 	border: 1px solid var(--sw-line);
 	border-radius: var(--sw-radius);
+	background: var(--sw-surface);
 }
 
 .sw-areas__legend {
-	padding: 0 0.25rem;
+	padding: 0 0.35rem;
+	font-family: var(--sw-font-heading);
+	font-size: 1.0625rem;
 	font-weight: 600;
 }
 

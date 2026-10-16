@@ -1,7 +1,8 @@
 import { Button, Notice, Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { adminLink, consoleData } from '../../lib/data';
+import { adminLink } from '../../lib/data';
+import { Card, Empty, Screen } from '../../lib/screen';
 import { count, localDate, money, shortDate, timeAgo } from '../../lib/format';
 import { loadDashboard } from './api';
 import './style.scss';
@@ -39,19 +40,19 @@ const modeLabel = {
 
 function Change( { now, before } ) {
 	if ( ! before ) {
-		return <span className="sw-dash__change is-flat">{ __( 'No earlier period to compare', 'storewright' ) }</span>;
+		return <span className="sw-stat__note">{ __( 'No earlier period to compare', 'storewright' ) }</span>;
 	}
 	const delta = Math.round( ( ( now - before ) / before ) * 100 );
-	const tone = delta > 0 ? 'is-up' : delta < 0 ? 'is-down' : 'is-flat';
+	const tone = delta > 0 ? 'is-up' : delta < 0 ? 'is-down' : '';
 	/* translators: %s: signed percentage */
-	return <span className={ `sw-dash__change ${ tone }` }>{ sprintf( __( '%s%% on the period before', 'storewright' ), delta > 0 ? `+${ delta }` : String( delta ) ) }</span>;
+	return <span className={ `sw-stat__note ${ tone }` }>{ sprintf( __( '%s%% on the period before', 'storewright' ), delta > 0 ? `+${ delta }` : String( delta ) ) }</span>;
 }
 
 function Kpi( { label, value, now, before } ) {
 	return (
-		<div className="sw-dash__kpi">
-			<span className="sw-dash__kpi-label">{ label }</span>
-			<strong className="sw-dash__kpi-value">{ value }</strong>
+		<div className="sw-stat">
+			<span className="sw-stat__label">{ label }</span>
+			<strong className="sw-stat__value">{ value }</strong>
 			<Change now={ now } before={ before } />
 		</div>
 	);
@@ -79,26 +80,14 @@ function Chart( { range, intervals } ) {
 	);
 }
 
-function Section( { title, action, children, className = '' } ) {
-	return (
-		<section className={ `sw-dash__section ${ className }` } aria-label={ title }>
-			<header className="sw-dash__section-head">
-				<h2 className="sw-dash__section-title">{ title }</h2>
-				{ action }
-			</header>
-			{ children }
-		</section>
-	);
-}
-
 const orderLink = ( id ) => adminLink( `admin.php?page=wc-orders&action=edit&id=${ id }` );
 
 function Orders( { orders } ) {
 	if ( orders.length === 0 ) {
-		return <p className="sw-dash__empty">{ __( 'No orders yet. The first one shows up here.', 'storewright' ) }</p>;
+		return <Empty>{ __( 'No orders yet. The first one shows up here.', 'storewright' ) }</Empty>;
 	}
 	return (
-		<table className="sw-dash__table">
+		<table className="sw-table">
 			<thead>
 				<tr>
 					<th scope="col">{ __( 'Order', 'storewright' ) }</th>
@@ -112,16 +101,22 @@ function Orders( { orders } ) {
 				{ orders.map( ( order ) => {
 					const customer = order.extended_info?.customer ?? {};
 					const name = [ customer.first_name, customer.last_name ].filter( Boolean ).join( ' ' ) || customer.email || __( 'Guest', 'storewright' );
+					const initials = name.split( /[\s@]+/ ).slice( 0, 2 ).map( ( part ) => part[ 0 ] ?? '' ).join( '' ).toUpperCase();
 					return (
 						<tr key={ order.order_id }>
 							<td>
-								<a href={ orderLink( order.order_id ) }>#{ order.order_id }</a>
+								<a className="sw-link" href={ orderLink( order.order_id ) }>#{ order.order_id }</a>
 								<small>{ timeAgo( order.date_created_gmt + 'Z' ) }</small>
 							</td>
-							<td>{ name }</td>
+							<td>
+								<span className="sw-dash__customer">
+									<span className="sw-avatar" aria-hidden="true">{ initials }</span>
+									{ name }
+								</span>
+							</td>
 							<td>{ ( order.extended_info?.products ?? [] ).map( ( p ) => ( Number( p.quantity ) > 1 ? `${ p.quantity } × ${ p.name }` : p.name ) ).join( ', ' ) }</td>
 							<td>
-								<span className={ `sw-dash__status is-${ order.status }` }>{ orderStatus[ order.status ] ?? order.status }</span>
+								<span className={ `sw-pill ${ [ 'pending', 'on-hold' ].includes( order.status ) ? 'is-quiet' : [ 'cancelled', 'failed', 'refunded' ].includes( order.status ) ? 'is-bad' : 'is-good' }` }>{ orderStatus[ order.status ] ?? order.status }</span>
 							</td>
 							<td className="is-number">{ money( order.total_sales, 2 ) }</td>
 						</tr>
@@ -186,7 +181,7 @@ function Stock( { stock, lowStock } ) {
 
 function Products( { products } ) {
 	if ( products.length === 0 ) {
-		return <p className="sw-dash__empty">{ __( 'Nothing sold in this period yet.', 'storewright' ) }</p>;
+		return <Empty>{ __( 'Nothing sold in this period yet.', 'storewright' ) }</Empty>;
 	}
 	return (
 		<ol className="sw-dash__products">
@@ -221,21 +216,18 @@ export const stage = () => {
 		};
 	}, [ period ] );
 
+	const switcher = (
+		<div className="sw-dash__periods" role="group" aria-label={ __( 'Period', 'storewright' ) }>
+			{ periods.map( ( item ) => (
+				<Button key={ item.key } variant={ item.key === period ? 'primary' : 'secondary' } size="compact" aria-pressed={ item.key === period } onClick={ () => setPeriod( item.key ) }>
+					{ item.label }
+				</Button>
+			) ) }
+		</div>
+	);
+
 	return (
-		<div className="sw-dash">
-			<header className="sw-dash__head">
-				<div>
-					<p className="sw-dash__store">{ consoleData.storeName }</p>
-					<h1 className="sw-dash__title">{ __( 'Today', 'storewright' ) }</h1>
-				</div>
-				<div className="sw-dash__periods" role="group" aria-label={ __( 'Period', 'storewright' ) }>
-					{ periods.map( ( item ) => (
-						<Button key={ item.key } variant={ item.key === period ? 'primary' : 'secondary' } size="compact" aria-pressed={ item.key === period } onClick={ () => setPeriod( item.key ) }>
-							{ item.label }
-						</Button>
-					) ) }
-				</div>
-			</header>
+		<Screen title={ __( 'Today', 'storewright' ) } actions={ switcher } className="sw-dash">
 			{ error && (
 				<Notice status="error" isDismissible={ false }>
 					{ error }
@@ -267,36 +259,37 @@ export const stage = () => {
 						) ) }
 					</ul>
 					<div className="sw-dash__grid">
-						<Section
+						<Card
 							title={ __( 'Recent orders', 'storewright' ) }
 							className="is-wide"
+							padded={ false }
 							action={
-								<a className="sw-dash__more" href={ adminLink( 'admin.php?page=wc-orders' ) }>
+								<a className="sw-link" href={ adminLink( 'admin.php?page=wc-orders' ) }>
 									{ __( 'All orders', 'storewright' ) }
 								</a>
 							}
 						>
 							<Orders orders={ data.orders } />
-						</Section>
-						<Section title={ __( 'Payments', 'storewright' ) }>
+						</Card>
+						<Card title={ __( 'Payments', 'storewright' ) }>
 							<Payments payments={ data.payments } />
-						</Section>
-						<Section
+						</Card>
+						<Card
 							title={ __( 'Stock', 'storewright' ) }
 							action={
-								<a className="sw-dash__more" href={ adminLink( 'edit.php?post_type=product&stock_status=outofstock' ) }>
+								<a className="sw-link" href={ adminLink( 'edit.php?post_type=product&stock_status=outofstock' ) }>
 									{ __( 'Out of stock', 'storewright' ) }
 								</a>
 							}
 						>
 							<Stock stock={ data.stock } lowStock={ data.lowStock } />
-						</Section>
-						<Section title={ __( 'Best sellers', 'storewright' ) }>
+						</Card>
+						<Card title={ __( 'Best sellers', 'storewright' ) }>
 							<Products products={ data.products } />
-						</Section>
+						</Card>
 					</div>
 				</>
 			) }
-		</div>
+		</Screen>
 	);
 };

@@ -50,5 +50,10 @@ Leaflet for the map, is bundled into that screen. Code shared between screens li
 with the logged-in user's nonce, so the API's own capability checks apply.
 
 A screen appears in the sidebar once it is added to `menuItems()` in
-`web/app/plugins/storewright-console/src/Console.php`. A link can open a screen directly with
-`?page=storewright&p=/path`.
+`web/app/plugins/storewright-console/src/Console.php`; its icon is set in
+`packages/console-init/src/index.js`, which runs before the app renders. A link can open a
+screen directly with `?page=storewright&p=/path`.
+
+Screens share `lib/screen.jsx` (`Screen`, `Card`, `Empty`) and `lib/_screen.scss` (tables,
+stats, pills, avatars), all drawn from the brand tokens, so a new screen looks like the others
+without copying styles.
