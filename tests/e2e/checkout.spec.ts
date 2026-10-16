@@ -135,6 +135,34 @@ test('cash on delivery is not offered when the bag holds a download', async ({ p
 	await expect(page.getByRole('radio', { name: /Cash on delivery/ })).toHaveCount(0);
 });
 
+test('a guest pays on razorpay by netbanking', async ({ page }) => {
+	test.skip(!/^rzp_test_/.test(process.env.RAZORPAY_KEY_ID ?? ''), 'needs sandbox RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env');
+	test.setTimeout(120_000);
+
+	await addToBag(page, products.mug);
+	await addToBag(page, products.guide);
+
+	await page.goto('/checkout/');
+	await fillDeliveryAddress(page);
+	await page.getByRole('radio', { name: /Razorpay/ }).check();
+	const placeOrder = page.getByRole('button', { name: 'Place order' });
+	await placeOrder.scrollIntoViewIfNeeded();
+	await placeOrder.click();
+
+	await page.waitForURL(/order-pay/, { timeout: 30_000 });
+	const razorpay = page.locator('iframe.razorpay-checkout-frame').filter({ visible: true }).contentFrame();
+	await expect(razorpay.getByText(/Using as \+91/)).toBeVisible({ timeout: 20_000 });
+	await expect(razorpay.getByTestId('contact-overlay-container')).toBeHidden({ timeout: 20_000 });
+	await razorpay.getByRole('button', { name: /^Netbanking/ }).click();
+	const bank = page.waitForEvent('popup');
+	await razorpay.getByRole('button', { name: /^Canara Bank/ }).first().click();
+	await (await bank).getByRole('button', { name: 'Success' }).click();
+
+	await expect(page).toHaveURL(/order-received/, { timeout: 60_000 });
+	await expect(page.getByText(/thank you/i).first()).toBeVisible();
+	await expect(page.getByRole('link', { name: 'guide.pdf' })).toBeVisible();
+});
+
 test('a guest pays for a mixed bag on the stripe checkout page', async ({ page }) => {
 	test.skip(!/^(sk|rk)_test_/.test(process.env.STRIPE_SECRET_KEY ?? ''), 'needs sandbox STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY in .env');
 	test.setTimeout(120_000);
