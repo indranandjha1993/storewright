@@ -1,0 +1,71 @@
+/*
+Theme Name: Storewright
+Theme URI: https://github.com/indranandjha1993/storewright
+Author: Indra Nand Jha
+Description: Storefront theme for Storewright stores. Block based, token driven, built on WooCommerce blocks.
+Version: 0.1.0
+Requires at least: 7.0
+Tested up to: 7.1
+Requires PHP: 8.3
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: storewright
+*/
+
+:root {
+	--sw-radius: 10px;
+	--sw-shadow: 0 1px 2px rgb(21 23 26 / 6%), 0 8px 24px rgb(21 23 26 / 6%);
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product-template__responsive {
+	gap: var(--wp--preset--spacing--40);
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product {
+	display: grid;
+	align-content: start;
+	gap: var(--wp--preset--spacing--20);
+	padding: var(--wp--preset--spacing--20);
+	border-radius: var(--sw-radius);
+	background: var(--wp--preset--color--surface);
+	transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product:hover {
+	box-shadow: var(--sw-shadow);
+	transform: translateY(-2px);
+}
+
+.wc-block-components-product-image img,
+.wp-block-woocommerce-product-image img,
+.wc-block-product-gallery img {
+	border-radius: calc(var(--sw-radius) - 2px);
+}
+
+.wc-block-components-button,
+.wp-element-button,
+.wp-block-button__link {
+	border-radius: var(--sw-radius);
+	font-weight: 600;
+	letter-spacing: 0.01em;
+}
+
+.wc-block-components-notice-banner {
+	border-radius: var(--sw-radius);
+}
+
+.wc-block-components-form .wc-block-components-text-input input,
+.wc-block-components-select .components-custom-select-control__button,
+.wc-block-components-country-input input {
+	border-radius: 8px;
+}
+
+.sw-trust {
+	border-top: 1px solid var(--wp--preset--color--line);
+	border-bottom: 1px solid var(--wp--preset--color--line);
+}
+
+.wp-block-site-title a {
+	text-decoration: none;
+	letter-spacing: -0.02em;
+}

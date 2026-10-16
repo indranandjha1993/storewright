@@ -13,7 +13,7 @@ if ! wp core is-installed >/dev/null 2>&1; then
 fi
 
 wp plugin activate woocommerce woocommerce-gateway-stripe woo-razorpay storewright-core
-wp theme activate twentytwentyfive
+wp theme activate storewright
 wp rewrite structure '/%postname%/' --hard
 wp option update blogdescription ""
 wp option update timezone_string "Asia/Kolkata"

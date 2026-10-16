@@ -41,6 +41,7 @@ final class GatewayCredentials
 	private static function merge(mixed $settings, array $map): mixed
 	{
 		$settings = is_array($settings) ? $settings : [];
+		$settings += ['description' => ''];
 		foreach ($map as $setting => $variable) {
 			$value = getenv($variable);
 			if ($value !== false && $value !== '') {
