@@ -54,6 +54,7 @@ final class ThemeJsonTest extends TestCase {
 			[
 				...Settings::DEFAULTS,
 				'headingFont' => 'fraunces',
+				'bodyFont'    => 'system',
 			]
 		);
 		$families = array_column( $data['settings']['typography']['fontFamilies'], null, 'slug' );

@@ -15,8 +15,8 @@ final class Settings {
 		'background'  => '#fafaf7',
 		'text'        => '#15171a',
 		'sale'        => '#b4472b',
-		'headingFont' => 'system',
-		'bodyFont'    => 'system',
+		'headingFont' => 'fraunces',
+		'bodyFont'    => 'inter',
 		'radius'      => 'soft',
 	];
 

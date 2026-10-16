@@ -31,7 +31,7 @@ final class SettingsTest extends TestCase {
 
 		self::assertSame( '#aabbcc', $settings['accent'] );
 		self::assertSame( '#15171a', $settings['text'] );
-		self::assertSame( 'system', $settings['headingFont'] );
+		self::assertSame( 'fraunces', $settings['headingFont'] );
 		self::assertSame( 'soft', $settings['radius'] );
 	}
 
