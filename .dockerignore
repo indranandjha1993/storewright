@@ -1,6 +1,7 @@
 .git
 .github
-node_modules
+**/node_modules
+web/app/plugins/storewright-console/build
 vendor
 web/wp
 web/app/uploads

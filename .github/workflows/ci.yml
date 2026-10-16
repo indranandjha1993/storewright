@@ -54,6 +54,12 @@ jobs:
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run console
       - run: make up
       - run: make install
       - run: make seed
@@ -65,11 +71,6 @@ jobs:
           curl -fsS http://localhost:8600/shop/ | grep -q 'themes/storewright/style.css'
           test "$(curl -fsS 'http://localhost:8600/wp-json/wc/store/v1/products?per_page=20' | jq length)" = "5"
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8600/wp/xmlrpc.php)" = "403"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: npm
-      - run: npm ci --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
       - if: failure()

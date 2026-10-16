@@ -26,6 +26,9 @@ vendor/autoload.php: composer.lock
 install: .env vendor/autoload.php ## install wordpress, activate woocommerce and the gateways, enable hpos
 	$(RUN) bin/install
 
+console: ## build the operator console (npm run console:dev to watch)
+	npm run console
+
 seed: .env ## demo catalogue, coupon and customers
 	$(RUN) wp storewright seed
 
