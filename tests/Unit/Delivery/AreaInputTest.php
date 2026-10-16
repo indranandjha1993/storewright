@@ -76,6 +76,40 @@ final class AreaInputTest extends TestCase {
 		self::assertSame( [], $input->pins );
 	}
 
+	public function test_pin_rules_are_strict_when_the_area_is_only_in_india(): void {
+		$this->expectExceptionMessage( '56O* is not a PIN code' );
+
+		AreaInput::from(
+			[
+				'name'    => 'Typo',
+				'regions' => [
+					[
+						'type' => 'state',
+						'code' => 'IN:KA',
+					],
+				],
+				'pins'    => '56O*',
+			]
+		);
+	}
+
+	public function test_pin_rules_allow_letters_when_the_area_reaches_abroad(): void {
+		$input = AreaInput::from(
+			[
+				'name'    => 'London',
+				'regions' => [
+					[
+						'type' => 'country',
+						'code' => 'GB',
+					],
+				],
+				'pins'    => 'SW1A*',
+			]
+		);
+
+		self::assertSame( [ 'SW1A*' ], $input->pins );
+	}
+
 	public function test_an_area_needs_a_name(): void {
 		$this->expectExceptionMessage( 'Give the area a name.' );
 

@@ -24,10 +24,11 @@ final class AreaInput {
 		if ( $name === '' ) {
 			throw new InvalidArgumentException( esc_html__( 'Give the area a name.', 'storewright' ) );
 		}
+		$regions = array_map( self::region( ... ), array_values( (array) ( $data['regions'] ?? [] ) ) );
 		return new self(
 			$name,
-			array_map( self::region( ... ), array_values( (array) ( $data['regions'] ?? [] ) ) ),
-			PinRules::parse( (string) ( $data['pins'] ?? '' ) ),
+			$regions,
+			PinRules::parse( (string) ( $data['pins'] ?? '' ), self::onlyIndia( $regions ) ),
 			self::shape( $data['shape'] ?? null ),
 			array_map( self::method( ... ), array_values( (array) ( $data['methods'] ?? [] ) ) ),
 		);
@@ -45,6 +46,11 @@ final class AreaInput {
 			throw new InvalidArgumentException( esc_html__( 'One of the regions is not a country or state the store knows.', 'storewright' ) );
 		}
 		return [ $type, $code ];
+	}
+
+	private static function onlyIndia( array $regions ): bool {
+		$abroad = array_filter( $regions, static fn( array $region ): bool => $region[1] !== 'IN' && ! str_starts_with( $region[1], 'IN:' ) );
+		return $regions !== [] && $abroad === [];
 	}
 
 	private static function shape( mixed $shape ): ?Shape {

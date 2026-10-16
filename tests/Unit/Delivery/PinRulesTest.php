@@ -53,6 +53,28 @@ final class PinRulesTest extends TestCase {
 		PinRules::parse( "560001\n560*01" );
 	}
 
+	public function test_indian_rules_are_six_digit_pins_prefixes_and_ranges(): void {
+		self::assertSame( [ '560001', '56*', '411001...411099' ], PinRules::parse( "560001\n56*\n411001-411099", true ) );
+	}
+
+	public function test_a_letter_in_an_indian_pin_is_refused(): void {
+		$this->expectExceptionMessage( '56O* is not a PIN code' );
+
+		PinRules::parse( '56O*', true );
+	}
+
+	public function test_an_indian_pin_has_six_digits(): void {
+		$this->expectException( InvalidArgumentException::class );
+
+		PinRules::parse( '56001', true );
+	}
+
+	public function test_an_indian_range_is_two_six_digit_pins(): void {
+		$this->expectExceptionMessage( 'The range 5600-5699 needs two 6 digit PIN codes, the lower one first.' );
+
+		PinRules::parse( '5600-5699', true );
+	}
+
 	public function test_nothing_typed_is_no_rules(): void {
 		self::assertSame( [], PinRules::parse( " \n " ) );
 	}
