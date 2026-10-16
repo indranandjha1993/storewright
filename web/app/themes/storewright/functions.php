@@ -13,6 +13,13 @@ add_action(
 );
 
 add_action(
+	'init',
+	static function (): void {
+		register_block_pattern_category( 'storewright', [ 'label' => __( 'Store sections', 'storewright' ) ] );
+	}
+);
+
+add_action(
 	'wp_enqueue_scripts',
 	static function (): void {
 		wp_enqueue_style( 'storewright', get_stylesheet_uri(), [], wp_get_theme()->get( 'Version' ) );

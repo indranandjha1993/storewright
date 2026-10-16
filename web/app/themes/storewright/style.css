@@ -92,3 +92,39 @@ Text Domain: storewright
 .sw-header__actions .wp-block-woocommerce-customer-account a {
 	color: var(--wp--preset--color--contrast);
 }
+
+.sw-categories .wp-block-term-template {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+	gap: var(--wp--preset--spacing--20);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.sw-categories .wp-block-term,
+.sw-categories .wp-block-term > * {
+	margin: 0;
+}
+
+.sw-categories .wp-block-term {
+	display: flex;
+	align-items: center;
+	min-height: 5.5rem;
+	padding: var(--wp--preset--spacing--20) var(--wp--preset--spacing--30);
+	border-radius: var(--sw-radius);
+	background: var(--wp--preset--color--surface);
+	border: 1px solid var(--wp--preset--color--line);
+	transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.sw-categories .wp-block-term:hover {
+	border-color: var(--wp--preset--color--accent);
+	box-shadow: var(--sw-shadow);
+}
+
+.sw-categories .wp-block-term-name a {
+	color: var(--wp--preset--color--contrast);
+	font-weight: 600;
+	text-decoration: none;
+}
