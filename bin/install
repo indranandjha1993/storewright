@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -eu
+cd "$(dirname "$0")/.."
+
+: "${WP_HOME:?}" "${ADMIN_USER:?}" "${ADMIN_EMAIL:?}" "${ADMIN_PASSWORD:?}"
+title="${SITE_TITLE:-Storewright}"
+
+until wp db check >/dev/null 2>&1; do sleep 1; done
+
+if ! wp core is-installed >/dev/null 2>&1; then
+  wp core install --url="$WP_HOME" --title="$title" --admin_user="$ADMIN_USER" \
+    --admin_email="$ADMIN_EMAIL" --admin_password="$ADMIN_PASSWORD" --skip-email
+fi
+
+wp plugin activate woocommerce woocommerce-gateway-stripe woo-razorpay
+wp theme activate twentytwentyfive
+wp rewrite structure '/%postname%/' --hard
+wp option update blogdescription ""
+wp option update timezone_string "Asia/Kolkata"
+wp option update woocommerce_store_address "" >/dev/null
+wp option update woocommerce_default_country "IN:KA"
+wp option update woocommerce_currency "INR"
+wp option update woocommerce_onboarding_profile '{"skipped":true}' --format=json
+wp option update woocommerce_coming_soon "no"
+wp wc hpos enable
+wp option update woocommerce_custom_orders_table_data_sync_enabled "no"
+wp cron event run --due-now >/dev/null 2>&1 || true
+
+echo "installed: $WP_HOME  admin user: $ADMIN_USER"
