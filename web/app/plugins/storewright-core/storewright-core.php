@@ -50,6 +50,7 @@ add_action(
 		add_action( 'rest_api_init', [ Payments\Stripe\StripeWebhookEndpoint::class, 'register' ] );
 		add_action( 'rest_api_init', [ Delivery\LocationEndpoint::class, 'register' ] );
 		add_action( 'rest_api_init', [ Delivery\AreasEndpoint::class, 'register' ] );
+		add_action( 'rest_api_init', [ Payments\HealthEndpoint::class, 'register' ] );
 		add_action( 'woocommerce_delete_shipping_zone', [ Delivery\ShapeStore::class, 'zoneDeleted' ] );
 		add_action( 'init', [ Delivery\DeliveryBlock::class, 'register' ] );
 		add_action(

@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Storewright\Core\Payments;
+
+use Storewright\Platform\GatewayCredentials;
+use WP_REST_Response;
+use WP_REST_Server;
+
+final class HealthEndpoint {
+
+	private const STUCK_AFTER_MINUTES = 10;
+
+	public static function register(): void {
+		register_rest_route(
+			'storewright/v1',
+			'/payments/health',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ self::class, 'show' ],
+				'permission_callback' => static fn(): bool => current_user_can( 'manage_woocommerce' ),
+			]
+		);
+	}
+
+	public static function show(): WP_REST_Response {
+		global $wpdb;
+		$modes  = class_exists( GatewayCredentials::class ) ? GatewayCredentials::modes( wp_get_environment_type() ) : [];
+		$rows   = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT gateway,
+					SUM(received_at >= UTC_TIMESTAMP() - INTERVAL 1 DAY) AS day,
+					SUM(status = %s) AS failed,
+					SUM(status = %s AND received_at < UTC_TIMESTAMP() - INTERVAL %d MINUTE) AS stuck,
+					MAX(received_at) AS last
+				FROM %i GROUP BY gateway',
+				WebhookGuard::FAILED,
+				WebhookGuard::RECEIVED,
+				self::STUCK_AFTER_MINUTES,
+				$wpdb->prefix . 'storewright_payment_events'
+			),
+			ARRAY_A
+		);
+		$events = array_column( (array) $rows, null, 'gateway' );
+		$out    = [];
+		foreach ( [ 'razorpay', 'stripe' ] as $gateway ) {
+			$row   = $events[ $gateway ] ?? [];
+			$out[] = [
+				'gateway' => $gateway,
+				'mode'    => $modes[ $gateway ] ?? 'off',
+				'day'     => (int) ( $row['day'] ?? 0 ),
+				'failed'  => (int) ( $row['failed'] ?? 0 ),
+				'stuck'   => (int) ( $row['stuck'] ?? 0 ),
+				'last'    => isset( $row['last'] ) ? get_date_from_gmt( (string) $row['last'], 'c' ) : null,
+			];
+		}
+		$cod = (array) get_option( 'woocommerce_cod_settings', [] );
+		return new WP_REST_Response(
+			[
+				'gateways'       => $out,
+				'cashOnDelivery' => ( $cod['enabled'] ?? 'no' ) === 'yes',
+			]
+		);
+	}
+}
