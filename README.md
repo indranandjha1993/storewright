@@ -56,11 +56,16 @@ make seed              # demo catalogue with physical and digital products
 make lint test         # what CI runs on the php
 make e2e               # browser tests in a visible Chrome window
 make stripe-listen     # forward Stripe sandbox webhooks to /wp-json/storewright/v1/webhooks/stripe
+make pins              # import the India Post PIN directory
 ```
 
 The store answers on `http://localhost:8600`, caught email on `http://localhost:8601`, and the
 database on `127.0.0.1:8602` for a desktop client. Storewright keeps to ports 8600 to 8619;
 change `WEB_PORT`, `MAIL_PORT` and `DB_PORT` in `.env` if you need others.
+
+## Delivery areas
+
+How areas, shapes and the PIN directory work is in [docs/delivery.md](docs/delivery.md).
 
 ## Payments
 
