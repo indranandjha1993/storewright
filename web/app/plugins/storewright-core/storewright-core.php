@@ -43,6 +43,7 @@ add_action(
 		}
 		Payments\GatewayRouting::register();
 		Checkout\PhoneSync::register();
+		Payments\RazorpayWebhooks::register();
 		add_filter( 'woocommerce_payment_gateways', static fn( array $gateways ): array => [ ...$gateways, Payments\Stripe\StripeCheckoutGateway::class ] );
 		add_action( 'template_redirect', [ Payments\Stripe\StripeCheckoutGateway::class, 'confirmOnReturn' ] );
 		add_action( 'rest_api_init', [ Payments\Stripe\StripeWebhookEndpoint::class, 'register' ] );

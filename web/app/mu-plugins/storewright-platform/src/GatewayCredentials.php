@@ -68,6 +68,11 @@ final class GatewayCredentials {
 		return $settings + [ 'enabled' => 'yes' ];
 	}
 
+	public static function razorpayWebhookSecret( string $environment ): string {
+		$mode = self::razorpayMode();
+		return $mode !== null && self::allowed( $mode, $environment ) ? self::env( 'RAZORPAY_WEBHOOK_SECRET' ) : '';
+	}
+
 	public static function stripeMode(): ?string {
 		$secret      = self::mode( self::env( 'STRIPE_SECRET_KEY' ), [ 'sk_test_', 'rk_test_' ], [ 'sk_live_', 'rk_live_' ] );
 		$publishable = self::mode( self::env( 'STRIPE_PUBLISHABLE_KEY' ), [ 'pk_test_' ], [ 'pk_live_' ] );
