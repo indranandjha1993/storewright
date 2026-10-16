@@ -7,9 +7,12 @@ services:
       dockerfile: docker/app/Dockerfile
       target: dev
     image: storewright-app:dev
+    user: "${HOST_UID:-82}:${HOST_GID:-82}"
     env_file: .env
     environment:
       PHP_OPCACHE_VALIDATE_TIMESTAMPS: "1"
+      COMPOSER_HOME: /tmp/composer
+      WP_CLI_CACHE_DIR: /tmp/wp-cli
     volumes:
       - .:/var/www/html
     depends_on:
@@ -57,7 +60,11 @@ services:
   cli:
     image: storewright-app:dev
     profiles: ["tools"]
+    user: "${HOST_UID:-82}:${HOST_GID:-82}"
     env_file: .env
+    environment:
+      COMPOSER_HOME: /tmp/composer
+      WP_CLI_CACHE_DIR: /tmp/wp-cli
     volumes:
       - .:/var/www/html
     depends_on:

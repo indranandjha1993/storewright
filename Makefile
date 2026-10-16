@@ -1,4 +1,6 @@
 -include .env
+HOST_UID := $(shell id -u)
+HOST_GID := $(shell id -g)
 export
 COMPOSE := docker compose --progress quiet
 RUN := $(COMPOSE) run --rm cli
@@ -14,7 +16,7 @@ help:
 build: .env ## build the application image
 	$(COMPOSE) build app
 
-up: .env ## start the local stack on http://localhost:8080
+up: .env ## start the local stack on http://localhost:8600
 	$(COMPOSE) up -d
 	@echo "store: http://localhost:$${WEB_PORT:-8600}  mail: http://localhost:$${MAIL_PORT:-8601}"
 

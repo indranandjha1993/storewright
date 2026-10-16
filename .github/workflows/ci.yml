@@ -54,7 +54,7 @@ jobs:
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - run: docker compose up -d --no-build
+      - run: make up
       - run: make install
       - run: make seed
       - name: smoke
