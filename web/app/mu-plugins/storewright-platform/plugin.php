@@ -23,3 +23,4 @@ Health::register();
 Hardening::register();
 Mail::register();
 GatewayCredentials::register();
+HttpCertificates::register();
