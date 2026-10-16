@@ -62,6 +62,10 @@ The store answers on `http://localhost:8600`, caught email on `http://localhost:
 database on `127.0.0.1:8602` for a desktop client. Storewright keeps to ports 8600 to 8619;
 change `WEB_PORT`, `MAIL_PORT` and `DB_PORT` in `.env` if you need others.
 
+## Payments
+
+Keys, webhooks and local testing for Razorpay and Stripe are in [docs/payments.md](docs/payments.md).
+
 ## Deploying
 
 One server per store. `deploy/` holds a compose file and a script that pulls a tagged image,
