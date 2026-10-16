@@ -22,7 +22,7 @@ test('staff land on the console and see what needs doing today', async ({ page }
 	for (const queue of ['To fulfil', 'Awaiting payment', 'On hold']) {
 		await expect(page.getByRole('link', { name: new RegExp(`^\\d+ ${queue}$`) })).toBeVisible();
 	}
-	await expect(page.getByRole('link', { name: /To fulfil/ })).toHaveAttribute('href', /page=wc-orders&status=wc-processing$/);
+	await expect(page.getByRole('link', { name: /To fulfil/ })).toHaveAttribute('href', /page=storewright&p=%2Forders&status=processing$/);
 });
 
 test('the dashboard shows sales, recent orders, payments and stock', async ({ page }) => {
@@ -31,7 +31,7 @@ test('the dashboard shows sales, recent orders, payments and stock', async ({ pa
 	await expect(page.getByText('Sales', { exact: true })).toBeVisible();
 	const orders = page.getByRole('region', { name: 'Recent orders' });
 	await expect(orders.getByRole('columnheader', { name: 'Customer' }).or(orders.getByText('No orders yet. The first one shows up here.'))).toBeVisible();
-	await expect(orders.getByRole('link', { name: 'All orders' })).toHaveAttribute('href', /page=wc-orders$/);
+	await expect(orders.getByRole('link', { name: 'All orders' })).toHaveAttribute('href', /page=storewright&p=%2Forders$/);
 	const payments = page.getByRole('region', { name: 'Payments' });
 	await expect(payments).toContainText('Razorpay');
 	await expect(payments).toContainText('Stripe');
@@ -58,4 +58,51 @@ test('shoppers cannot open the console', async ({ page }) => {
 
 	await expect(page.getByText('Sorry, you are not allowed to access this page.')).toBeVisible();
 	await expect(page.getByRole('heading', { name: 'Today' })).toHaveCount(0);
+});
+
+test('staff work orders from the console', async ({ page }) => {
+	await logIn(page, staff);
+	await page.getByRole('link', { name: 'Orders' }).click();
+
+	await expect(page.getByRole('heading', { name: 'Orders' })).toBeVisible();
+	await page.getByRole('button', { name: /^To fulfil/ }).click();
+	const first = page.locator('.sw-orders__table tbody tr').first();
+	await expect(first).toContainText('To fulfil');
+	await first.locator('.sw-orders__open').click();
+	const panel = page.getByRole('complementary', { name: /^Order #/ });
+	await expect(panel.getByRole('heading', { name: 'Items' })).toBeVisible();
+	await panel.getByPlaceholder('Add a note').fill('Packed in the blue box.');
+	await panel.getByRole('button', { name: 'Add note' }).click();
+	await expect(panel.locator('.sw-order__notes')).toContainText('Packed in the blue box.');
+});
+
+test('staff change a price without leaving the console', async ({ page }) => {
+	await logIn(page, staff);
+	await page.getByRole('link', { name: 'Products' }).click();
+
+	const row = page.locator('.sw-products__table tbody tr', { hasText: 'Dot Grid Notebook' });
+	await row.getByRole('button', { name: 'Edit' }).click();
+	const editor = page.getByRole('form', { name: 'Edit Dot Grid Notebook' });
+	await editor.getByLabel('Price', { exact: true }).fill('359');
+	await editor.getByRole('button', { name: 'Save' }).click();
+	await expect(row).toContainText('₹359.00');
+	await row.getByRole('button', { name: 'Edit' }).click();
+	await editor.getByLabel('Price', { exact: true }).fill('349');
+	await editor.getByRole('button', { name: 'Save' }).click();
+	await expect(row).toContainText('₹349.00');
+});
+
+test('customers and content screens list what staff expect', async ({ page }) => {
+	await logIn(page, staff);
+	await page.getByRole('link', { name: 'Customers' }).click();
+	await expect(page.locator('.sw-customers__table')).toContainText('Asha Menon');
+	await expect(page.locator('.sw-customers__table')).not.toContainText('console.e2e@example.com');
+
+	await page.getByRole('link', { name: 'Pages and journal' }).click();
+	const pages = page.getByRole('region', { name: 'Pages' });
+	for (const title of ['About', 'Contact', 'Shipping and returns', 'Terms of sale', 'Privacy Policy']) {
+		await expect(pages).toContainText(title);
+	}
+	await expect(pages).not.toContainText('Checkout');
+	await expect(page.getByRole('region', { name: 'Journal' })).toContainText('Caring for stoneware');
 });

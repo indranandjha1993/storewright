@@ -1,7 +1,7 @@
 import { Button, Notice, Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { adminLink } from '../../lib/data';
+import { adminLink, consoleLink } from '../../lib/data';
 import { Card, Empty, Screen } from '../../lib/screen';
 import { count, localDate, money, shortDate, timeAgo } from '../../lib/format';
 import { loadDashboard } from './api';
@@ -80,7 +80,7 @@ function Chart( { range, intervals } ) {
 	);
 }
 
-const orderLink = ( id ) => adminLink( `admin.php?page=wc-orders&action=edit&id=${ id }` );
+const orderLink = ( id ) => consoleLink( '/orders', `order=${ id }` );
 
 function Orders( { orders } ) {
 	if ( orders.length === 0 ) {
@@ -251,7 +251,7 @@ export const stage = () => {
 					<ul className="sw-dash__queues">
 						{ queues.map( ( queue ) => (
 							<li key={ queue.status }>
-								<a className="sw-dash__queue" href={ adminLink( `admin.php?page=wc-orders&status=wc-${ queue.status }` ) }>
+								<a className="sw-dash__queue" href={ consoleLink( '/orders', `status=${ queue.status }` ) }>
 									<span className="sw-dash__count">{ count( data.queues[ queue.status ] ?? 0 ) }</span>
 									<span className="sw-dash__label">{ queue.label }</span>
 								</a>
@@ -264,7 +264,7 @@ export const stage = () => {
 							className="is-wide"
 							padded={ false }
 							action={
-								<a className="sw-link" href={ adminLink( 'admin.php?page=wc-orders' ) }>
+								<a className="sw-link" href={ consoleLink( '/orders' ) }>
 									{ __( 'All orders', 'storewright' ) }
 								</a>
 							}

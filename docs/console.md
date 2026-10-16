@@ -25,8 +25,20 @@ so a deployment needs nothing extra.
 - **Today** (`/`): sales, orders, average order and refunds for today, the last 7 or 30 days
   against the period before, a sales chart, the queues to fulfil, awaiting payment and on hold,
   recent orders, payment gateway health from the webhook log, low stock and best sellers.
+- **Orders** (`/orders`): every order with status filters, search, a detail panel with items,
+  customer, delivery address, payment and notes, and the next status one click away. Refunds and
+  line edits open the advanced order screen.
+- **Products** (`/products`): the catalogue with stock filters and search; price, sale price and
+  stock are edited in the row. Variations and everything else open the full editor.
+- **Customers** (`/customers`): shoppers with a profile panel: contact, delivery address and
+  recent orders.
+- **Pages and journal** (`/content`): the business pages and journal entries with their status,
+  each opening in the block editor.
 - **Brand** (`/brand`): name, logo, colours, typefaces and corners for every surface, with a live
   preview. See [branding.md](branding.md).
+
+Links into a screen carry their state in the query string: `p=/orders&status=processing` opens
+the fulfilment queue and `p=/orders&order=42` opens one order.
 - **Delivery areas** (`/areas`): the delivery areas in the order addresses are checked, an editor
   for each one and a box that tests a PIN code or a spot on the map. See
   [delivery.md](delivery.md).

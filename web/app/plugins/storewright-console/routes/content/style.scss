@@ -1,0 +1,29 @@
+@use '../../lib/screen';
+
+.sw-content__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+	gap: 1rem;
+	align-items: start;
+}
+
+.sw-content .sw-table td small {
+	display: block;
+	color: var(--sw-muted);
+	font-size: 0.75rem;
+}
+
+.sw-content__actions {
+	white-space: nowrap;
+
+	.sw-link {
+		margin-left: 0.75rem;
+		font-size: 0.8125rem;
+	}
+}
+
+.sw-content__note {
+	margin: 0;
+	color: var(--sw-muted);
+	font-size: 0.8125rem;
+}

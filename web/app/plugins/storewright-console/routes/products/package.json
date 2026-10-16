@@ -1,0 +1,8 @@
+{
+  "name": "storewright-console-products",
+  "private": true,
+  "route": {
+    "path": "/products",
+    "page": "storewright"
+  }
+}
