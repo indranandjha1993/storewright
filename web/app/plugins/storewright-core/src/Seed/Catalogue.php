@@ -12,6 +12,8 @@ use WC_Product_Variation;
 
 final class Catalogue {
 
+	private const VARIATION_STOCK = 15;
+
 	private Media $media;
 
 	public function __construct() {
@@ -90,7 +92,7 @@ final class Catalogue {
 	}
 
 	private function simple( string $sku, string $name, string $description, int $price, int $category, string $colour, array $shipping ): void {
-		if ( wc_get_product_id_by_sku( $sku ) ) {
+		if ( $this->restock( $sku, $shipping['stock'] ) ) {
 			return;
 		}
 		$product = new WC_Product_Simple();
@@ -125,8 +127,21 @@ final class Catalogue {
 		$product->save();
 	}
 
+	private function restock( string $sku, int $quantity ): bool {
+		$id = wc_get_product_id_by_sku( $sku );
+		if ( ! $id ) {
+			return false;
+		}
+		wc_update_product_stock( $id, $quantity );
+		return true;
+	}
+
 	private function variable( string $sku, string $name, string $description, int $price, int $category, string $colour, array $options ): void {
-		if ( wc_get_product_id_by_sku( $sku ) ) {
+		$existing = wc_get_product_id_by_sku( $sku );
+		if ( $existing ) {
+			foreach ( wc_get_product( $existing )->get_children() as $variation ) {
+				wc_update_product_stock( $variation, self::VARIATION_STOCK );
+			}
 			return;
 		}
 		$product = new WC_Product_Variable();
@@ -152,7 +167,7 @@ final class Catalogue {
 			$variation->set_sku( $sku . '-' . $index );
 			$variation->set_regular_price( (string) $price );
 			$variation->set_manage_stock( true );
-			$variation->set_stock_quantity( 15 );
+			$variation->set_stock_quantity( self::VARIATION_STOCK );
 			$variation->set_weight( '0.25' );
 			$variation->set_attributes( array_change_key_case( array_combine( array_keys( $options ), $combination ), CASE_LOWER ) );
 			$variation->save();
