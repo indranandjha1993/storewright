@@ -16,28 +16,16 @@ final class WebhookGuard {
 
 	public function __construct( private readonly EventStore $store ) {}
 
-	public function admit( string $gateway, string $payload, bool $authentic ): string {
-		if ( ! $authentic ) {
+	public function admit( string $gateway, string $eventId, string $eventType, string $payload, bool $authentic ): string {
+		if ( ! $authentic || $eventId === '' ) {
 			return self::PASS;
 		}
-		$event = json_decode( $payload, true );
-		if ( ! is_array( $event ) || ! is_string( $event['id'] ?? null ) || $event['id'] === '' ) {
-			return self::PASS;
-		}
-		$id   = $event['id'];
-		$type = is_string( $event['type'] ?? null ) ? $event['type'] : (string) ( $event['event'] ?? 'unknown' );
-
-		$known = $this->store->status( $gateway, $id );
-		$this->store->receive( $gateway, $id, $type, hash( 'sha256', $payload ) );
-
+		$known = $this->store->status( $gateway, $eventId );
+		$this->store->receive( $gateway, $eventId, $eventType !== '' ? $eventType : 'unknown', hash( 'sha256', $payload ) );
 		return $known === self::PROCESSED ? self::DUPLICATE : self::RECORDED;
 	}
 
-	public function settle( string $gateway, string $payload, int $httpStatus ): void {
-		$event = json_decode( $payload, true );
-		if ( ! is_array( $event ) || ! is_string( $event['id'] ?? null ) ) {
-			return;
-		}
-		$this->store->mark( $gateway, $event['id'], $httpStatus >= 200 && $httpStatus < 300 ? self::PROCESSED : self::FAILED );
+	public function settle( string $gateway, string $eventId, int $httpStatus ): void {
+		$this->store->mark( $gateway, $eventId, $httpStatus >= 200 && $httpStatus < 300 ? self::PROCESSED : self::FAILED );
 	}
 }

@@ -32,15 +32,20 @@ final class StripeWebhookEndpoint {
 			return new WP_REST_Response( [ 'error' => 'signature' ], 400 );
 		}
 
+		$event = json_decode( $payload, true );
+		if ( ! is_array( $event ) ) {
+			return new WP_REST_Response( [ 'error' => 'payload' ], 400 );
+		}
 		global $wpdb;
 		$guard    = new WebhookGuard( new WpdbEventStore( $wpdb ) );
-		$decision = $guard->admit( StripeCheckoutGateway::ID, $payload, true );
+		$id       = (string) ( $event['id'] ?? '' );
+		$decision = $guard->admit( StripeCheckoutGateway::ID, $id, (string) ( $event['type'] ?? '' ), $payload, true );
 		if ( $decision === WebhookGuard::DUPLICATE ) {
 			return new WP_REST_Response( [ 'received' => 'duplicate' ], 200 );
 		}
 
-		$status = self::apply( json_decode( $payload, true ) ) ? 200 : 500;
-		$guard->settle( StripeCheckoutGateway::ID, $payload, $status );
+		$status = self::apply( $event ) ? 200 : 500;
+		$guard->settle( StripeCheckoutGateway::ID, $id, $status );
 		return new WP_REST_Response( [ 'received' => true ], $status );
 	}
 
