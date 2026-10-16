@@ -3,7 +3,7 @@
 	grid-template-columns: minmax(22rem, 30rem) minmax(0, 1fr);
 	height: 100%;
 	font-size: 14px;
-	color: #15171a;
+	color: var(--sw-contrast);
 }
 
 .sw-areas__panel {
@@ -12,7 +12,7 @@
 	gap: 1.5rem;
 	padding: 2rem;
 	overflow-y: auto;
-	border-right: 1px solid #e6e4df;
+	border-right: 1px solid var(--sw-line);
 }
 
 .sw-areas__map {
@@ -45,7 +45,7 @@
 
 .sw-areas__hint {
 	margin: 0.25rem 0;
-	color: #5f6368;
+	color: var(--sw-muted);
 }
 
 .sw-areas__list,
@@ -67,12 +67,12 @@
 	grid-template-columns: 2rem minmax(0, 1fr);
 	gap: 0.75rem;
 	padding: 1rem;
-	border: 1px solid #e6e4df;
-	border-radius: 12px;
+	border: 1px solid var(--sw-line);
+	border-radius: var(--sw-radius);
 
 	&.is-highlighted {
-		border-color: #15171a;
-		box-shadow: 0 0 0 1px #15171a;
+		border-color: var(--sw-contrast);
+		box-shadow: 0 0 0 1px var(--sw-contrast);
 	}
 }
 
@@ -98,7 +98,7 @@
 	margin: 0 0 0.75rem;
 
 	dt {
-		color: #5f6368;
+		color: var(--sw-muted);
 	}
 
 	dd {
@@ -130,25 +130,25 @@
 
 .sw-areas__test {
 	padding: 1rem;
-	border-radius: 12px;
-	background: #f6f5f2;
+	border-radius: var(--sw-radius);
+	background: var(--sw-accent-soft);
 }
 
 .sw-areas__answer {
 	margin-top: 0.75rem;
 	padding-left: 0.75rem;
-	border-left: 3px solid #5f6368;
+	border-left: 3px solid var(--sw-muted);
 
 	&.is-deliverable {
-		border-color: #0f5c4d;
+		border-color: var(--sw-accent);
 	}
 
 	&.is-undeliverable {
-		border-color: #d63638;
+		border-color: var(--sw-sale);
 	}
 
 	&.is-approximate {
-		border-color: #b4541a;
+		border-color: var(--sw-muted);
 	}
 }
 
@@ -167,8 +167,8 @@
 	gap: 0.75rem;
 	margin: 0;
 	padding: 1rem;
-	border: 1px solid #e6e4df;
-	border-radius: 12px;
+	border: 1px solid var(--sw-line);
+	border-radius: var(--sw-radius);
 }
 
 .sw-areas__legend {
@@ -180,7 +180,7 @@
 	display: grid;
 	gap: 0.5rem;
 	padding-bottom: 0.75rem;
-	border-bottom: 1px solid #e6e4df;
+	border-bottom: 1px solid var(--sw-line);
 	justify-items: start;
 
 	> .components-base-control {
@@ -189,7 +189,7 @@
 }
 
 .sw-areas__handle {
-	border: 2px solid #d63638;
+	border: 2px solid var(--sw-sale);
 	border-radius: 50%;
 	background: #fff;
 }

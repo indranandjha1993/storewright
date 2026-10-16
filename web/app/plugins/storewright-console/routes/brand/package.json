@@ -1,0 +1,8 @@
+{
+  "name": "storewright-console-brand",
+  "private": true,
+  "route": {
+    "path": "/brand",
+    "page": "storewright"
+  }
+}

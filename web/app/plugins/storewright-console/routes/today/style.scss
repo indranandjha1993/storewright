@@ -2,12 +2,12 @@
 	max-width: 64rem;
 	padding: 2rem;
 	font-size: 14px;
-	color: #15171a;
+	color: var(--sw-contrast);
 }
 
 .sw-today__store {
 	margin: 0;
-	color: #5f6368;
+	color: var(--sw-muted);
 }
 
 .sw-today__title {
@@ -29,14 +29,14 @@
 	display: grid;
 	gap: 0.25rem;
 	padding: 1.25rem;
-	border: 1px solid #e6e4df;
-	border-radius: 12px;
+	border: 1px solid var(--sw-line);
+	border-radius: var(--sw-radius);
 	color: inherit;
 	text-decoration: none;
 
 	&:hover,
 	&:focus-visible {
-		border-color: #0f5c4d;
+		border-color: var(--sw-accent);
 	}
 }
 
@@ -47,5 +47,5 @@
 }
 
 .sw-today__label {
-	color: #5f6368;
+	color: var(--sw-muted);
 }

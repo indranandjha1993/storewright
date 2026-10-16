@@ -23,13 +23,20 @@ export const stage = () => {
 	const [ view, setView ] = useState( null );
 
 	useEffect( () => {
+		let current = true;
 		loadAreas()
 			.then( ( data ) => {
+				if ( ! current ) {
+					return;
+				}
 				setAreas( data.areas );
 				setPlaces( data.places );
 				setView( viewOf( data.areas.map( ( area ) => area.shape ) ) );
 			} )
-			.catch( ( failure ) => setError( failure.message ) );
+			.catch( ( failure ) => current && setError( failure.message ) );
+		return () => {
+			current = false;
+		};
 	}, [] );
 
 	const colours = useMemo( () => ( areas ?? [] ).map( ( area, index ) => COLOURS[ index % COLOURS.length ] ), [ areas ] );

@@ -39,6 +39,7 @@ final class Console {
 	public static function menuItems(): void {
 		self::generated( 'storewright_console_register_storewright_menu_item', 'today', __( 'Today', 'storewright' ), '/' );
 		self::generated( 'storewright_console_register_storewright_menu_item', 'areas', __( 'Delivery areas', 'storewright' ), '/areas' );
+		self::generated( 'storewright_console_register_storewright_menu_item', 'brand', __( 'Brand', 'storewright' ), '/brand' );
 	}
 
 	public static function page(): void {
