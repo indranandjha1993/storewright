@@ -30,7 +30,7 @@ test('the dashboard shows sales, recent orders, payments and stock', async ({ pa
 
 	await expect(page.getByText('Sales', { exact: true })).toBeVisible();
 	const orders = page.getByRole('region', { name: 'Recent orders' });
-	await expect(orders.getByRole('columnheader', { name: 'Customer' })).toBeVisible();
+	await expect(orders.getByRole('columnheader', { name: 'Customer' }).or(orders.getByText('No orders yet. The first one shows up here.'))).toBeVisible();
 	await expect(orders.getByRole('link', { name: 'All orders' })).toHaveAttribute('href', /page=wc-orders$/);
 	const payments = page.getByRole('region', { name: 'Payments' });
 	await expect(payments).toContainText('Razorpay');

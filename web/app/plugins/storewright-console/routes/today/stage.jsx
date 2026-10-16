@@ -2,7 +2,7 @@ import { Button, Notice, Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { adminLink, consoleData } from '../../lib/data';
-import { count, money, shortDate, timeAgo } from '../../lib/format';
+import { count, localDate, money, shortDate, timeAgo } from '../../lib/format';
 import { loadDashboard } from './api';
 import './style.scss';
 
@@ -57,15 +57,22 @@ function Kpi( { label, value, now, before } ) {
 	);
 }
 
-function Chart( { intervals } ) {
-	const bars = [ ...intervals ].reverse();
-	const peak = Math.max( 1, ...bars.map( ( bar ) => bar.subtotals.total_sales ) );
+function Chart( { range, intervals } ) {
+	const sales = Object.fromEntries( intervals.map( ( bar ) => [ bar.interval, bar.subtotals.total_sales ] ) );
+	const bars = [];
+	const day = new Date( range.after );
+	for ( let i = 0; i < range.days; i++ ) {
+		const key = localDate( day );
+		bars.push( { key, date: new Date( day ), total: sales[ key ] ?? 0 } );
+		day.setDate( day.getDate() + 1 );
+	}
+	const peak = Math.max( 1, ...bars.map( ( bar ) => bar.total ) );
 	return (
 		<div className="sw-dash__chart" role="img" aria-label={ __( 'Sales by day', 'storewright' ) }>
 			{ bars.map( ( bar ) => (
-				<div className="sw-dash__bar" key={ bar.interval } title={ `${ shortDate( bar.date_start ) }: ${ money( bar.subtotals.total_sales ) }` }>
-					<span className="sw-dash__bar-fill" style={ { height: `${ Math.max( 2, ( bar.subtotals.total_sales / peak ) * 100 ) }%` } } />
-					{ bars.length <= 7 && <span className="sw-dash__bar-label">{ shortDate( bar.date_start ) }</span> }
+				<div className="sw-dash__bar" key={ bar.key } title={ `${ shortDate( bar.date ) }: ${ money( bar.total ) }` }>
+					<span className="sw-dash__bar-fill" style={ { height: `${ Math.max( 2, ( bar.total / peak ) * 100 ) }%` } } />
+					{ bars.length <= 7 && <span className="sw-dash__bar-label">{ shortDate( bar.date ) }</span> }
 				</div>
 			) ) }
 		</div>
@@ -248,7 +255,7 @@ export const stage = () => {
 						/>
 						<Kpi label={ __( 'Refunds', 'storewright' ) } value={ money( data.now.totals.refunds ?? 0 ) } now={ data.now.totals.refunds ?? 0 } before={ data.before.totals.refunds ?? 0 } />
 					</div>
-					{ data.range.days > 1 && <Chart intervals={ data.now.intervals } /> }
+					{ data.range.days > 1 && <Chart range={ data.range } intervals={ data.now.intervals } /> }
 					<ul className="sw-dash__queues">
 						{ queues.map( ( queue ) => (
 							<li key={ queue.status }>
