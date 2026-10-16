@@ -53,7 +53,7 @@ test('one save restyles the storefront, sign-in page, console and emails', async
 	await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#7a1f5c');
 
 	await page.context().clearCookies();
-	await page.goto('/wp/wp-login.php');
+	await page.goto('/sign-in/');
 	await expect(page.locator('#wp-submit')).toHaveCSS('background-color', 'rgb(122, 31, 92)');
 
 	expect(wp('option', 'get', 'woocommerce_email_base_color')).toBe('#7a1f5c');

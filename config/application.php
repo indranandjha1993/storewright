@@ -49,6 +49,7 @@ Config::define('WP_REDIS_HOST', env('REDIS_HOST') ?: 'cache');
 Config::define('WP_CACHE_KEY_SALT', env('WP_HOME'));
 
 Config::define('AUTOMATIC_UPDATER_DISABLED', true);
+Config::define('STOREWRIGHT_LOGIN_PATH', env('LOGIN_PATH') ?: 'sign-in');
 Config::define('DISALLOW_FILE_EDIT', true);
 Config::define('DISALLOW_FILE_MODS', true);
 Config::define('DISABLE_WP_CRON', env('DISABLE_WP_CRON') ?? true);

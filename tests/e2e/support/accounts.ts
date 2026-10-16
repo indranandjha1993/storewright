@@ -16,9 +16,9 @@ export function account(login: string, role: string, name: string): Account {
 }
 
 export async function logIn(page: Page, who: Account) {
-	await page.goto('/wp/wp-login.php');
+	await page.goto('/sign-in/');
 	await page.getByLabel('Username or Email Address').fill(who.email);
 	await page.getByLabel('Password', { exact: true }).fill(who.password);
 	await page.getByRole('button', { name: 'Log In' }).click();
-	await page.waitForURL((url) => !url.pathname.endsWith('/wp-login.php'));
+	await page.waitForURL((url) => !url.pathname.includes('/sign-in'));
 }

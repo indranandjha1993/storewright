@@ -71,6 +71,16 @@ How areas, shapes and the PIN directory work is in [docs/delivery.md](docs/deliv
 
 Keys, webhooks and local testing for Razorpay and Stripe are in [docs/payments.md](docs/payments.md).
 
+## Content
+
+About, Contact, Shipping and returns, Terms, Privacy and a Journal come seeded and ready to edit.
+See [docs/content.md](docs/content.md).
+
+## Security
+
+Staff sign in at `/sign-in/`; the usual WordPress probes answer 404 and the usual fingerprints
+are not printed. See [docs/security.md](docs/security.md).
+
 ## Branding
 
 Name, logo, colours, typefaces and corners are set once in the console and reach the storefront,

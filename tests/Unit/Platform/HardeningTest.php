@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace Storewright\Tests\Unit\Platform;
 
+use Brain\Monkey\Functions;
 use Storewright\Platform\Hardening;
 use Storewright\Tests\TestCase;
 
 final class HardeningTest extends TestCase {
+
+	protected function setUp(): void {
+		parent::setUp();
+		Functions\when( 'is_ssl' )->justReturn( false );
+	}
 
 	public function test_headers_drop_pingback_and_add_browser_protections(): void {
 		$headers = Hardening::headers(

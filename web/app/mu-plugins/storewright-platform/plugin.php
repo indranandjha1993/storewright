@@ -21,6 +21,8 @@ const VERSION = '0.1.0';
 
 Health::register();
 Hardening::register();
+LoginPath::register();
+LoginThrottle::register();
 Mail::register();
 GatewayCredentials::register();
 HttpCertificates::register();
