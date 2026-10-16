@@ -6,7 +6,7 @@ namespace Storewright\Core;
 
 final class Schema {
 
-	public const VERSION = '2';
+	public const VERSION = '3';
 	private const OPTION = 'storewright_schema_version';
 
 	public static function register(): void {
@@ -46,6 +46,18 @@ final class Schema {
   shape longtext NOT NULL,
   updated_at datetime NOT NULL,
   PRIMARY KEY  (zone_id)
+) {$charset};"
+		);
+		dbDelta(
+			"CREATE TABLE {$wpdb->prefix}storewright_pincodes (
+  pin char(6) NOT NULL,
+  district varchar(100) NOT NULL,
+  state varchar(10) NOT NULL,
+  lat decimal(9,6) NULL,
+  lng decimal(9,6) NULL,
+  offices smallint(5) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY  (pin),
+  KEY lat_lng (lat, lng)
 ) {$charset};"
 		);
 		update_option( self::OPTION, self::VERSION, false );

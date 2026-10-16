@@ -56,6 +56,7 @@ add_action(
 			\WP_CLI::add_command( 'storewright setup', Cli\SetupCommand::class );
 			\WP_CLI::add_command( 'storewright area', Cli\AreaCommand::class );
 			\WP_CLI::add_command( 'storewright deliver', Cli\DeliverCommand::class );
+			\WP_CLI::add_command( 'storewright pins', Cli\PinsCommand::class );
 		}
 	}
 );

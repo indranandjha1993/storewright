@@ -29,6 +29,9 @@ install: .env vendor/autoload.php ## install wordpress, activate woocommerce and
 seed: .env ## demo catalogue, coupon and customers
 	$(RUN) wp storewright seed
 
+pins: .env ## download the India Post PIN directory and import it
+	$(RUN) sh -c 'curl -fsSL "$${PINS_SOURCE_URL:-https://raw.githubusercontent.com/dropdevrahul/pincodes-india/master/pincode.csv}" -o /tmp/pincode.csv && wp storewright pins import /tmp/pincode.csv'
+
 down: ## stop the stack, keep data
 	$(COMPOSE) down
 
