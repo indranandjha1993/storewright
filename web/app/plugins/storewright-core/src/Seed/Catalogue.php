@@ -22,11 +22,12 @@ final class Catalogue {
 
 	public function run(): array {
 		$categories = [
-			'apparel'  => $this->category( 'Apparel', 'apparel' ),
-			'desk'     => $this->category( 'Kitchen and Desk', 'kitchen-and-desk' ),
-			'books'    => $this->category( 'Books', 'books' ),
-			'software' => $this->category( 'Software', 'software' ),
+			'apparel'  => $this->category( 'Apparel', 'apparel', 'Everyday basics' ),
+			'desk'     => $this->category( 'Kitchen and Desk', 'kitchen-and-desk', 'Mugs, notebooks and the small things' ),
+			'books'    => $this->category( 'Books', 'books', 'Short guides you can read tonight' ),
+			'software' => $this->category( 'Software', 'software', 'Icons and templates, delivered instantly' ),
 		];
+		$this->hero();
 
 		$this->variable(
 			'SW-TEE',
@@ -82,13 +83,45 @@ final class Catalogue {
 		];
 	}
 
-	private function category( string $name, string $slug ): int {
-		$term = get_term_by( 'slug', $slug, 'product_cat' );
-		if ( $term ) {
-			return (int) $term->term_id;
+	private function category( string $name, string $slug, string $description ): int {
+		$term    = get_term_by( 'slug', $slug, 'product_cat' );
+		$created = $term ? [ 'term_id' => $term->term_id ] : wp_insert_term(
+			$name,
+			'product_cat',
+			[
+				'slug'        => $slug,
+				'description' => $description,
+			]
+		);
+		if ( is_wp_error( $created ) ) {
+			return 0;
 		}
-		$created = wp_insert_term( $name, 'product_cat', [ 'slug' => $slug ] );
-		return is_wp_error( $created ) ? 0 : (int) $created['term_id'];
+		$id = (int) $created['term_id'];
+		if ( $term && $term->description === '' ) {
+			wp_update_term( $id, 'product_cat', [ 'description' => $description ] );
+		}
+		$key = array_search(
+			$slug,
+			[
+				'apparel'  => 'apparel',
+				'desk'     => 'kitchen-and-desk',
+				'books'    => 'books',
+				'software' => 'software',
+			],
+			true
+		);
+		if ( $key && ! get_post( (int) get_term_meta( $id, 'thumbnail_id', true ) ) ) {
+			update_term_meta( $id, 'thumbnail_id', $this->media->image( "{$name} category", '#dfdfdc', Photos::url( (string) $key ), Photos::credit( (string) $key ) ) );
+		}
+		return $id;
+	}
+
+	private function hero(): void {
+		if ( get_post( (int) get_option( 'storewright_hero_image' ) ) ) {
+			return;
+		}
+		update_option( 'storewright_hero_image', $this->media->image( 'Home hero', '#dae4e0', Photos::url( 'hero' ), Photos::credit( 'hero' ) ) );
+		add_option( 'storewright_announcement', __( 'Free delivery on orders over 999. Same-day in Bengaluru.', 'storewright' ) );
 	}
 
 	private function simple( string $sku, string $name, string $description, int $price, int $category, string $colour, array $shipping ): void {
