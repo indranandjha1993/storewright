@@ -1,0 +1,67 @@
+# Storewright
+
+Storewright is an online store platform built on WordPress and WooCommerce. It sells physical
+and digital products, takes payment through Stripe and Razorpay, tracks shipments through to
+delivery, and replaces the stock WordPress dashboard with an operator console built for running
+a shop. Everything ships as one Docker image, so the store you run locally is the store you
+deploy.
+
+## Status
+
+Early development. The repository currently holds the project layout, licensing and
+contribution guidelines. The first milestone is a running store with a completed Stripe test
+order; progress is recorded in [CHANGELOG.md](CHANGELOG.md).
+
+## What it will do
+
+- Physical, digital and mixed orders from one catalogue, with secure downloads and stock.
+- Stripe for cards, Apple Pay, Google Pay and Link; Razorpay for UPI, cards, netbanking,
+  wallets, EMI and cash on delivery. The gateway is picked by currency and country.
+- Shipments built on WooCommerce fulfillments, with carrier integrations (manual, Shiprocket,
+  Delhivery first), a tracking page for the customer and delivery notifications.
+- An operator console: dashboard, orders, fulfillments, products, customers, payments and
+  settings, with a setup wizard for a new store. wp-admin stays available for the rare case.
+- Invoices with GST support for India, coupons, reviews, wishlists, search and customer accounts.
+- A block theme that is the store's design system, extended through the WooCommerce
+  checkout and Store APIs rather than template overrides.
+
+## How it is built
+
+```
+web/app/plugins/storewright-core/         payments, fulfillments, carriers, invoices, settings, REST
+web/app/plugins/storewright-console/      the operator console (React, @wordpress/boot, dataviews)
+web/app/mu-plugins/storewright-platform/  always-on: branding, hardening, health, migrations
+web/app/themes/storewright/               block theme
+docker/                                   image build, nginx and php configuration
+deploy/                                   compose file and script for a server
+```
+
+WordPress core, WooCommerce and the two gateway plugins are installed by Composer and pinned
+in `composer.lock`. Nothing under `web/wp` or `vendor` is tracked. Uploads live in a volume.
+
+Targets: WordPress 7.1, WooCommerce 11.2, PHP 8.3 or newer, MariaDB 11, Redis 7.
+
+## Running it locally
+
+Requires Docker. Once the first milestone lands:
+
+```
+make up        # start php, nginx, mariadb, redis and mailpit
+make install   # install WordPress and WooCommerce, create the admin user
+make seed      # demo catalogue with physical and digital products
+```
+
+The store answers on `http://localhost:8080` and caught email on `http://localhost:8025`.
+
+## Deploying
+
+One server per store. `deploy/` holds a compose file and a script that pulls a tagged image,
+runs migrations and restarts, with rollback and backups. Details land with the first release.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Security issues go through [SECURITY.md](SECURITY.md).
+
+## License
+
+GPL-2.0-or-later, the same as WordPress. See [LICENSE](LICENSE).

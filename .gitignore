@@ -1,0 +1,30 @@
+# Local research never leaves this machine
+research/
+
+# WordPress runtime: core and third-party code come from Composer, only our own code is tracked
+/web/wp/
+/web/app/uploads/
+/web/app/upgrade/
+/web/app/cache/
+/web/app/plugins/*
+!/web/app/plugins/storewright-*/
+/web/app/themes/*
+!/web/app/themes/storewright/
+/web/app/mu-plugins/*
+!/web/app/mu-plugins/storewright-*/
+/web/.htaccess
+
+# Dependencies and build output
+vendor/
+node_modules/
+build/
+dist/
+*.zip
+*.log
+
+# Local env
+.env
+.env.*
+!.env.example
+*.sql
+*.sql.gz
