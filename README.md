@@ -71,6 +71,10 @@ How areas, shapes and the PIN directory work is in [docs/delivery.md](docs/deliv
 
 Keys, webhooks and local testing for Razorpay and Stripe are in [docs/payments.md](docs/payments.md).
 
+## White label
+
+What staff see in place of WordPress and WooCommerce is in [docs/white-label.md](docs/white-label.md).
+
 ## Deploying
 
 One server per store. `deploy/` holds a compose file and a script that pulls a tagged image,
