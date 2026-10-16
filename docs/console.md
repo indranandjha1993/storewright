@@ -22,7 +22,9 @@ so a deployment needs nothing extra.
 
 ## Screens
 
-- **Today** (`/`): orders to fulfil, awaiting payment and on hold, each linking to the order list.
+- **Today** (`/`): sales, orders, average order and refunds for today, the last 7 or 30 days
+  against the period before, a sales chart, the queues to fulfil, awaiting payment and on hold,
+  recent orders, payment gateway health from the webhook log, low stock and best sellers.
 - **Brand** (`/brand`): name, logo, colours, typefaces and corners for every surface, with a live
   preview. See [branding.md](branding.md).
 - **Delivery areas** (`/areas`): the delivery areas in the order addresses are checked, an editor
