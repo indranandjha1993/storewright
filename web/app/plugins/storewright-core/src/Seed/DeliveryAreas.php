@@ -16,7 +16,9 @@ final class DeliveryAreas {
 	public const SAME_DAY = 'Bengaluru same-day';
 
 	public function run(): int {
-		$zone    = $this->find( self::SAME_DAY ) ?? $this->create();
+		$zone = $this->find( self::SAME_DAY ) ?? $this->create();
+		$zone->set_zone_order( 0 );
+		$zone->save();
 		$country = $this->find( StoreDefaults::ZONE );
 		if ( $country ) {
 			$country->set_zone_order( 1 );
@@ -30,7 +32,6 @@ final class DeliveryAreas {
 	private function create(): WC_Shipping_Zone {
 		$zone = new WC_Shipping_Zone();
 		$zone->set_zone_name( self::SAME_DAY );
-		$zone->set_zone_order( 0 );
 		$zone->add_location( 'IN', 'country' );
 		$zone->add_location( '560*', 'postcode' );
 		$zone->save();
