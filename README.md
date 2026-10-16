@@ -1,5 +1,7 @@
 # Storewright
 
+[![ci](https://github.com/indranandjha1993/storewright/actions/workflows/ci.yml/badge.svg)](https://github.com/indranandjha1993/storewright/actions/workflows/ci.yml)
+
 Storewright is an online store platform built on WordPress and WooCommerce. It sells physical
 and digital products, takes payment through Stripe and Razorpay, tracks shipments through to
 delivery, and replaces the stock WordPress dashboard with an operator console built for running
@@ -8,9 +10,9 @@ deploy.
 
 ## Status
 
-Early development. The repository currently holds the project layout, licensing and
-contribution guidelines. The first milestone is a running store with a completed Stripe test
-order; progress is recorded in [CHANGELOG.md](CHANGELOG.md).
+Early development. `make up && make install && make seed` gives a running store with WooCommerce,
+both gateways, the Storewright theme and a demo catalogue. The first milestone closes with a
+completed Stripe test order; progress is recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ## What it will do
 
@@ -43,12 +45,14 @@ Targets: WordPress 7.1, WooCommerce 11.2, PHP 8.3 or newer, MariaDB 11, Redis 7.
 
 ## Running it locally
 
-Requires Docker. Once the first milestone lands:
+Requires Docker.
 
 ```
-make up        # start php, nginx, mariadb, redis and mailpit
-make install   # install WordPress and WooCommerce, create the admin user
-make seed      # demo catalogue with physical and digital products
+cp .env.example .env   # then set the salts and an admin password
+make up                # start php, nginx, mariadb, redis and mailpit
+make install           # install WordPress and WooCommerce, create the admin user
+make seed              # demo catalogue with physical and digital products
+make lint test         # what CI runs on the php
 ```
 
 The store answers on `http://localhost:8600`, caught email on `http://localhost:8601`, and the
