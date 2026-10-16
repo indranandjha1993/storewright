@@ -1,12 +1,8 @@
-import { execFileSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import type { Page } from '@playwright/test';
+import { wp } from './wp';
 
 export type Account = { email: string; password: string };
-
-function wp(...args: string[]) {
-	execFileSync('docker', ['compose', '--progress', 'quiet', 'run', '--rm', 'cli', 'wp', ...args], { stdio: 'pipe' });
-}
 
 export function account(login: string, role: string, name: string): Account {
 	const email = `${login}@example.com`;
