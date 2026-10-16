@@ -6,6 +6,7 @@ namespace Storewright\Core\Cli;
 
 use Storewright\Core\Seed\Catalogue;
 use Storewright\Core\Seed\Customers;
+use Storewright\Core\Seed\DeliveryAreas;
 use WP_CLI;
 
 final class SeedCommand {
@@ -16,9 +17,10 @@ final class SeedCommand {
 		}
 		$catalogue = ( new Catalogue() )->run();
 		$customers = ( new Customers() )->run();
+		( new DeliveryAreas() )->run();
 		WP_CLI::success(
 			sprintf(
-				'%d categories, %d products, %d coupon(s), %d customers in place.',
+				'%d categories, %d products, %d coupon(s), %d customers and a same-day area in place.',
 				$catalogue['categories'],
 				$catalogue['products'],
 				$catalogue['coupons'],
