@@ -7,16 +7,18 @@ namespace Storewright\Core\Seed;
 final class Photos {
 
 	private const PEXELS = [
-		'SW-TEE'   => [ 12025472, 'Mr Mockup' ],
-		'SW-MUG'   => [ 29783602, 'Brunxs' ],
-		'SW-NOTE'  => [ 8059127, 'Eva Bronzini' ],
-		'SW-EBOOK' => [ 31145642, 'Leticia Alvares' ],
-		'SW-ICONS' => [ 6614748, 'Tima Miroshnichenko' ],
-		'apparel'  => [ 12025472, 'Mr Mockup' ],
-		'desk'     => [ 7319184, 'Angela Roma' ],
-		'books'    => [ 6963777, 'Cup of Couple' ],
-		'software' => [ 6614748, 'Tima Miroshnichenko' ],
-		'hero'     => [ 8092417, 'Karola G.' ],
+		'SW-TEE'        => [ 12025472, 'Mr Mockup' ],
+		'SW-MUG'        => [ 29783602, 'Brunxs' ],
+		'SW-NOTE'       => [ 8059127, 'Eva Bronzini' ],
+		'SW-EBOOK'      => [ 31145642, 'Leticia Alvares' ],
+		'SW-ICONS'      => [ 6614748, 'Tima Miroshnichenko' ],
+		'apparel'       => [ 12025472, 'Mr Mockup' ],
+		'desk'          => [ 7319184, 'Angela Roma' ],
+		'books'         => [ 6963777, 'Cup of Couple' ],
+		'software'      => [ 6614748, 'Tima Miroshnichenko' ],
+		'hero'          => [ 8092417, 'Karola G.' ],
+		'post-choosing' => [ 6805516, 'Karola G.' ],
+		'post-care'     => [ 4065905, 'cottonbro studio' ],
 	];
 
 	public static function url( string $key ): string {
