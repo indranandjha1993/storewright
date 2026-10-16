@@ -43,7 +43,11 @@ final class GatewayCredentials {
 	}
 
 	public static function razorpay( mixed $settings ): array {
-		return self::enableWhenConfigured( self::merge( $settings, self::razorpayMap() ), [ 'key_id', 'key_secret' ], [ 'enabled' => 'yes' ] );
+		$settings = self::merge( $settings, self::razorpayMap() ) + [
+			'key_id'     => '',
+			'key_secret' => '',
+		];
+		return self::enableWhenConfigured( $settings, [ 'key_id', 'key_secret' ], [ 'enabled' => 'yes' ] );
 	}
 
 	public static function enableWhenConfigured( array $settings, array $required, array $defaults ): array {
