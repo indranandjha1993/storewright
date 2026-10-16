@@ -8,7 +8,7 @@ use ZipArchive;
 
 final class Media {
 
-	public function image( string $title, string $colour ): int {
+	public function image( string $title, string $colour, string $url = '', string $credit = '' ): int {
 		$existing = get_posts(
 			[
 				'post_type'      => 'attachment',
@@ -20,16 +20,22 @@ final class Media {
 		if ( $existing ) {
 			return (int) $existing[0];
 		}
-		$path = wp_tempnam( $title . '.png' );
-		$this->paint( $path, $title, $colour );
-		$id = media_handle_sideload(
-			[
+		$photo = $url !== '' ? download_url( $url, 30 ) : null;
+		if ( is_string( $photo ) ) {
+			$file = [
+				'name'     => sanitize_title( $title ) . '.jpg',
+				'tmp_name' => $photo,
+			];
+		} else {
+			$path = wp_tempnam( $title . '.png' );
+			$this->paint( $path, $title, $colour );
+			$file   = [
 				'name'     => sanitize_title( $title ) . '.png',
 				'tmp_name' => $path,
-			],
-			0,
-			$title
-		);
+			];
+			$credit = '';
+		}
+		$id = media_handle_sideload( $file, 0, $title, [ 'post_excerpt' => $credit ] );
 		return is_wp_error( $id ) ? 0 : (int) $id;
 	}
 

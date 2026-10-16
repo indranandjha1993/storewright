@@ -52,7 +52,7 @@ Requires Docker.
 cp .env.example .env   # then set the salts and an admin password
 make up                # start php, nginx, mariadb, redis and mailpit
 make install           # install WordPress and WooCommerce, create the admin user
-make seed              # demo catalogue with physical and digital products
+make seed              # demo catalogue with physical and digital products, photos from Pexels
 make lint test         # what CI runs on the php
 make e2e               # browser tests in a visible Chrome window
 make stripe-listen     # forward Stripe sandbox webhooks to /wp-json/storewright/v1/webhooks/stripe

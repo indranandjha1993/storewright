@@ -93,6 +93,7 @@ final class Catalogue {
 
 	private function simple( string $sku, string $name, string $description, int $price, int $category, string $colour, array $shipping ): void {
 		if ( $this->restock( $sku, $shipping['stock'] ) ) {
+			$this->picture( $sku, $name, $colour );
 			return;
 		}
 		$product = new WC_Product_Simple();
@@ -108,6 +109,7 @@ final class Catalogue {
 
 	private function digital( string $sku, string $name, string $description, int $price, int $category, string $colour, string $fileName, string $path ): void {
 		if ( wc_get_product_id_by_sku( $sku ) ) {
+			$this->picture( $sku, $name, $colour );
 			return;
 		}
 		$product = new WC_Product_Simple();
@@ -127,6 +129,15 @@ final class Catalogue {
 		$product->save();
 	}
 
+	private function picture( string $sku, string $name, string $colour ): void {
+		$product = wc_get_product( wc_get_product_id_by_sku( $sku ) );
+		if ( ! $product || get_post( (int) $product->get_image_id() ) ) {
+			return;
+		}
+		$product->set_image_id( $this->media->image( $name, $colour, Photos::url( $sku ), Photos::credit( $sku ) ) );
+		$product->save();
+	}
+
 	private function restock( string $sku, int $quantity ): bool {
 		$id = wc_get_product_id_by_sku( $sku );
 		if ( ! $id ) {
@@ -142,6 +153,7 @@ final class Catalogue {
 			foreach ( wc_get_product( $existing )->get_children() as $variation ) {
 				wc_update_product_stock( $variation, self::VARIATION_STOCK );
 			}
+			$this->picture( $sku, $name, $colour );
 			return;
 		}
 		$product = new WC_Product_Variable();
@@ -183,7 +195,7 @@ final class Catalogue {
 		$product->set_short_description( wp_trim_words( $description, 12 ) );
 		$product->set_status( 'publish' );
 		$product->set_category_ids( [ $category ] );
-		$product->set_image_id( $this->media->image( $name, $colour ) );
+		$product->set_image_id( $this->media->image( $name, $colour, Photos::url( $sku ), Photos::credit( $sku ) ) );
 	}
 
 	private function combinations( array $options ): array {
