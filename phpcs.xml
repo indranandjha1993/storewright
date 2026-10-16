@@ -43,6 +43,11 @@
 			<property name="text_domain" type="array"><element value="storewright"/></property>
 		</properties>
 	</rule>
+	<rule ref="WordPress.WP.Capabilities">
+		<properties>
+			<property name="custom_capabilities" type="array"><element value="manage_woocommerce"/></property>
+		</properties>
+	</rule>
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array"><element value="storewright"/><element value="Storewright"/></property>

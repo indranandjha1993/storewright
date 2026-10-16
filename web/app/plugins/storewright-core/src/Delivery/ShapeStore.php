@@ -37,9 +37,16 @@ final class ShapeStore {
 			],
 			[ '%d', '%s', '%s' ]
 		);
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
 	}
 
 	public function clear( int $zoneId ): void {
 		$this->db->delete( $this->table, [ 'zone_id' => $zoneId ], [ '%d' ] );
+		\WC_Cache_Helper::get_transient_version( 'shipping', true );
+	}
+
+	public static function zoneDeleted( int $zoneId ): void {
+		global $wpdb;
+		( new self( $wpdb ) )->clear( $zoneId );
 	}
 }

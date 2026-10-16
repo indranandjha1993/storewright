@@ -8,27 +8,31 @@ final class ShopperCheck {
 
 	public const PIN_PATTERN = '/^[1-8][0-9]{5}$/';
 
-	public static function byPin( string $pin ): array {
+	public static function byPin( string $pin, bool $remember = true ): array {
 		$pin = preg_replace( '/\D/', '', $pin );
 		if ( ! preg_match( self::PIN_PATTERN, (string) $pin ) ) {
 			return self::result( 'invalid', (string) $pin, null, null );
 		}
 		global $wpdb;
 		$entry = ( new Pincodes( $wpdb ) )->find( (string) $pin );
-		self::remember( (string) $pin, $entry, null );
+		if ( $remember ) {
+			self::remember( (string) $pin, $entry, null );
+		}
 		if ( $entry === null ) {
 			return self::result( 'unknown', (string) $pin, null, null );
 		}
 		return self::result( 'found', (string) $pin, $entry, DeliveryCheck::forShopper( new Address( 'IN', $entry['state'], (string) $pin ), null ) );
 	}
 
-	public static function byPoint( Point $point ): array {
+	public static function byPoint( Point $point, bool $remember = true ): array {
 		global $wpdb;
 		$entry = ( new Pincodes( $wpdb ) )->nearest( $point );
 		if ( $entry === null ) {
 			return self::result( 'unknown', '', null, null );
 		}
-		self::remember( $entry['pin'], $entry, $point );
+		if ( $remember ) {
+			self::remember( $entry['pin'], $entry, $point );
+		}
 		return self::result( 'found', $entry['pin'], $entry, DeliveryCheck::forShopper( new Address( 'IN', $entry['state'], $entry['pin'] ), $point ) );
 	}
 
@@ -75,6 +79,8 @@ final class ShopperCheck {
 			'district' => $entry['district'] ?? '',
 			'status'   => $answer ? $answer->status : Answer::UNDELIVERABLE,
 			'area'     => $answer?->zone?->name,
+			'areaId'   => $answer?->zone?->id,
+			'point'    => isset( $entry['point'] ) ? [ $entry['point']->lat, $entry['point']->lng ] : null,
 			'message'  => Messages::forShopper( $lookup, $pin, (string) ( $entry['district'] ?? '' ), $answer ),
 		];
 	}
