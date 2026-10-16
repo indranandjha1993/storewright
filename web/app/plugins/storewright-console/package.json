@@ -1,0 +1,30 @@
+{
+  "name": "storewright-console",
+  "version": "0.1.0",
+  "private": true,
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "build": "wp-build",
+    "dev": "wp-build --watch"
+  },
+  "wpPlugin": {
+    "name": "storewright_console",
+    "scriptGlobal": false,
+    "packageNamespace": "storewright-console",
+    "handlePrefix": "storewright-console",
+    "pages": [
+      {
+        "id": "storewright",
+        "capability": "manage_woocommerce"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@wordpress/api-fetch": "7.56.0",
+    "@wordpress/build": "0.24.0",
+    "@wordpress/components": "41.0.0",
+    "@wordpress/element": "8.8.0",
+    "@wordpress/i18n": "6.29.0",
+    "@wordpress/url": "4.56.0"
+  }
+}

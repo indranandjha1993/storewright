@@ -16,7 +16,7 @@ if ! wp core is-installed >/dev/null 2>&1; then
     --admin_email="$ADMIN_EMAIL" --admin_password="$ADMIN_PASSWORD" --skip-email
 fi
 
-wp plugin activate woocommerce woo-razorpay storewright-core
+wp plugin activate woocommerce woo-razorpay storewright-core storewright-console
 wp theme activate storewright
 wp rewrite structure '/%postname%/' --hard
 wp wc hpos enable

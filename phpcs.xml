@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <ruleset name="Storewright">
 	<file>web/app/plugins/storewright-core</file>
+	<file>web/app/plugins/storewright-console/storewright-console.php</file>
+	<file>web/app/plugins/storewright-console/src</file>
 	<file>web/app/mu-plugins/storewright-platform</file>
 	<file>web/app/mu-plugins/storewright-platform.php</file>
 	<file>web/app/themes/storewright</file>
