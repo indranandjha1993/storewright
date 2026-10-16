@@ -11,7 +11,7 @@ research/
 /web/app/themes/*
 !/web/app/themes/storewright/
 /web/app/mu-plugins/*
-!/web/app/mu-plugins/storewright-*/
+!/web/app/mu-plugins/storewright-*
 /web/.htaccess
 
 # Dependencies and build output

@@ -20,11 +20,13 @@ WORKDIR /var/www/html
 COPY --from=vendor /build/vendor ./vendor
 COPY --from=vendor /build/web/wp ./web/wp
 COPY --from=vendor /build/web/app/plugins ./web/app/plugins
-COPY --from=vendor /build/web/app/themes ./web/app/themes
+COPY web/app/plugins/storewright-core ./web/app/plugins/storewright-core
+COPY web/app/mu-plugins ./web/app/mu-plugins
+COPY web/app/themes/storewright ./web/app/themes/storewright
 COPY config ./config
 COPY web/index.php web/wp-config.php ./web/
 COPY wp-cli.yml ./
-RUN mkdir -p web/app/uploads web/app/mu-plugins && chown -R www-data:www-data web/app/uploads
+RUN mkdir -p web/app/uploads && chown -R www-data:www-data web/app/uploads
 USER www-data
 EXPOSE 9000
 HEALTHCHECK --interval=30s --timeout=5s CMD php -r 'exit(0);'
