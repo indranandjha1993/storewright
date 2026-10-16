@@ -53,6 +53,7 @@ make up                # start php, nginx, mariadb, redis and mailpit
 make install           # install WordPress and WooCommerce, create the admin user
 make seed              # demo catalogue with physical and digital products
 make lint test         # what CI runs on the php
+make e2e               # browser tests in a visible Chrome window
 ```
 
 The store answers on `http://localhost:8600`, caught email on `http://localhost:8601`, and the

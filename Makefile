@@ -45,8 +45,11 @@ lint: .env ## phpcs and phpstan
 test: .env ## unit tests
 	$(RUN) composer test
 
-e2e: .env ## browser tests against the running store
+e2e: .env ## browser tests in a visible chrome window; E2E_SLOWMO=0 for full speed
 	npx playwright test
+
+e2e-headless: .env ## browser tests without a window, as ci runs them
+	CI=1 npx playwright test
 
 shell: .env ## shell inside the application container
 	$(RUN) bash
