@@ -34,20 +34,6 @@ async function fillDeliveryAddress(page: Page) {
 	await shipping.getByLabel('PIN Code').blur();
 }
 
-async function settle(page: Page) {
-	await page.waitForFunction(
-		() => {
-			const data = (window as any).wp?.data;
-			const busy = data && (data.select('wc/store/checkout').isCalculating() || data.select('wc/store/cart').isCustomerDataUpdating());
-			const w = window as any;
-			w.__quietSince = busy ? 0 : w.__quietSince || performance.now();
-			return !busy && performance.now() - w.__quietSince > 600;
-		},
-		null,
-		{ polling: 100 }
-	);
-}
-
 test.beforeEach(async ({ context }) => {
 	await context.clearCookies();
 });
@@ -139,9 +125,8 @@ test('a guest pays for a mixed bag with a stripe test card', async ({ page }) =>
 	await card.getByRole('textbox', { name: /Expiration date/ }).fill('12 / 34');
 	await card.getByRole('textbox', { name: 'Security code' }).fill('123');
 	const placeOrder = page.getByRole('button', { name: 'Place order' });
+	// The Stripe element drops a click that Playwright scrolls and fires in one step; a shopper scrolls first.
 	await placeOrder.scrollIntoViewIfNeeded();
-	await settle(page);
-
 	await placeOrder.click();
 
 	await expect(page).toHaveURL(/order-received/, { timeout: 45_000 });
