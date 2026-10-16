@@ -23,9 +23,36 @@ final class GatewayCredentials {
 
 	public static function register(): void {
 		foreach ( [ 'option', 'default_option' ] as $hook ) {
-			add_filter( $hook . '_woocommerce_stripe_settings', static fn( mixed $settings ): array => self::testModeOutsideProduction( self::merge( $settings, self::STRIPE ), wp_get_environment_type() ) );
-			add_filter( $hook . '_woocommerce_razorpay_settings', static fn( mixed $settings ): mixed => self::merge( $settings, self::razorpayMap() ) );
+			add_filter( $hook . '_woocommerce_stripe_settings', static fn( mixed $settings ): array => self::stripe( $settings, wp_get_environment_type() ) );
+			add_filter( $hook . '_woocommerce_razorpay_settings', static fn( mixed $settings ): array => self::razorpay( $settings ) );
 		}
+	}
+
+	public static function stripe( mixed $settings, string $environment ): array {
+		$settings = self::testModeOutsideProduction( self::merge( $settings, self::STRIPE ), $environment );
+		$required = $settings['testmode'] === 'yes' ? [ 'test_publishable_key', 'test_secret_key' ] : [ 'publishable_key', 'secret_key' ];
+		return self::enableWhenConfigured(
+			$settings,
+			$required,
+			[
+				'enabled'                         => 'yes',
+				'upe_checkout_experience_enabled' => 'yes',
+				'optimized_checkout_element'      => 'yes',
+			]
+		);
+	}
+
+	public static function razorpay( mixed $settings ): array {
+		return self::enableWhenConfigured( self::merge( $settings, self::razorpayMap() ), [ 'key_id', 'key_secret' ], [ 'enabled' => 'yes' ] );
+	}
+
+	public static function enableWhenConfigured( array $settings, array $required, array $defaults ): array {
+		foreach ( $required as $key ) {
+			if ( ( $settings[ $key ] ?? '' ) === '' ) {
+				return $settings;
+			}
+		}
+		return $settings + $defaults;
 	}
 
 	public static function razorpayMap(): array {
@@ -44,6 +71,7 @@ final class GatewayCredentials {
 		if ( $environment !== 'production' ) {
 			$settings['testmode'] = 'yes';
 		}
+		$settings += [ 'testmode' => 'no' ];
 		return $settings;
 	}
 
