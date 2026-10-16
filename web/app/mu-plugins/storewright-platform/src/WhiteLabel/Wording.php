@@ -13,7 +13,7 @@ final class Wording {
 	public static function register(): void {
 		if ( is_admin() ) {
 			self::hook();
-			add_action( 'admin_enqueue_scripts', [ self::class, 'scripts' ], 0 );
+			add_action( 'admin_init', [ self::class, 'scripts' ], 0 );
 		}
 		add_action( 'login_init', [ self::class, 'hook' ] );
 		add_filter( 'rest_pre_dispatch', [ self::class, 'restRequest' ], 10, 3 );
