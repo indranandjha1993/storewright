@@ -22,7 +22,7 @@ add_action(
 add_action(
 	'wp_enqueue_scripts',
 	static function (): void {
-		wp_enqueue_style( 'storewright', get_stylesheet_uri(), [], wp_get_theme()->get( 'Version' ) );
+		wp_enqueue_style( 'storewright', get_stylesheet_uri(), [], (string) filemtime( get_stylesheet_directory() . '/style.css' ) );
 	}
 );
 

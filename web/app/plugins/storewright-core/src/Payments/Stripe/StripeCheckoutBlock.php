@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Storewright\Core\Payments\Stripe;
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
+use Storewright\Core\Asset;
 
 final class StripeCheckoutBlock extends AbstractPaymentMethodType {
 
@@ -21,9 +22,9 @@ final class StripeCheckoutBlock extends AbstractPaymentMethodType {
 	public function get_payment_method_script_handles(): array {
 		wp_register_script(
 			'storewright-stripe-checkout',
-			plugins_url( 'assets/js/stripe-checkout-block.js', \Storewright\Core\FILE ),
+			Asset::url( 'assets/js/stripe-checkout-block.js' ),
 			[ 'wc-blocks-registry', 'wc-settings', 'wp-element', 'wp-html-entities' ],
-			\Storewright\Core\VERSION,
+			Asset::version( 'assets/js/stripe-checkout-block.js' ),
 			true
 		);
 		return [ 'storewright-stripe-checkout' ];
