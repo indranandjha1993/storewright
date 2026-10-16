@@ -30,5 +30,7 @@ dist/
 *.sql.gz
 
 # Tool caches
+/tests/e2e/results/
+/tests/e2e/report/
 .phpunit.result.cache
 .phpcs-cache

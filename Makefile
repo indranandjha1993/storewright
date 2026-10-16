@@ -45,6 +45,9 @@ lint: .env ## phpcs and phpstan
 test: .env ## unit tests
 	$(RUN) composer test
 
+e2e: .env ## browser tests against the running store
+	npx playwright test
+
 shell: .env ## shell inside the application container
 	$(RUN) bash
 
