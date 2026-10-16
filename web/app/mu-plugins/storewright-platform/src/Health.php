@@ -32,14 +32,15 @@ final class Health {
 		];
 	}
 
-	public static function report(): array {
-		$checks = [
-			'database' => self::database(),
-			'cache'    => self::cache(),
+	public static function report( ?array $checks = null ): array {
+		$checks ??= [
+			'database' => self::database( ... ),
+			'cache'    => self::cache( ... ),
 		];
+		$results = array_map( static fn( callable $check ): bool => $check(), $checks );
 		return [
-			'ok'     => ! in_array( false, $checks, true ),
-			'checks' => $checks,
+			'ok'     => ! in_array( false, $results, true ),
+			'checks' => $results,
 		];
 	}
 
@@ -52,11 +53,14 @@ final class Health {
 		if ( ! class_exists( \Redis::class ) ) {
 			return true;
 		}
+		set_error_handler( static fn(): bool => true );
 		try {
 			$redis = new \Redis();
 			return $redis->connect( (string) ( defined( 'WP_REDIS_HOST' ) ? WP_REDIS_HOST : 'cache' ), 6379, 1.0 ) && $redis->ping() !== false;
 		} catch ( \RedisException ) {
 			return false;
+		} finally {
+			restore_error_handler();
 		}
 	}
 
