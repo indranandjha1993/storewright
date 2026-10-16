@@ -21,3 +21,14 @@ add_action(
 
 add_filter( 'woocommerce_product_single_add_to_cart_text', static fn(): string => __( 'Add to bag', 'storewright' ) );
 add_filter( 'woocommerce_product_add_to_cart_text', static fn( string $text, WC_Product $product ): string => $product->is_type( 'variable' ) ? __( 'Choose options', 'storewright' ) : __( 'Add to bag', 'storewright' ), 10, 2 );
+
+add_filter(
+	'woocommerce_product_add_to_cart_description',
+	static fn( string $description, WC_Product $product ): string => sprintf(
+		/* translators: %s: product name */
+		$product->is_type( 'variable' ) ? __( 'Choose options for “%s”', 'storewright' ) : __( 'Add to bag: “%s”', 'storewright' ),
+		$product->get_name()
+	),
+	10,
+	2
+);

@@ -1,9 +1,25 @@
 import { expect, test, type Page } from '@playwright/test';
 
-async function addToBag(page: Page, slug: string) {
-	await page.goto(`/product/${slug}/`);
-	await page.getByRole('button', { name: 'Add to bag' }).click();
-	await expect(page.getByText(/has been added to your cart/i)).toBeVisible();
+const products = {
+	mug: { slug: 'stoneware-mug', name: 'Stoneware Mug' },
+	notebook: { slug: 'dot-grid-notebook', name: 'Dot Grid Notebook' },
+	guide: { slug: 'running-a-small-shop-online', name: 'Running a Small Shop Online' },
+	tee: { slug: 'everyday-tee', name: 'Everyday Tee' },
+};
+
+async function addToBag(page: Page, product: { slug: string; name: string }, options: string[] = []) {
+	await page.goto(`/product/${product.slug}/`);
+	for (const option of options) {
+		await page.getByRole('radio', { name: option, exact: true }).check();
+	}
+	const button = options.length
+		? page.getByRole('button', { name: 'Add to bag', exact: true })
+		: page.getByRole('button', { name: `Add to bag: “${product.name}”` });
+	const added = page.waitForResponse(
+		(response) => response.request().method() === 'POST' && /\/wc\/store\/v1\/(cart\/add-item|batch)/.test(response.url())
+	);
+	await button.click();
+	expect((await added).ok()).toBe(true);
 }
 
 async function fillDeliveryAddress(page: Page) {
@@ -23,8 +39,8 @@ test.beforeEach(async ({ context }) => {
 });
 
 test('a physical and a digital product reach the block checkout together', async ({ page }) => {
-	await addToBag(page, 'stoneware-mug');
-	await addToBag(page, 'running-a-small-shop-online');
+	await addToBag(page, products.mug);
+	await addToBag(page, products.guide);
 
 	await page.goto('/cart/');
 	const cart = page.locator('.wp-block-woocommerce-cart');
@@ -38,8 +54,17 @@ test('a physical and a digital product reach the block checkout together', async
 	await expect(page.getByRole('group', { name: 'Payment options' })).toBeVisible();
 });
 
+test('a shopper picks a size and colour before adding the tee', async ({ page }) => {
+	await addToBag(page, products.tee, ['M', 'Black']);
+
+	await page.goto('/cart/');
+	const row = page.getByRole('row', { name: /Everyday Tee/ });
+	await expect(row.getByText('M', { exact: true })).toBeVisible();
+	await expect(row.getByText('Black', { exact: true })).toBeVisible();
+});
+
 test('a digital only bag asks for no shipping address', async ({ page }) => {
-	await addToBag(page, 'running-a-small-shop-online');
+	await addToBag(page, products.guide);
 
 	await page.goto('/checkout/');
 	await expect(page.getByRole('group', { name: 'Billing address' })).toBeVisible();
@@ -47,8 +72,8 @@ test('a digital only bag asks for no shipping address', async ({ page }) => {
 });
 
 test('an indian address below 999 is offered standard delivery only', async ({ page }) => {
-	await addToBag(page, 'stoneware-mug');
-	await addToBag(page, 'running-a-small-shop-online');
+	await addToBag(page, products.mug);
+	await addToBag(page, products.guide);
 
 	await page.goto('/checkout/');
 	await fillDeliveryAddress(page);
@@ -60,9 +85,9 @@ test('an indian address below 999 is offered standard delivery only', async ({ p
 });
 
 test('free delivery is offered from 999', async ({ page }) => {
-	await addToBag(page, 'stoneware-mug');
-	await addToBag(page, 'dot-grid-notebook');
-	await addToBag(page, 'running-a-small-shop-online');
+	await addToBag(page, products.mug);
+	await addToBag(page, products.notebook);
+	await addToBag(page, products.guide);
 
 	await page.goto('/checkout/');
 	await fillDeliveryAddress(page);
@@ -73,8 +98,8 @@ test('free delivery is offered from 999', async ({ page }) => {
 test('a guest pays for a mixed bag with a stripe test card', async ({ page }) => {
 	test.skip(!process.env.STRIPE_TEST_PUBLISHABLE_KEY, 'needs STRIPE_TEST_PUBLISHABLE_KEY and STRIPE_TEST_SECRET_KEY in .env');
 
-	await addToBag(page, 'stoneware-mug');
-	await addToBag(page, 'running-a-small-shop-online');
+	await addToBag(page, products.mug);
+	await addToBag(page, products.guide);
 
 	await page.goto('/checkout/');
 	await fillDeliveryAddress(page);
