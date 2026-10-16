@@ -4,6 +4,7 @@
 	<file>web/app/mu-plugins/storewright-platform</file>
 	<file>web/app/mu-plugins/storewright-platform.php</file>
 	<file>web/app/themes/storewright</file>
+	<file>tests</file>
 	<exclude-pattern>*/build/*</exclude-pattern>
 	<arg name="extensions" value="php"/>
 	<arg name="colors"/>
@@ -27,6 +28,12 @@
 	</rule>
 	<rule ref="WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler">
 		<exclude-pattern>*/storewright-platform/src/Health.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_putenv">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound">
+		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>
 	<rule ref="WordPress.WP.I18n">
 		<properties>
