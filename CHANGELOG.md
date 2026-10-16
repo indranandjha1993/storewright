@@ -11,3 +11,7 @@ All notable changes are listed here. Versions follow semantic versioning once th
 - Platform layer: health and version endpoints, hardening, local mail capture, gateway keys from the environment.
 - Storewright block theme.
 - CI: coding standards, static analysis, unit tests and a full stack smoke test.
+- Payment webhook log: each verified Stripe event is recorded once and repeat deliveries are not reprocessed.
+- Stripe stays in test mode on every store that is not production.
+- `wp storewright setup` applies store defaults and a domestic shipping zone.
+- Browser tests for the bag and checkout on phone and desktop viewports.
