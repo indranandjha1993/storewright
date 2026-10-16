@@ -23,6 +23,8 @@ so a deployment needs nothing extra.
 ## Screens
 
 - **Today** (`/`): orders to fulfil, awaiting payment and on hold, each linking to the order list.
+- **Brand** (`/brand`): name, logo, colours, typefaces and corners for every surface, with a live
+  preview. See [branding.md](branding.md).
 - **Delivery areas** (`/areas`): the delivery areas in the order addresses are checked, an editor
   for each one and a box that tests a PIN code or a spot on the map. See
   [delivery.md](delivery.md).

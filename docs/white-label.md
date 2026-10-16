@@ -9,7 +9,7 @@ keeps:
 |---|---|
 | Name | Settings, General, Site Title |
 | Logo | the Site Logo block (or the theme's custom logo) |
-| Colour | the theme palette colour with the slug `accent` |
+| Colour | the brand accent, see [branding.md](branding.md) |
 
 Change any of them in the site editor and the login page and admin follow.
 
