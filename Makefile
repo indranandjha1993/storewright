@@ -21,6 +21,9 @@ up: .env ## start the local stack on http://localhost:8080
 install: .env ## install wordpress, activate woocommerce and the gateways, enable hpos
 	$(RUN) bin/install
 
+seed: .env ## demo catalogue, coupon and customers
+	$(RUN) wp storewright seed
+
 down: ## stop the stack, keep data
 	$(COMPOSE) down
 

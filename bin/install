@@ -12,7 +12,7 @@ if ! wp core is-installed >/dev/null 2>&1; then
     --admin_email="$ADMIN_EMAIL" --admin_password="$ADMIN_PASSWORD" --skip-email
 fi
 
-wp plugin activate woocommerce woocommerce-gateway-stripe woo-razorpay
+wp plugin activate woocommerce woocommerce-gateway-stripe woo-razorpay storewright-core
 wp theme activate twentytwentyfive
 wp rewrite structure '/%postname%/' --hard
 wp option update blogdescription ""
