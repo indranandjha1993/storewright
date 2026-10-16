@@ -111,7 +111,7 @@ test('free delivery is offered from 999', async ({ page }) => {
 });
 
 test('a guest pays for a mixed bag with a stripe test card', async ({ page }) => {
-	test.skip(!process.env.STRIPE_TEST_PUBLISHABLE_KEY, 'needs STRIPE_TEST_PUBLISHABLE_KEY and STRIPE_TEST_SECRET_KEY in .env');
+	test.skip(!process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_') && !process.env.STRIPE_SECRET_KEY?.startsWith('rk_test_'), 'needs sandbox STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY in .env');
 
 	await addToBag(page, products.mug);
 	await addToBag(page, products.guide);

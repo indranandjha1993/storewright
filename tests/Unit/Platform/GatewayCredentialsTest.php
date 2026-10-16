@@ -9,102 +9,131 @@ use Storewright\Tests\TestCase;
 
 final class GatewayCredentialsTest extends TestCase {
 
+	private const VARIABLES = [
+		'STRIPE_PUBLISHABLE_KEY',
+		'STRIPE_SECRET_KEY',
+		'STRIPE_WEBHOOK_SECRET',
+		'RAZORPAY_KEY_ID',
+		'RAZORPAY_KEY_SECRET',
+		'RAZORPAY_WEBHOOK_SECRET',
+	];
+
 	protected function tearDown(): void {
-		foreach ( [ 'STRIPE_TEST_PUBLISHABLE_KEY', 'STRIPE_TEST_SECRET_KEY', 'STRIPE_LIVE_PUBLISHABLE_KEY', 'STRIPE_LIVE_SECRET_KEY', 'RAZORPAY_KEY_ID', 'RAZORPAY_TEST_KEY_ID', 'RAZORPAY_TEST_KEY_SECRET' ] as $name ) {
+		foreach ( self::VARIABLES as $name ) {
 			putenv( $name );
 		}
 		parent::tearDown();
 	}
 
-	public function test_environment_values_override_saved_settings(): void {
-		putenv( 'STRIPE_TEST_SECRET_KEY=sk_test_env' );
-
-		$merged = GatewayCredentials::merge(
-			[
-				'test_secret_key' => 'sk_test_saved',
-				'enabled'         => 'yes',
-			],
-			[ 'test_secret_key' => 'STRIPE_TEST_SECRET_KEY' ]
-		);
-
-		self::assertSame( 'sk_test_env', $merged['test_secret_key'] );
-		self::assertSame( 'yes', $merged['enabled'] );
+	private function stripeKeys( string $mode ): void {
+		putenv( "STRIPE_PUBLISHABLE_KEY=pk_{$mode}_abc" );
+		putenv( "STRIPE_SECRET_KEY=sk_{$mode}_abc" );
+		putenv( 'STRIPE_WEBHOOK_SECRET=whsec_abc' );
 	}
 
-	public function test_empty_environment_values_leave_settings_alone(): void {
-		putenv( 'STRIPE_TEST_SECRET_KEY=' );
-
-		$merged = GatewayCredentials::merge( [ 'test_secret_key' => 'sk_test_saved' ], [ 'test_secret_key' => 'STRIPE_TEST_SECRET_KEY' ] );
-
-		self::assertSame( 'sk_test_saved', $merged['test_secret_key'] );
-	}
-
-	public function test_a_missing_option_becomes_an_array_with_a_description(): void {
-		$merged = GatewayCredentials::merge( false, [] );
-
-		self::assertSame( [ 'description' => '' ], $merged );
-	}
-
-	public function test_razorpay_falls_back_to_test_keys_when_live_keys_are_absent(): void {
-		putenv( 'RAZORPAY_TEST_KEY_ID=rzp_test_1' );
-		putenv( 'RAZORPAY_TEST_KEY_SECRET=s' );
-
-		self::assertSame( 'RAZORPAY_TEST_KEY_ID', GatewayCredentials::razorpayMap()['key_id'] );
-
-		putenv( 'RAZORPAY_KEY_ID=rzp_live_1' );
-
-		self::assertSame( 'RAZORPAY_KEY_ID', GatewayCredentials::razorpayMap()['key_id'] );
-	}
-
-	public function test_stripe_is_forced_into_test_mode_outside_production(): void {
-		self::assertSame( 'yes', GatewayCredentials::testModeOutsideProduction( [ 'testmode' => 'no' ], 'staging' )['testmode'] );
-		self::assertSame( 'yes', GatewayCredentials::testModeOutsideProduction( [], 'development' )['testmode'] );
-	}
-
-	public function test_production_keeps_the_saved_mode(): void {
-		self::assertSame( 'no', GatewayCredentials::testModeOutsideProduction( [ 'testmode' => 'no' ], 'production' )['testmode'] );
-	}
-
-	public function test_stripe_switches_on_with_optimized_checkout_once_its_test_keys_are_set(): void {
-		putenv( 'STRIPE_TEST_PUBLISHABLE_KEY=pk_test_1' );
-		putenv( 'STRIPE_TEST_SECRET_KEY=sk_test_1' );
+	public function test_sandbox_stripe_keys_fill_the_test_fields_and_switch_the_gateway_on(): void {
+		$this->stripeKeys( 'test' );
 
 		$settings = GatewayCredentials::stripe( false, 'development' );
 
+		self::assertSame( 'yes', $settings['testmode'] );
+		self::assertSame( 'pk_test_abc', $settings['test_publishable_key'] );
+		self::assertSame( 'sk_test_abc', $settings['test_secret_key'] );
+		self::assertSame( 'whsec_abc', $settings['test_webhook_secret'] );
+		self::assertArrayNotHasKey( 'secret_key', $settings );
 		self::assertSame( 'yes', $settings['enabled'] );
-		self::assertSame( 'yes', $settings['upe_checkout_experience_enabled'] );
 		self::assertSame( 'yes', $settings['optimized_checkout_element'] );
 	}
 
-	public function test_stripe_stays_off_without_both_keys(): void {
-		putenv( 'STRIPE_TEST_PUBLISHABLE_KEY=pk_test_1' );
+	public function test_live_stripe_keys_fill_the_live_fields_in_production(): void {
+		$this->stripeKeys( 'live' );
 
-		self::assertArrayNotHasKey( 'enabled', GatewayCredentials::stripe( false, 'development' ) );
+		$settings = GatewayCredentials::stripe( false, 'production' );
+
+		self::assertSame( 'no', $settings['testmode'] );
+		self::assertSame( 'sk_live_abc', $settings['secret_key'] );
+		self::assertSame( 'whsec_abc', $settings['webhook_secret'] );
+		self::assertSame( 'yes', $settings['enabled'] );
+	}
+
+	public function test_live_stripe_keys_are_refused_outside_production(): void {
+		$this->stripeKeys( 'live' );
+
+		$settings = GatewayCredentials::stripe( false, 'staging' );
+
+		self::assertSame( 'yes', $settings['testmode'] );
+		self::assertArrayNotHasKey( 'secret_key', $settings );
+		self::assertArrayNotHasKey( 'enabled', $settings );
+		self::assertSame( 'refused', GatewayCredentials::modes( 'staging' )['stripe'] );
+	}
+
+	public function test_sandbox_keys_are_allowed_in_production(): void {
+		$this->stripeKeys( 'test' );
+
+		self::assertSame( 'yes', GatewayCredentials::stripe( false, 'production' )['testmode'] );
+		self::assertSame( 'sandbox', GatewayCredentials::modes( 'production' )['stripe'] );
+	}
+
+	public function test_a_restricted_sandbox_key_from_the_stripe_cli_is_accepted(): void {
+		putenv( 'STRIPE_PUBLISHABLE_KEY=pk_test_abc' );
+		putenv( 'STRIPE_SECRET_KEY=rk_test_abc' );
+
+		self::assertSame( 'rk_test_abc', GatewayCredentials::stripe( false, 'development' )['test_secret_key'] );
+	}
+
+	public function test_keys_from_different_modes_are_ignored(): void {
+		putenv( 'STRIPE_PUBLISHABLE_KEY=pk_live_abc' );
+		putenv( 'STRIPE_SECRET_KEY=sk_test_abc' );
+
+		self::assertArrayNotHasKey( 'enabled', GatewayCredentials::stripe( false, 'production' ) );
+		self::assertSame( 'off', GatewayCredentials::modes( 'production' )['stripe'] );
 	}
 
 	public function test_an_operator_who_switched_stripe_off_is_respected(): void {
-		putenv( 'STRIPE_TEST_PUBLISHABLE_KEY=pk_test_1' );
-		putenv( 'STRIPE_TEST_SECRET_KEY=sk_test_1' );
+		$this->stripeKeys( 'test' );
 
 		self::assertSame( 'no', GatewayCredentials::stripe( [ 'enabled' => 'no' ], 'development' )['enabled'] );
 	}
 
-	public function test_production_needs_live_keys_before_stripe_switches_on(): void {
-		putenv( 'STRIPE_TEST_PUBLISHABLE_KEY=pk_test_1' );
-		putenv( 'STRIPE_TEST_SECRET_KEY=sk_test_1' );
-
-		self::assertArrayNotHasKey( 'enabled', GatewayCredentials::stripe( [ 'testmode' => 'no' ], 'production' ) );
-
-		putenv( 'STRIPE_LIVE_PUBLISHABLE_KEY=pk_live_1' );
-		putenv( 'STRIPE_LIVE_SECRET_KEY=sk_live_1' );
-
-		self::assertSame( 'yes', GatewayCredentials::stripe( [ 'testmode' => 'no' ], 'production' )['enabled'] );
+	public function test_saved_settings_stay_in_test_mode_outside_production(): void {
+		self::assertSame( 'yes', GatewayCredentials::stripe( [ 'testmode' => 'no' ], 'staging' )['testmode'] );
+		self::assertSame( 'no', GatewayCredentials::stripe( [ 'testmode' => 'no' ], 'production' )['testmode'] );
 	}
 
-	public function test_razorpay_switches_on_once_its_keys_are_set(): void {
-		putenv( 'RAZORPAY_TEST_KEY_ID=rzp_test_1' );
-		putenv( 'RAZORPAY_TEST_KEY_SECRET=s' );
+	public function test_sandbox_razorpay_keys_switch_the_gateway_on(): void {
+		putenv( 'RAZORPAY_KEY_ID=rzp_test_abc' );
+		putenv( 'RAZORPAY_KEY_SECRET=secret' );
+		putenv( 'RAZORPAY_WEBHOOK_SECRET=hook' );
 
-		self::assertSame( 'yes', GatewayCredentials::razorpay( false )['enabled'] );
+		$settings = GatewayCredentials::razorpay( false, 'development' );
+
+		self::assertSame( 'rzp_test_abc', $settings['key_id'] );
+		self::assertSame( 'secret', $settings['key_secret'] );
+		self::assertSame( 'hook', $settings['webhook_secret'] );
+		self::assertSame( 'yes', $settings['enabled'] );
+	}
+
+	public function test_live_razorpay_keys_are_refused_outside_production(): void {
+		putenv( 'RAZORPAY_KEY_ID=rzp_live_abc' );
+		putenv( 'RAZORPAY_KEY_SECRET=secret' );
+
+		self::assertSame( '', GatewayCredentials::razorpay( false, 'development' )['key_id'] );
+		self::assertSame( 'refused', GatewayCredentials::modes( 'development' )['razorpay'] );
+		self::assertSame( 'live', GatewayCredentials::modes( 'production' )['razorpay'] );
+	}
+
+	public function test_without_keys_razorpay_still_gets_empty_fields_and_stays_off(): void {
+		$settings = GatewayCredentials::razorpay( false, 'development' );
+
+		self::assertSame( '', $settings['key_id'] );
+		self::assertSame( '', $settings['description'] );
+		self::assertArrayNotHasKey( 'enabled', $settings );
+		self::assertSame(
+			[
+				'stripe'   => 'off',
+				'razorpay' => 'off',
+			],
+			GatewayCredentials::modes( 'development' )
+		);
 	}
 }

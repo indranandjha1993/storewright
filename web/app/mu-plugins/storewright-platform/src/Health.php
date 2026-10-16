@@ -29,6 +29,7 @@ final class Health {
 			'wordpress'   => get_bloginfo( 'version' ),
 			'php'         => PHP_VERSION,
 			'environment' => wp_get_environment_type(),
+			'payments'    => GatewayCredentials::modes( wp_get_environment_type() ),
 		];
 	}
 

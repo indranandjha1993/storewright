@@ -22,6 +22,13 @@ final class HealthTest extends TestCase {
 		self::assertSame( 'abc123', $version['sha'] );
 		self::assertSame( '7.1.3', $version['wordpress'] );
 		self::assertSame( 'production', $version['environment'] );
+		self::assertSame(
+			[
+				'stripe'   => 'off',
+				'razorpay' => 'off',
+			],
+			$version['payments']
+		);
 		putenv( 'STOREWRIGHT_VERSION' );
 		putenv( 'GIT_SHA' );
 	}
