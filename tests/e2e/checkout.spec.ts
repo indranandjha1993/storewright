@@ -1,4 +1,31 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page, type Request } from '@playwright/test';
+
+const storeApiInFlight = new WeakMap<Page, Set<Request>>();
+
+test.beforeEach(({ page }) => {
+	const open = new Set<Request>();
+	page.on('request', (request) => /\/wc\/store\/v1\//.test(request.url()) && open.add(request));
+	page.on('requestfinished', (request) => open.delete(request));
+	page.on('requestfailed', (request) => open.delete(request));
+	storeApiInFlight.set(page, open);
+});
+
+// A background address update still running at Place Order can overwrite the order's billing address.
+async function placeOrder(page: Page) {
+	const open = storeApiInFlight.get(page) ?? new Set();
+	let quietSince = Date.now();
+	await expect
+		.poll(() => {
+			if (open.size > 0) {
+				quietSince = Date.now();
+			}
+			return Date.now() - quietSince;
+		}, { timeout: 15_000, intervals: [100] })
+		.toBeGreaterThan(1500);
+	const button = page.getByRole('button', { name: 'Place order' });
+	await button.scrollIntoViewIfNeeded();
+	await button.click();
+}
 
 const products = {
 	mug: { slug: 'stoneware-mug', name: 'Stoneware Mug' },
@@ -187,9 +214,7 @@ test('a guest pays on razorpay by netbanking', async ({ page }) => {
 	await page.goto('/checkout/');
 	await fillDeliveryAddress(page);
 	await page.getByRole('radio', { name: /Razorpay/ }).check();
-	const placeOrder = page.getByRole('button', { name: 'Place order' });
-	await placeOrder.scrollIntoViewIfNeeded();
-	await placeOrder.click();
+	await placeOrder(page);
 
 	await page.waitForURL(/order-pay/, { timeout: 30_000 });
 	const razorpay = page.locator('iframe.razorpay-checkout-frame').filter({ visible: true }).contentFrame();
@@ -217,9 +242,7 @@ test('a guest pays for a mixed bag on the stripe checkout page', async ({ page }
 	await page.getByRole('radio', { name: /^Stripe/ }).check();
 	await expect(page.locator('iframe[title="Secure payment input frame"]')).toHaveCount(0);
 
-	const placeOrder = page.getByRole('button', { name: 'Place order' });
-	await placeOrder.scrollIntoViewIfNeeded();
-	await placeOrder.click();
+	await placeOrder(page);
 
 	await page.waitForURL(/checkout\.stripe\.com/, { timeout: 30_000 });
 	await expect(page.getByText(/at Storewright/)).toBeVisible();
