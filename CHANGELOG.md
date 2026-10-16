@@ -4,6 +4,11 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+## 0.1.0 - 2026-10-16
+
+The walking skeleton: a running store you can install with one command and pay for with a Stripe
+sandbox card.
+
 - Project layout, licence and contribution guidelines.
 - WordPress, WooCommerce and the Stripe and Razorpay gateways managed by Composer.
 - Application image and local stack with nginx, MariaDB, Redis and Mailpit.
@@ -19,3 +24,5 @@ All notable changes are listed here. Versions follow semantic versioning once th
 - Product page on the Interactivity API gallery and add to bag form, without the jQuery gallery scripts.
 - Header fits a phone screen; the closed bag drawer is out of the tab order.
 - Home page built from reusable patterns: hero, category grid, new in, trust strip.
+- One set of gateway variables; the key decides sandbox or live, live keys are refused outside production, and keys from the environment are never stored.
+- Stripe sandbox order tested end to end in the browser, with webhooks forwarded by `make stripe-listen`.
