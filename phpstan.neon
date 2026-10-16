@@ -1,0 +1,15 @@
+includes:
+	- vendor/szepeviktor/phpstan-wordpress/extension.neon
+parameters:
+	level: 6
+	paths:
+		- web/app/plugins/storewright-core
+		- web/app/mu-plugins/storewright-platform
+		- web/app/mu-plugins/storewright-platform.php
+		- web/app/themes/storewright/functions.php
+	scanFiles:
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+		- vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+	ignoreErrors:
+		- identifier: missingType.iterableValue

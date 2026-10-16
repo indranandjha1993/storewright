@@ -1,0 +1,68 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php:
+    name: lint, analyse, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer:v2
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('composer.lock') }}
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: composer lint
+      - run: composer analyse
+      - run: composer test
+
+  stack:
+    name: compose, install, seed, smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: write .env
+        run: |
+          cp .env.example .env
+          sed -i 's/^ADMIN_PASSWORD=.*/ADMIN_PASSWORD=ci-only-password/' .env
+          for s in AUTH_KEY SECURE_AUTH_KEY LOGGED_IN_KEY NONCE_KEY AUTH_SALT SECURE_AUTH_SALT LOGGED_IN_SALT NONCE_SALT; do
+            sed -i "s/^$s=.*/$s=$(openssl rand -hex 32)/" .env
+          done
+      - uses: docker/setup-buildx-action@v3
+      - name: build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/app/Dockerfile
+          target: dev
+          tags: storewright-app:dev
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - run: docker compose up -d --no-build
+      - run: make install
+      - run: make seed
+      - name: smoke
+        run: |
+          curl -fsS http://localhost:8600/health | tee /dev/stderr | grep -q '"ok":true'
+          curl -fsS http://localhost:8600/version | grep -q '"name":"storewright"'
+          curl -fsS http://localhost:8600/shop/ | grep -q 'themes/storewright/style.css'
+          test "$(curl -fsS 'http://localhost:8600/wp-json/wc/store/v1/products?per_page=20' | jq length)" = "5"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8600/wp/xmlrpc.php)" = "403"
+      - if: failure()
+        run: docker compose logs --no-color app web db | tail -200

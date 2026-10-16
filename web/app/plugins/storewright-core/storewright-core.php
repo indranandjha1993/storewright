@@ -15,27 +15,32 @@ declare(strict_types=1);
 
 namespace Storewright\Core;
 
-defined('ABSPATH') || exit;
+defined( 'ABSPATH' ) || exit;
 
 const VERSION = '0.1.0';
-const FILE = __FILE__;
+const FILE    = __FILE__;
 
-spl_autoload_register(static function (string $class): void {
-	$prefix = __NAMESPACE__ . '\\';
-	if (!str_starts_with($class, $prefix)) {
-		return;
+spl_autoload_register(
+	static function ( string $className ): void {
+		$prefix = __NAMESPACE__ . '\\';
+		if ( ! str_starts_with( $className, $prefix ) ) {
+			return;
+		}
+		$file = __DIR__ . '/src/' . str_replace( '\\', '/', substr( $className, strlen( $prefix ) ) ) . '.php';
+		if ( is_file( $file ) ) {
+			require $file;
+		}
 	}
-	$file = __DIR__ . '/src/' . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
-	if (is_file($file)) {
-		require $file;
-	}
-});
+);
 
-add_action('plugins_loaded', static function (): void {
-	if (!class_exists(\WooCommerce::class)) {
-		return;
+add_action(
+	'plugins_loaded',
+	static function (): void {
+		if ( ! class_exists( \WooCommerce::class ) ) {
+			return;
+		}
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			\WP_CLI::add_command( 'storewright seed', Cli\SeedCommand::class );
+		}
 	}
-	if (defined('WP_CLI') && WP_CLI) {
-		\WP_CLI::add_command('storewright seed', Cli\SeedCommand::class);
-	}
-});
+);
