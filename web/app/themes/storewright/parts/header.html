@@ -1,5 +1,6 @@
-<!-- wp:group {"tagName":"header","align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|20","bottom":"var:preset|spacing|20"}},"border":{"bottom":{"color":"var:preset|color|line","width":"1px"}}},"backgroundColor":"surface","layout":{"type":"constrained","contentSize":"78rem"}} -->
-<header class="wp-block-group alignfull has-surface-background-color has-background" style="border-bottom-color:var(--wp--preset--color--line);border-bottom-width:1px;padding-top:var(--wp--preset--spacing--20);padding-bottom:var(--wp--preset--spacing--20)">
+<!-- wp:pattern {"slug":"storewright/announcement"} /-->
+<!-- wp:group {"tagName":"header","align":"full","className":"sw-header-bar","layout":{"type":"constrained","contentSize":"80rem"}} -->
+<header class="wp-block-group alignfull sw-header-bar">
 	<!-- wp:group {"className":"sw-header","layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->
 	<div class="wp-block-group sw-header">
 		<!-- wp:group {"className":"sw-header__brand","layout":{"type":"flex","flexWrap":"nowrap"}} -->
@@ -8,13 +9,14 @@
 			<!-- wp:site-title {"level":0} /-->
 		</div>
 		<!-- /wp:group -->
+		<!-- wp:navigation {"overlayMenu":"mobile","className":"sw-header__nav","layout":{"type":"flex","justifyContent":"center"}} -->
+			<!-- wp:navigation-link {"label":"Shop","url":"/shop/","kind":"custom"} /-->
+			<!-- wp:navigation-link {"label":"Best sellers","url":"/shop/?orderby=popularity","kind":"custom"} /-->
+			<!-- wp:navigation-link {"label":"Account","url":"/my-account/","kind":"custom"} /-->
+		<!-- /wp:navigation -->
 		<!-- wp:group {"className":"sw-header__actions","style":{"spacing":{"blockGap":"var:preset|spacing|10"}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"right"}} -->
 		<div class="wp-block-group sw-header__actions">
 			<!-- wp:storewright/delivery /-->
-			<!-- wp:navigation {"overlayMenu":"mobile","layout":{"type":"flex","justifyContent":"right"}} -->
-				<!-- wp:navigation-link {"label":"Shop","url":"/shop/","kind":"custom"} /-->
-				<!-- wp:navigation-link {"label":"Account","url":"/my-account/","kind":"custom"} /-->
-			<!-- /wp:navigation -->
 			<!-- wp:search {"label":"Search","showLabel":false,"placeholder":"Search products","buttonText":"Search","buttonPosition":"button-only","buttonUseIcon":true,"isSearchFieldHidden":true,"query":{"post_type":"product"}} /-->
 			<!-- wp:woocommerce/customer-account {"displayStyle":"icon_only","iconStyle":"line","iconClass":"wc-block-customer-account__account-icon"} /-->
 			<!-- wp:woocommerce/mini-cart {"hasHiddenPrice":true} /-->

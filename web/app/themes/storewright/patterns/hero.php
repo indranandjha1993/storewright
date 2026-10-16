@@ -3,24 +3,29 @@
  * Title: Hero
  * Slug: storewright/hero
  * Categories: storewright
- * Description: Full width opening section with a headline, a line of copy and one call to action.
+ * Description: Full width opening section with a photograph, a headline, a line of copy and two calls to action.
  */
 
+$storewright_image = storewright_hero_image();
 ?>
-<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|60","bottom":"var:preset|spacing|60"}}},"backgroundColor":"accent-soft","layout":{"type":"constrained","contentSize":"48rem"}} -->
-<div class="wp-block-group alignfull has-accent-soft-background-color has-background" style="padding-top:var(--wp--preset--spacing--60);padding-bottom:var(--wp--preset--spacing--60)">
-	<!-- wp:heading {"textAlign":"center","level":1,"fontSize":"xx-large"} -->
-	<h1 class="wp-block-heading has-text-align-center has-xx-large-font-size"><?php esc_html_e( 'Made well, delivered to your door', 'storewright' ); ?></h1>
-	<!-- /wp:heading -->
-	<!-- wp:paragraph {"align":"center","fontSize":"large","textColor":"muted"} -->
-	<p class="has-text-align-center has-muted-color has-text-color has-large-font-size"><?php esc_html_e( 'Everyday things for home and work, with tracked delivery and simple returns.', 'storewright' ); ?></p>
-	<!-- /wp:paragraph -->
-	<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
-	<div class="wp-block-buttons">
-		<!-- wp:button -->
-		<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="/shop/"><?php esc_html_e( 'Shop everything', 'storewright' ); ?></a></div>
-		<!-- /wp:button -->
+<section class="sw-hero alignfull<?php echo $storewright_image ? ' sw-hero--photo' : ''; ?>">
+	<?php if ( $storewright_image ) : ?>
+		<img class="sw-hero__image" src="<?php echo esc_url( $storewright_image ); ?>" alt="" width="1600" height="1067" fetchpriority="high" decoding="async">
+	<?php endif; ?>
+	<div class="sw-hero__inner">
+		<div class="sw-hero__copy">
+			<p class="sw-eyebrow"><?php esc_html_e( 'New this season', 'storewright' ); ?></p>
+			<h1 class="sw-hero__title"><?php esc_html_e( 'Made well, delivered to your door', 'storewright' ); ?></h1>
+			<p class="sw-hero__lead"><?php esc_html_e( 'Everyday things for home and work. Tracked delivery, simple returns, and same-day in the city.', 'storewright' ); ?></p>
+			<div class="sw-hero__actions">
+				<a class="wp-element-button" href="<?php echo esc_url( home_url( '/shop/' ) ); ?>"><?php esc_html_e( 'Shop everything', 'storewright' ); ?></a>
+				<a class="sw-button sw-button--ghost" href="<?php echo esc_url( home_url( '/shop/?orderby=popularity' ) ); ?>"><?php esc_html_e( 'Best sellers', 'storewright' ); ?><?php echo storewright_icon( 'arrow' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a>
+			</div>
+			<ul class="sw-hero__trust">
+				<li><?php echo storewright_icon( 'truck' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( 'Tracked delivery', 'storewright' ); ?></li>
+				<li><?php echo storewright_icon( 'return' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( 'Easy returns', 'storewright' ); ?></li>
+				<li><?php echo storewright_icon( 'wallet' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( 'UPI, cards, cash on delivery', 'storewright' ); ?></li>
+			</ul>
+		</div>
 	</div>
-	<!-- /wp:buttons -->
-</div>
-<!-- /wp:group -->
+</section>

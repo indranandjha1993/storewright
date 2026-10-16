@@ -1,21 +1,51 @@
-<!-- wp:group {"tagName":"footer","align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50"}},"border":{"top":{"color":"var:preset|color|line","width":"1px"}}},"backgroundColor":"surface","layout":{"type":"constrained","contentSize":"78rem"}} -->
-<footer class="wp-block-group alignfull has-surface-background-color has-background" style="border-top-color:var(--wp--preset--color--line);border-top-width:1px;padding-top:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--50)">
-	<!-- wp:group {"layout":{"type":"flex","flexWrap":"wrap","justifyContent":"space-between"}} -->
-	<div class="wp-block-group">
-		<!-- wp:group {"layout":{"type":"flex","orientation":"vertical"}} -->
+<!-- wp:group {"tagName":"footer","align":"full","className":"sw-footer","layout":{"type":"constrained","contentSize":"80rem"}} -->
+<footer class="wp-block-group alignfull sw-footer">
+	<!-- wp:group {"className":"sw-footer__grid","layout":{"type":"grid","minimumColumnWidth":"14rem"}} -->
+	<div class="wp-block-group sw-footer__grid">
+		<!-- wp:group {"className":"sw-footer__brand","layout":{"type":"flex","orientation":"vertical"}} -->
 		<div class="wp-block-group sw-footer__brand">
-			<!-- wp:site-logo {"width":120,"shouldSyncIcon":false} /-->
+			<!-- wp:site-logo {"width":140,"shouldSyncIcon":false} /-->
 			<!-- wp:site-title {"level":0} /-->
-			<!-- wp:site-tagline {"fontSize":"small","textColor":"muted"} /-->
+			<!-- wp:site-tagline {"className":"sw-footer__tagline"} /-->
 		</div>
 		<!-- /wp:group -->
-		<!-- wp:navigation {"overlayMenu":"never","layout":{"type":"flex","justifyContent":"right"},"fontSize":"small"} -->
-			<!-- wp:navigation-link {"label":"Shop","url":"/shop/","kind":"custom"} /-->
-			<!-- wp:navigation-link {"label":"Account","url":"/my-account/","kind":"custom"} /-->
-			<!-- wp:navigation-link {"label":"Privacy","url":"/privacy-policy/","kind":"custom"} /-->
-			<!-- wp:navigation-link {"label":"Refunds","url":"/refund_returns/","kind":"custom"} /-->
-		<!-- /wp:navigation -->
+		<!-- wp:group {"className":"sw-footer__column","layout":{"type":"flex","orientation":"vertical"}} -->
+		<div class="wp-block-group sw-footer__column">
+			<!-- wp:heading {"level":3,"className":"sw-footer__heading"} -->
+			<h3 class="wp-block-heading sw-footer__heading">Shop</h3>
+			<!-- /wp:heading -->
+			<!-- wp:navigation {"overlayMenu":"never","className":"sw-footer__nav","layout":{"type":"flex","orientation":"vertical"}} -->
+				<!-- wp:navigation-link {"label":"All products","url":"/shop/","kind":"custom"} /-->
+				<!-- wp:navigation-link {"label":"Best sellers","url":"/shop/?orderby=popularity","kind":"custom"} /-->
+				<!-- wp:navigation-link {"label":"New in","url":"/shop/?orderby=date","kind":"custom"} /-->
+			<!-- /wp:navigation -->
+		</div>
+		<!-- /wp:group -->
+		<!-- wp:group {"className":"sw-footer__column","layout":{"type":"flex","orientation":"vertical"}} -->
+		<div class="wp-block-group sw-footer__column">
+			<!-- wp:heading {"level":3,"className":"sw-footer__heading"} -->
+			<h3 class="wp-block-heading sw-footer__heading">Help</h3>
+			<!-- /wp:heading -->
+			<!-- wp:navigation {"overlayMenu":"never","className":"sw-footer__nav","layout":{"type":"flex","orientation":"vertical"}} -->
+				<!-- wp:navigation-link {"label":"Your account","url":"/my-account/","kind":"custom"} /-->
+				<!-- wp:navigation-link {"label":"Track an order","url":"/my-account/orders/","kind":"custom"} /-->
+				<!-- wp:navigation-link {"label":"Returns and refunds","url":"/refund_returns/","kind":"custom"} /-->
+				<!-- wp:navigation-link {"label":"Privacy","url":"/privacy-policy/","kind":"custom"} /-->
+			<!-- /wp:navigation -->
+		</div>
+		<!-- /wp:group -->
+		<!-- wp:group {"className":"sw-footer__column","layout":{"type":"flex","orientation":"vertical"}} -->
+		<div class="wp-block-group sw-footer__column">
+			<!-- wp:heading {"level":3,"className":"sw-footer__heading"} -->
+			<h3 class="wp-block-heading sw-footer__heading">Pay your way</h3>
+			<!-- /wp:heading -->
+			<!-- wp:paragraph {"className":"sw-footer__text"} -->
+			<p class="sw-footer__text">UPI, cards, netbanking, wallets and cash on delivery. Every payment on a secure page.</p>
+			<!-- /wp:paragraph -->
+		</div>
+		<!-- /wp:group -->
 	</div>
 	<!-- /wp:group -->
+	<!-- wp:pattern {"slug":"storewright/footer-note"} /-->
 </footer>
 <!-- /wp:group -->

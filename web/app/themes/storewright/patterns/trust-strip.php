@@ -1,47 +1,26 @@
 <?php
 /**
- * Title: Trust strip
+ * Title: Promises
  * Slug: storewright/trust-strip
  * Categories: storewright
- * Description: Three short promises about delivery, returns and payment.
+ * Description: Four short promises about delivery, returns, payment and support.
  */
 
+$storewright_promises = [
+	[ 'truck', __( 'Tracked delivery', 'storewright' ), __( 'Follow every parcel from dispatch to your door, with same-day options where we are close by.', 'storewright' ) ],
+	[ 'return', __( 'Simple returns', 'storewright' ), __( 'Changed your mind? Request a return from your account in a minute and we collect it.', 'storewright' ) ],
+	[ 'wallet', __( 'Pay your way', 'storewright' ), __( 'UPI, cards, netbanking, wallets and cash on delivery. Every payment on a secure page.', 'storewright' ) ],
+	[ 'shield', __( 'Made to last', 'storewright' ), __( 'We choose things we would keep ourselves and stand behind every one of them.', 'storewright' ) ],
+];
 ?>
-<!-- wp:group {"align":"full","className":"sw-trust","style":{"spacing":{"padding":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|40"}}},"layout":{"type":"constrained","contentSize":"78rem"}} -->
-<div class="wp-block-group alignfull sw-trust" style="padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--40)">
-	<!-- wp:columns -->
-	<div class="wp-block-columns">
-		<!-- wp:column -->
-		<div class="wp-block-column">
-			<!-- wp:heading {"level":3,"fontSize":"medium"} -->
-			<h3 class="wp-block-heading has-medium-font-size"><?php esc_html_e( 'Tracked delivery', 'storewright' ); ?></h3>
-			<!-- /wp:heading -->
-			<!-- wp:paragraph {"fontSize":"small","textColor":"muted"} -->
-			<p class="has-muted-color has-text-color has-small-font-size"><?php esc_html_e( 'Follow every parcel from dispatch to your door.', 'storewright' ); ?></p>
-			<!-- /wp:paragraph -->
-		</div>
-		<!-- /wp:column -->
-		<!-- wp:column -->
-		<div class="wp-block-column">
-			<!-- wp:heading {"level":3,"fontSize":"medium"} -->
-			<h3 class="wp-block-heading has-medium-font-size"><?php esc_html_e( 'Simple returns', 'storewright' ); ?></h3>
-			<!-- /wp:heading -->
-			<!-- wp:paragraph {"fontSize":"small","textColor":"muted"} -->
-			<p class="has-muted-color has-text-color has-small-font-size"><?php esc_html_e( 'Request a return from your account in a minute.', 'storewright' ); ?></p>
-			<!-- /wp:paragraph -->
-		</div>
-		<!-- /wp:column -->
-		<!-- wp:column -->
-		<div class="wp-block-column">
-			<!-- wp:heading {"level":3,"fontSize":"medium"} -->
-			<h3 class="wp-block-heading has-medium-font-size"><?php esc_html_e( 'Pay your way', 'storewright' ); ?></h3>
-			<!-- /wp:heading -->
-			<!-- wp:paragraph {"fontSize":"small","textColor":"muted"} -->
-			<p class="has-muted-color has-text-color has-small-font-size"><?php esc_html_e( 'UPI, cards, netbanking, wallets and cash on delivery.', 'storewright' ); ?></p>
-			<!-- /wp:paragraph -->
-		</div>
-		<!-- /wp:column -->
+<section class="sw-section sw-promises alignfull">
+	<div class="sw-promises__inner">
+		<?php foreach ( $storewright_promises as [ $storewright_icon, $storewright_title, $storewright_text ] ) : ?>
+			<div class="sw-promise">
+				<span class="sw-promise__icon"><?php echo storewright_icon( $storewright_icon ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<h3 class="sw-promise__title"><?php echo esc_html( $storewright_title ); ?></h3>
+				<p class="sw-promise__text"><?php echo esc_html( $storewright_text ); ?></p>
+			</div>
+		<?php endforeach; ?>
 	</div>
-	<!-- /wp:columns -->
-</div>
-<!-- /wp:group -->
+</section>
