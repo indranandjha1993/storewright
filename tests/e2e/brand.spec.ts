@@ -74,7 +74,7 @@ test('a logo replaces the store name in the header', async ({ page }) => {
 	await expect(header.locator('.wp-block-site-title')).not.toBeInViewport();
 
 	await openBrand(page);
-	await page.getByRole('button', { name: 'Remove', exact: true }).click();
+	await page.locator('.sw-brand__logo').filter({ has: page.getByRole('img', { name: 'Current logo' }) }).getByRole('button', { name: 'Remove', exact: true }).click();
 	await page.getByRole('button', { name: 'Save brand' }).click();
 	await expect(savedNotice(page)).toContainText('Saved. The store is wearing the new brand.');
 	await page.goto('/');

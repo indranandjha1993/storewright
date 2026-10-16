@@ -4,7 +4,7 @@ export const loadBrand = () => apiFetch( { path: '/storewright/v1/brand' } );
 
 export const saveBrand = ( data ) => apiFetch( { path: '/storewright/v1/brand', method: 'PUT', data } );
 
-export function uploadLogo( file ) {
+export function uploadImage( file ) {
 	const body = new FormData();
 	body.append( 'file', file, file.name );
 	body.append( 'title', file.name.replace( /\.[^.]+$/, '' ) );

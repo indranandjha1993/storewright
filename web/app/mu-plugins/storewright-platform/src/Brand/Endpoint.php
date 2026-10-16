@@ -66,6 +66,16 @@ final class Endpoint {
 			update_option( 'site_logo', $logo );
 			set_theme_mod( 'custom_logo', $logo );
 		}
+		if ( array_key_exists( 'heroImage', $input ) ) {
+			$hero = (int) $input['heroImage'];
+			if ( $hero > 0 && ! wp_attachment_is_image( $hero ) ) {
+				return new WP_Error( 'storewright_brand_invalid', __( 'The home page photo has to be an image from the media library.', 'storewright' ), [ 'status' => 400 ] );
+			}
+			update_option( 'storewright_hero_image', $hero );
+		}
+		if ( array_key_exists( 'announcement', $input ) ) {
+			update_option( 'storewright_announcement', mb_substr( trim( sanitize_text_field( (string) $input['announcement'] ) ), 0, 140 ) );
+		}
 		ThemeJson::refresh();
 		return new WP_REST_Response( self::describe() );
 	}
@@ -73,18 +83,24 @@ final class Endpoint {
 	public static function describe(): array {
 		$settings = Settings::get();
 		$logo     = Brand::logoId();
+		$hero     = (int) get_option( 'storewright_hero_image' );
 		return [
-			'name'     => Brand::name(),
-			'logo'     => [
+			'name'         => Brand::name(),
+			'announcement' => (string) get_option( 'storewright_announcement', '' ),
+			'logo'         => [
 				'id'  => $logo,
 				'url' => Brand::logoUrl(),
 			],
-			'settings' => $settings,
-			'palette'  => Palette::from( $settings ),
-			'radii'    => Palette::radii( $settings['radius'] ),
-			'fonts'    => Fonts::all(),
-			'fontCss'  => Fonts::fontFaceCss( array_merge( ...array_column( Fonts::all(), 'faces' ) ) ),
-			'adminCss' => Tokens::admin(),
+			'heroImage'    => [
+				'id'  => $hero,
+				'url' => $hero ? (string) wp_get_attachment_image_url( $hero, 'large' ) : '',
+			],
+			'settings'     => $settings,
+			'palette'      => Palette::from( $settings ),
+			'radii'        => Palette::radii( $settings['radius'] ),
+			'fonts'        => Fonts::all(),
+			'fontCss'      => Fonts::fontFaceCss( array_merge( ...array_column( Fonts::all(), 'faces' ) ) ),
+			'adminCss'     => Tokens::admin(),
 		];
 	}
 }

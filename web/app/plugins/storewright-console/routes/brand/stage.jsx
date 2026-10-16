@@ -1,9 +1,9 @@
 import { Button, Notice, Spinner, TextControl } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { loadBrand, saveBrand, uploadLogo } from './api';
+import { loadBrand, saveBrand, uploadImage } from './api';
 import { contrast, isHex } from './colour';
-import { ColourField, FontField, LogoField, RadiusField } from './fields';
+import { ColourField, FontField, ImageField, RadiusField } from './fields';
 import { Preview } from './preview';
 import './style.scss';
 
@@ -29,12 +29,12 @@ export const stage = () => {
 	const [ saved, setSaved ] = useState( false );
 	const [ busy, setBusy ] = useState( false );
 	const [ uploading, setUploading ] = useState( false );
-	const [ pendingLogo, setPendingLogo ] = useState( null );
+	const [ pending, setPending ] = useState( {} );
 
 	const take = ( data ) => {
 		setBrand( data );
-		setPendingLogo( null );
-		setDraft( { ...data.settings, name: data.name, logo: data.logo.id } );
+		setPending( {} );
+		setDraft( { ...data.settings, name: data.name, announcement: data.announcement, logo: data.logo.id, heroImage: data.heroImage.id } );
 		const tokens = document.getElementById( 'storewright-tokens' );
 		if ( tokens ) {
 			tokens.textContent = data.adminCss;
@@ -74,29 +74,31 @@ export const stage = () => {
 			.finally( () => setBusy( false ) );
 	};
 
-	const upload = ( file ) => {
-		setUploading( true );
+	const upload = ( key ) => ( file ) => {
+		setUploading( key );
 		setError( null );
-		uploadLogo( file )
+		uploadImage( file )
 			.then( ( media ) => {
-				setPendingLogo( { id: media.id, url: media.source_url } );
-				set( 'logo' )( media.id );
+				setPending( ( current ) => ( { ...current, [ key ]: { id: media.id, url: media.source_url } } ) );
+				set( key )( media.id );
 			} )
 			.catch( ( failure ) => setError( failure.message ) )
 			.finally( () => setUploading( false ) );
 	};
 
-	const removeLogo = () => {
-		setPendingLogo( { id: 0, url: '' } );
-		set( 'logo' )( 0 );
+	const remove = ( key ) => () => {
+		setPending( ( current ) => ( { ...current, [ key ]: { id: 0, url: '' } } ) );
+		set( key )( 0 );
 	};
+
+	const image = ( key ) => ( pending[ key ] && draft[ key ] === pending[ key ].id ? pending[ key ] : brand[ key ] );
 
 	if ( ! draft ) {
 		return <div className="sw-brand__loading">{ error ? <Notice status="error" isDismissible={ false }>{ error }</Notice> : <Spinner /> }</div>;
 	}
 
-	const dirty = JSON.stringify( draft ) !== JSON.stringify( { ...brand.settings, name: brand.name, logo: brand.logo.id } );
-	const logo = pendingLogo && draft.logo === pendingLogo.id ? pendingLogo : brand.logo;
+	const dirty = JSON.stringify( draft ) !== JSON.stringify( { ...brand.settings, name: brand.name, announcement: brand.announcement, logo: brand.logo.id, heroImage: brand.heroImage.id } );
+	const logo = image( 'logo' );
 
 	return (
 		<div className="sw-brand">
@@ -117,7 +119,31 @@ export const stage = () => {
 				<fieldset className="sw-brand__fieldset">
 					<legend className="sw-brand__legend">{ __( 'Identity', 'storewright' ) }</legend>
 					<TextControl label={ __( 'Store name', 'storewright' ) } value={ draft.name } onChange={ set( 'name' ) } />
-					<LogoField logo={ logo } busy={ uploading } onUpload={ upload } onRemove={ removeLogo } />
+					<ImageField
+						label={ __( 'Logo', 'storewright' ) }
+						image={ logo }
+						busy={ uploading === 'logo' }
+						empty={ __( 'Without a logo the store shows its name in the heading typeface.', 'storewright' ) }
+						hint={ __( 'PNG or SVG with a transparent background works best, about 400 pixels wide.', 'storewright' ) }
+						onUpload={ upload( 'logo' ) }
+						onRemove={ remove( 'logo' ) }
+					/>
+					<TextControl
+						label={ __( 'Announcement', 'storewright' ) }
+						help={ __( 'One line above the header, for an offer or a delivery promise. Leave empty to hide it.', 'storewright' ) }
+						value={ draft.announcement }
+						maxLength={ 140 }
+						onChange={ set( 'announcement' ) }
+					/>
+					<ImageField
+						label={ __( 'Home page photo', 'storewright' ) }
+						image={ image( 'heroImage' ) }
+						busy={ uploading === 'heroImage' }
+						empty={ __( 'Without a photo the opening section sits on the soft accent tint.', 'storewright' ) }
+						hint={ __( 'A wide photo, at least 1600 pixels across. The headline sits on its left side.', 'storewright' ) }
+						onUpload={ upload( 'heroImage' ) }
+						onRemove={ remove( 'heroImage' ) }
+					/>
 				</fieldset>
 				<fieldset className="sw-brand__fieldset">
 					<legend className="sw-brand__legend">{ __( 'Colours', 'storewright' ) }</legend>

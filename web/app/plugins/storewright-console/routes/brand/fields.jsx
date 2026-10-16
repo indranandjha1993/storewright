@@ -51,18 +51,18 @@ export function RadiusField( { value, onChange } ) {
 	);
 }
 
-export function LogoField( { logo, busy, onUpload, onRemove } ) {
+export function ImageField( { label, image, busy, hint, empty, onUpload, onRemove } ) {
 	const input = useRef();
 	return (
 		<div className="sw-brand__logo">
-			<span className="sw-brand__label">{ __( 'Logo', 'storewright' ) }</span>
-			{ logo.url ? <img className="sw-brand__logo-image" src={ logo.url } alt={ __( 'Current logo', 'storewright' ) } /> : <p className="sw-brand__hint">{ __( 'Without a logo the store shows its name in the heading typeface.', 'storewright' ) }</p> }
+			<span className="sw-brand__label">{ label }</span>
+			{ image.url ? <img className="sw-brand__logo-image" src={ image.url } alt={ /* translators: %s: field label */ sprintf( __( 'Current %s', 'storewright' ), label.toLowerCase() ) } /> : <p className="sw-brand__hint">{ empty }</p> }
 			<input
 				ref={ input }
 				type="file"
 				accept="image/png,image/jpeg,image/svg+xml,image/webp"
 				hidden
-				aria-label={ __( 'Logo file', 'storewright' ) }
+				aria-label={ /* translators: %s: field label */ sprintf( __( '%s file', 'storewright' ), label ) }
 				onChange={ ( event ) => {
 					const [ file ] = event.target.files;
 					if ( file ) {
@@ -73,15 +73,15 @@ export function LogoField( { logo, busy, onUpload, onRemove } ) {
 			/>
 			<div className="sw-brand__buttons">
 				<Button variant="secondary" size="compact" isBusy={ busy } disabled={ busy } onClick={ () => input.current.click() }>
-					{ logo.url ? __( 'Replace logo', 'storewright' ) : __( 'Upload a logo', 'storewright' ) }
+					{ image.url ? __( 'Replace', 'storewright' ) : __( 'Upload', 'storewright' ) }
 				</Button>
-				{ logo.url && (
+				{ image.url && (
 					<Button variant="tertiary" size="compact" isDestructive disabled={ busy } onClick={ onRemove }>
 						{ __( 'Remove', 'storewright' ) }
 					</Button>
 				) }
 			</div>
-			<p className="sw-brand__hint">{ __( 'PNG or SVG with a transparent background works best, about 400 pixels wide.', 'storewright' ) }</p>
+			<p className="sw-brand__hint">{ hint }</p>
 		</div>
 	);
 }

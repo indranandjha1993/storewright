@@ -25,10 +25,16 @@ Brand. The same choices reach:
 Derived shades (hover, soft tint, line, muted text, the text colour on top of the accent) are
 worked out from these, so a client never has to pick eleven colours.
 
+Two more pieces of the storefront come from the same screen: the announcement line above the
+header (option `storewright_announcement`, hidden when empty) and the home page hero photograph
+(option `storewright_hero_image`, an attachment id; without one the hero sits on the soft accent
+tint).
+
 ## Typefaces
 
 The list is the system typeface plus six open typefaces under the SIL Open Font License, bundled
 as variable fonts: Inter, Manrope, Space Grotesk, Fraunces, Playfair Display and Source Serif.
+A new store starts with Fraunces for headings and Inter for text.
 Their files are not in git. `npm run fonts` copies the Latin subsets and licences from the
 `@fontsource-variable` packages into `web/app/themes/storewright/assets/fonts/`; `make console`
 runs it, the image build runs it, and CI runs it. Only the typefaces a store uses are loaded on
@@ -43,7 +49,7 @@ Read or change them over REST (`manage_woocommerce`):
 
 ```
 GET /wp-json/storewright/v1/brand
-PUT /wp-json/storewright/v1/brand   {"accent":"#7A1F5C","headingFont":"fraunces","radius":"round","name":"Lila","logo":42}
+PUT /wp-json/storewright/v1/brand   {"accent":"#7A1F5C","headingFont":"fraunces","radius":"round","name":"Lila","logo":42,"announcement":"Free delivery over 999","heroImage":57}
 ```
 
 or from the command line:
