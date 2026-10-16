@@ -1,0 +1,43 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+<!-- wp:group {"tagName":"main","className":"sw-journal","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|70"}}},"layout":{"type":"constrained","contentSize":"80rem"}} -->
+<main class="wp-block-group sw-journal" style="padding-top:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--70)">
+	<!-- wp:group {"className":"sw-journal__head","layout":{"type":"constrained","contentSize":"44rem","justifyContent":"left"}} -->
+	<div class="wp-block-group sw-journal__head">
+		<!-- wp:paragraph {"className":"sw-eyebrow"} -->
+		<p class="sw-eyebrow">Journal</p>
+		<!-- /wp:paragraph -->
+		<!-- wp:heading {"level":1,"className":"sw-journal__title"} -->
+		<h1 class="wp-block-heading sw-journal__title">Notes from the studio</h1>
+		<!-- /wp:heading -->
+		<!-- wp:paragraph {"className":"sw-journal__lead"} -->
+		<p class="sw-journal__lead">How things are made, how to look after them, and what is coming next.</p>
+		<!-- /wp:paragraph -->
+	</div>
+	<!-- /wp:group -->
+	<!-- wp:query {"queryId":1,"query":{"perPage":9,"postType":"post","inherit":true},"className":"sw-journal__list"} -->
+	<div class="wp-block-query sw-journal__list">
+		<!-- wp:post-template {"layout":{"type":"grid","columnCount":3}} -->
+			<!-- wp:group {"tagName":"article","className":"sw-post-card","layout":{"type":"constrained"}} -->
+			<article class="wp-block-group sw-post-card">
+				<!-- wp:post-featured-image {"isLink":true,"aspectRatio":"4/3","className":"sw-post-card__image"} /-->
+				<!-- wp:post-date {"className":"sw-post-card__date","format":"j M Y"} /-->
+				<!-- wp:post-title {"level":2,"isLink":true,"className":"sw-post-card__title"} /-->
+				<!-- wp:post-excerpt {"moreText":"Read more","excerptLength":24,"className":"sw-post-card__excerpt"} /-->
+			</article>
+			<!-- /wp:group -->
+		<!-- /wp:post-template -->
+		<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"center"}} -->
+			<!-- wp:query-pagination-previous /-->
+			<!-- wp:query-pagination-numbers /-->
+			<!-- wp:query-pagination-next /-->
+		<!-- /wp:query-pagination -->
+		<!-- wp:query-no-results -->
+			<!-- wp:paragraph -->
+			<p>Nothing here yet.</p>
+			<!-- /wp:paragraph -->
+		<!-- /wp:query-no-results -->
+	</div>
+	<!-- /wp:query -->
+</main>
+<!-- /wp:group -->
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

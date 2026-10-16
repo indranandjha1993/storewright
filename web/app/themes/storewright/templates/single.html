@@ -1,0 +1,22 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+<!-- wp:group {"tagName":"main","className":"sw-post","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|70"}}},"layout":{"type":"constrained","contentSize":"44rem","wideSize":"64rem"}} -->
+<main class="wp-block-group sw-post" style="padding-top:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--70)">
+	<!-- wp:group {"className":"sw-post__head","layout":{"type":"constrained","contentSize":"44rem"}} -->
+	<div class="wp-block-group sw-post__head">
+		<!-- wp:post-terms {"term":"category","className":"sw-eyebrow"} /-->
+		<!-- wp:post-title {"level":1,"className":"sw-post__title"} /-->
+		<!-- wp:post-date {"className":"sw-post__date","format":"j F Y"} /-->
+	</div>
+	<!-- /wp:group -->
+	<!-- wp:post-featured-image {"align":"wide","aspectRatio":"16/9","className":"sw-post__image"} /-->
+	<!-- wp:post-content {"className":"sw-prose","layout":{"type":"constrained","contentSize":"44rem"}} /-->
+	<!-- wp:group {"className":"sw-post__footer","layout":{"type":"constrained","contentSize":"44rem"}} -->
+	<div class="wp-block-group sw-post__footer">
+		<!-- wp:paragraph -->
+		<p><a href="/journal/">All journal entries</a></p>
+		<!-- /wp:paragraph -->
+	</div>
+	<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
