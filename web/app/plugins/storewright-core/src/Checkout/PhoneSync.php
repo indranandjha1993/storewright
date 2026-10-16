@@ -9,8 +9,13 @@ use WC_Order;
 final class PhoneSync {
 
 	public static function register(): void {
-		add_action( 'woocommerce_store_api_checkout_update_order_from_request', [ self::class, 'apply' ] );
+		add_action( 'woocommerce_store_api_checkout_order_processed', [ self::class, 'applyAndSave' ] );
 		add_action( 'woocommerce_checkout_create_order', [ self::class, 'apply' ] );
+	}
+
+	public static function applyAndSave( WC_Order $order ): void {
+		self::apply( $order );
+		$order->save();
 	}
 
 	public static function apply( WC_Order $order ): void {
