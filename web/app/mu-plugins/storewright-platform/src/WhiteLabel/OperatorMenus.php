@@ -6,7 +6,7 @@ namespace Storewright\Platform\WhiteLabel;
 
 final class OperatorMenus {
 
-	public const HIDDEN = [ 'edit.php', 'edit-comments.php', 'tools.php' ];
+	public const HIDDEN = [ 'edit-comments.php', 'tools.php' ];
 
 	public const HIDDEN_SUBMENUS = [ 'woocommerce' => 'wc-status' ];
 

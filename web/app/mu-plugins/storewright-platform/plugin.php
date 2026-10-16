@@ -36,3 +36,4 @@ WhiteLabel\Login::register();
 WhiteLabel\AdminChrome::register();
 WhiteLabel\Promotions::register();
 WhiteLabel\OperatorMenus::register();
+WhiteLabel\Journal::register();

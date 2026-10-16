@@ -26,8 +26,9 @@ Change any of them in the site editor and the login page and admin follow.
 - Marketplace suggestions, the Extensions screens and the Marketing overview are gone. Coupons
   stay under Marketing.
 
-Staff without the `manage_options` capability, such as shop managers, also do not see Posts,
-Comments, Tools or the system status page. Administrators keep everything.
+Staff without the `manage_options` capability, such as shop managers, also do not see Comments,
+Tools or the system status page. Administrators keep everything. Posts appear as the Journal, the
+store's own notes and guides, with entries instead of posts throughout.
 
 `wp storewright setup` hides WooCommerce's setup checklists and removes the sample post, page
 and comment WordPress installs, as long as nobody has edited them.

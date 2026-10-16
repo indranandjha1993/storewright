@@ -13,7 +13,7 @@ test.beforeEach(({}, testInfo) => {
 });
 
 test('the login page carries the store brand only', async ({ page }) => {
-	await page.goto('/wp/wp-login.php');
+	await page.goto('/sign-in/');
 
 	await expect(page).toHaveTitle('Log In ‹ Storewright');
 	await expect(page.getByRole('link', { name: 'Storewright' }).first()).toHaveAttribute('href', /localhost:\d+\/$/);
@@ -33,12 +33,13 @@ test('an operator never reads WordPress or WooCommerce in the admin', async ({ p
 	}
 });
 
-test('the operator menu leaves out posts, comments, tools and the marketplace', async ({ page }) => {
+test('the operator menu shows the journal and leaves out comments, tools and the marketplace', async ({ page }) => {
 	await logIn(page, operator);
 	await page.goto('/wp/wp-admin/index.php');
 	const menu = page.locator('#adminmenu');
 
 	await expect(menu.getByRole('link', { name: 'Store', exact: true })).toBeVisible();
+	await expect(menu.getByRole('link', { name: 'Journal', exact: true })).toBeVisible();
 	for (const hidden of ['Posts', 'Comments', 'Tools', 'Extensions', 'Status']) {
 		await expect(menu.getByRole('link', { name: hidden, exact: true })).toHaveCount(0);
 	}
