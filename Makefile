@@ -18,7 +18,10 @@ up: .env ## start the local stack on http://localhost:8080
 	$(COMPOSE) up -d
 	@echo "store: http://localhost:$${WEB_PORT:-8600}  mail: http://localhost:$${MAIL_PORT:-8601}"
 
-install: .env ## install wordpress, activate woocommerce and the gateways, enable hpos
+vendor/autoload.php: composer.lock
+	$(RUN) composer install --no-interaction --no-progress
+
+install: .env vendor/autoload.php ## install wordpress, activate woocommerce and the gateways, enable hpos
 	$(RUN) bin/install
 
 seed: .env ## demo catalogue, coupon and customers

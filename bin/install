@@ -5,7 +5,11 @@ cd "$(dirname "$0")/.."
 : "${WP_HOME:?}" "${ADMIN_USER:?}" "${ADMIN_EMAIL:?}" "${ADMIN_PASSWORD:?}"
 title="${SITE_TITLE:-Storewright}"
 
-until wp db check >/dev/null 2>&1; do sleep 1; done
+for _ in $(seq 1 45); do
+  wp db check >/dev/null 2>&1 && break
+  sleep 2
+done
+wp db check >/dev/null
 
 if ! wp core is-installed >/dev/null 2>&1; then
   wp core install --url="$WP_HOME" --title="$title" --admin_user="$ADMIN_USER" \
