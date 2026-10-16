@@ -48,6 +48,8 @@ add_action(
 		add_filter( 'woocommerce_payment_gateways', static fn( array $gateways ): array => [ ...$gateways, Payments\Stripe\StripeCheckoutGateway::class ] );
 		add_action( 'template_redirect', [ Payments\Stripe\StripeCheckoutGateway::class, 'confirmOnReturn' ] );
 		add_action( 'rest_api_init', [ Payments\Stripe\StripeWebhookEndpoint::class, 'register' ] );
+		add_action( 'rest_api_init', [ Delivery\LocationEndpoint::class, 'register' ] );
+		add_action( 'init', [ Delivery\DeliveryBlock::class, 'register' ] );
 		add_action(
 			'woocommerce_blocks_payment_method_type_registration',
 			static fn( $registry ) => $registry->register( new Payments\Stripe\StripeCheckoutBlock() )

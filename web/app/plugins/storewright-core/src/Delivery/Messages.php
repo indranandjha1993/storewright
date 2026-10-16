@@ -16,6 +16,25 @@ final class Messages {
 		return sprintf( __( 'We do not deliver to %s yet. Please use another delivery address.', 'storewright' ), $place );
 	}
 
+	public static function forShopper( string $lookup, string $pin, string $district, ?Answer $answer ): string {
+		if ( $lookup === 'invalid' ) {
+			return __( 'Enter the 6 digit PIN code of the delivery address.', 'storewright' );
+		}
+		if ( $lookup === 'unknown' || $answer === null ) {
+			/* translators: %s: PIN code */
+			return $pin === '' ? __( 'We could not place your location. Enter your PIN code instead.', 'storewright' ) : sprintf( __( 'We could not find PIN %s. Check the number and try again.', 'storewright' ), $pin );
+		}
+		$place = $district !== '' ? "{$pin}, {$district}" : $pin;
+		return match ( $answer->status ) {
+			/* translators: %s: PIN code and district */
+			Answer::DELIVERABLE => sprintf( __( 'We deliver to %s.', 'storewright' ), $place ),
+			/* translators: %s: PIN code and district */
+			Answer::APPROXIMATE => sprintf( __( 'We probably deliver to %s. Use your location to be sure.', 'storewright' ), $place ),
+			/* translators: %s: PIN code and district */
+			default             => sprintf( __( 'We do not deliver to %s yet. Try another PIN code or use your location.', 'storewright' ), $place ),
+		};
+	}
+
 	public static function badge( Answer $answer ): string {
 		return match ( $answer->status ) {
 			Answer::DELIVERABLE   => __( 'We deliver here.', 'storewright' ),
