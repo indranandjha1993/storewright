@@ -19,15 +19,8 @@ fi
 wp plugin activate woocommerce woocommerce-gateway-stripe woo-razorpay storewright-core
 wp theme activate storewright
 wp rewrite structure '/%postname%/' --hard
-wp option update blogdescription ""
-wp option update timezone_string "Asia/Kolkata"
-wp option update woocommerce_store_address "" >/dev/null
-wp option update woocommerce_default_country "IN:KA"
-wp option update woocommerce_currency "INR"
-wp option update woocommerce_onboarding_profile '{"skipped":true}' --format=json
-wp option update woocommerce_coming_soon "no"
 wp wc hpos enable
-wp option update woocommerce_custom_orders_table_data_sync_enabled "no"
+wp storewright setup
 wp cron event run --due-now >/dev/null 2>&1 || true
 
 echo "installed: $WP_HOME  admin user: $ADMIN_USER"

@@ -44,6 +44,7 @@ add_action(
 		Payments\StripeWebhooks::register();
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			\WP_CLI::add_command( 'storewright seed', Cli\SeedCommand::class );
+			\WP_CLI::add_command( 'storewright setup', Cli\SetupCommand::class );
 		}
 	}
 );
