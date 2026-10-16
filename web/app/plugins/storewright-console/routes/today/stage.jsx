@@ -1,7 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { adminLink, consoleData } from './data';
+import { adminLink, consoleData } from '../../lib/data';
 import './style.scss';
 
 const queues = [
