@@ -27,3 +27,5 @@ HttpCertificates::register();
 WhiteLabel\Wording::register();
 WhiteLabel\Login::register();
 WhiteLabel\AdminChrome::register();
+WhiteLabel\Promotions::register();
+WhiteLabel\OperatorMenus::register();
