@@ -31,7 +31,8 @@ async function fillDeliveryAddress(page: Page) {
 	await shipping.getByLabel('City').fill('Bengaluru');
 	await shipping.getByLabel('State').selectOption({ label: 'Karnataka' });
 	await shipping.getByLabel('PIN Code').fill('560001');
-	await shipping.getByLabel('PIN Code').blur();
+	await shipping.getByLabel('Phone').fill('9123456780');
+	await shipping.getByLabel('Phone').blur();
 }
 
 test.beforeEach(async ({ context }) => {
@@ -111,6 +112,7 @@ test('free delivery is offered from 999', async ({ page }) => {
 });
 
 test('an indian checkout offers razorpay first and cash on delivery for goods that ship', async ({ page }) => {
+	test.skip(!/^rzp_test_/.test(process.env.RAZORPAY_KEY_ID ?? ''), 'needs sandbox RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env');
 	await addToBag(page, products.mug);
 
 	await page.goto('/checkout/');
@@ -129,7 +131,7 @@ test('cash on delivery is not offered when the bag holds a download', async ({ p
 	await page.goto('/checkout/');
 	await fillDeliveryAddress(page);
 
-	await expect(page.getByRole('radio', { name: /Razorpay/ })).toBeVisible();
+	await expect(page.getByRole('group', { name: 'Payment options' })).toBeVisible();
 	await expect(page.getByRole('radio', { name: /Cash on delivery/ })).toHaveCount(0);
 });
 

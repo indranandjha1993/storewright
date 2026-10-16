@@ -13,15 +13,16 @@ final class StoreDefaults {
 	public const FLAT_RATE      = '79';
 	public const FREE_FROM      = '999';
 	private const STORE_OPTIONS = [
-		'woocommerce_default_country'     => 'IN:KA',
-		'woocommerce_currency'            => 'INR',
-		'woocommerce_ship_to_countries'   => '',
-		'woocommerce_ship_to_destination' => 'shipping',
-		'woocommerce_calc_taxes'          => 'no',
-		'woocommerce_coming_soon'         => 'no',
+		'woocommerce_default_country'      => 'IN:KA',
+		'woocommerce_currency'             => 'INR',
+		'woocommerce_ship_to_countries'    => '',
+		'woocommerce_ship_to_destination'  => 'shipping',
+		'woocommerce_checkout_phone_field' => 'required',
+		'woocommerce_calc_taxes'           => 'no',
+		'woocommerce_coming_soon'          => 'no',
 		'woocommerce_custom_orders_table_data_sync_enabled' => 'no',
-		'timezone_string'                 => 'Asia/Kolkata',
-		'blogdescription'                 => '',
+		'timezone_string'                  => 'Asia/Kolkata',
+		'blogdescription'                  => '',
 	];
 
 	public function apply(): array {
