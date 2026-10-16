@@ -63,6 +63,21 @@ test('a shopper picks a size and colour before adding the tee', async ({ page })
 	await expect(row.getByText('Black', { exact: true })).toBeVisible();
 });
 
+test('the bag drawer stays out of reach until it is opened', async ({ page }) => {
+	await addToBag(page, products.mug);
+
+	const drawer = page.getByRole('dialog');
+	await expect(drawer).toBeHidden();
+	await expect(page.locator('.wc-block-mini-cart__drawer button:visible')).toHaveCount(0);
+
+	await page.getByRole('button', { name: /Number of items in the cart/ }).click();
+	await expect(drawer).toBeVisible();
+	await expect(drawer.getByRole('link', { name: 'Stoneware Mug' }).last()).toBeVisible();
+
+	await page.keyboard.press('Escape');
+	await expect(drawer).toBeHidden();
+});
+
 test('a digital only bag asks for no shipping address', async ({ page }) => {
 	await addToBag(page, products.guide);
 

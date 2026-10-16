@@ -69,3 +69,26 @@ Text Domain: storewright
 	text-decoration: none;
 	letter-spacing: -0.02em;
 }
+
+.wc-block-mini-cart__drawer[aria-hidden="true"] {
+	visibility: hidden;
+	transition: visibility 0s linear 300ms;
+}
+
+.sw-header .wp-block-site-title {
+	flex-shrink: 0;
+}
+
+.sw-header__actions .wp-block-search__button {
+	padding: 0.5rem;
+	background: transparent;
+	color: var(--wp--preset--color--contrast);
+}
+
+.sw-header__actions .wp-block-search__input {
+	min-width: 0;
+}
+
+.sw-header__actions .wp-block-woocommerce-customer-account a {
+	color: var(--wp--preset--color--contrast);
+}
