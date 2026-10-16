@@ -28,3 +28,7 @@ dist/
 !.env.example
 *.sql
 *.sql.gz
+
+# Tool caches
+.phpunit.result.cache
+.phpcs-cache

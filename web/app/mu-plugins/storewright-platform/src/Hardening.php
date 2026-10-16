@@ -12,7 +12,7 @@ final class Hardening {
 		add_filter( 'rest_endpoints', [ self::class, 'hideUsersFromGuests' ] );
 		add_filter( 'login_errors', static fn(): string => __( 'Check your username and password.', 'storewright' ) );
 		add_filter( 'pre_option_blog_public', [ self::class, 'indexing' ] );
-		add_action( 'template_redirect', [ self::class, 'blockAuthorArchives' ] );
+		add_action( 'template_redirect', [ self::class, 'blockAuthorArchives' ], 0 );
 		remove_action( 'wp_head', 'wp_generator' );
 		remove_action( 'wp_head', 'wlwmanifest_link' );
 		remove_action( 'wp_head', 'rsd_link' );
