@@ -26,5 +26,8 @@
     "@wordpress/element": "8.8.0",
     "@wordpress/i18n": "6.29.0",
     "@wordpress/url": "4.56.0"
+  },
+  "dependencies": {
+    "leaflet": "1.9.4"
   }
 }

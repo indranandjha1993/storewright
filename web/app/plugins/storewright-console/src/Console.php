@@ -38,6 +38,7 @@ final class Console {
 
 	public static function menuItems(): void {
 		self::generated( 'storewright_console_register_storewright_menu_item', 'today', __( 'Today', 'storewright' ), '/' );
+		self::generated( 'storewright_console_register_storewright_menu_item', 'areas', __( 'Delivery areas', 'storewright' ), '/areas' );
 	}
 
 	public static function page(): void {
@@ -64,6 +65,13 @@ final class Console {
 			...$data,
 			'adminUrl'  => admin_url(),
 			'storeName' => get_bloginfo( 'name' ),
+			'mapTiles'  => apply_filters(
+				'storewright_map_tiles',
+				[
+					'url'         => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+					'attribution' => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+				]
+			),
 		];
 	}
 

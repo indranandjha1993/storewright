@@ -22,6 +22,13 @@ so a deployment needs nothing extra.
 
 ## Screens
 
+- **Today** (`/`): orders to fulfil, awaiting payment and on hold, each linking to the order list.
+- **Delivery areas** (`/areas`): the delivery areas in the order addresses are checked, an editor
+  for each one and a box that tests a PIN code or a spot on the map. See
+  [delivery.md](delivery.md).
+
+## Adding a screen
+
 Each screen is a folder under `web/app/plugins/storewright-console/routes/`:
 
 ```
@@ -33,7 +40,9 @@ routes/today/
 ```
 
 WordPress packages such as `@wordpress/components` and `@wordpress/api-fetch` are not bundled.
-The page loads the copies that ship with WordPress. Screens read the store through the REST API
+The page loads the copies that ship with WordPress. Anything else a screen imports, such as
+Leaflet for the map, is bundled into that screen. Code shared between screens lives in
+`web/app/plugins/storewright-console/lib/`. Screens read the store through the REST API
 with the logged-in user's nonce, so the API's own capability checks apply.
 
 A screen appears in the sidebar once it is added to `menuItems()` in
