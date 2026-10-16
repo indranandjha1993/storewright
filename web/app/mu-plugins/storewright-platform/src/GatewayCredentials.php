@@ -11,15 +11,12 @@ final class GatewayCredentials {
 	public const REFUSED = 'refused';
 	public const OFF     = 'off';
 
-	private const STRIPE_FIELDS   = [ 'test_publishable_key', 'test_secret_key', 'test_webhook_secret', 'publishable_key', 'secret_key', 'webhook_secret' ];
 	private const RAZORPAY_FIELDS = [ 'key_id', 'key_secret', 'webhook_secret' ];
 
 	public static function register(): void {
 		foreach ( [ 'option', 'default_option' ] as $hook ) {
-			add_filter( $hook . '_woocommerce_stripe_settings', static fn( mixed $saved ): array => self::stripe( $saved, wp_get_environment_type() ) );
 			add_filter( $hook . '_woocommerce_razorpay_settings', static fn( mixed $saved ): array => self::razorpay( $saved, wp_get_environment_type() ) );
 		}
-		add_filter( 'pre_update_option_woocommerce_stripe_settings', static fn( mixed $value ): mixed => self::keepOutOfDatabase( $value, self::stripeMode(), self::STRIPE_FIELDS ) );
 		add_filter( 'pre_update_option_woocommerce_razorpay_settings', static fn( mixed $value ): mixed => self::keepOutOfDatabase( $value, self::razorpayMode(), self::RAZORPAY_FIELDS ) );
 	}
 
@@ -30,8 +27,8 @@ final class GatewayCredentials {
 		return array_diff_key( $value, array_flip( $fields ) );
 	}
 
-	public static function stripeFields(): array {
-		return self::STRIPE_FIELDS;
+	public static function razorpayFields(): array {
+		return self::RAZORPAY_FIELDS;
 	}
 
 	public static function modes( string $environment ): array {
@@ -41,28 +38,16 @@ final class GatewayCredentials {
 		];
 	}
 
-	public static function stripe( mixed $saved, string $environment ): array {
-		$settings = self::settings( $saved );
-		if ( $environment !== 'production' ) {
-			$settings['testmode'] = 'yes';
-		}
+	public static function stripeKeys( string $environment ): ?array {
 		$mode = self::stripeMode();
 		if ( $mode === null || ! self::allowed( $mode, $environment ) ) {
-			$settings += [ 'testmode' => 'no' ];
-			$prefix    = $settings['testmode'] === 'yes' ? 'test_' : '';
-			return self::offWithoutKeys( $settings, [ $prefix . 'publishable_key', $prefix . 'secret_key' ] );
+			return null;
 		}
-		$prefix                                  = $mode === self::SANDBOX ? 'test_' : '';
-		$settings['testmode']                    = $mode === self::SANDBOX ? 'yes' : 'no';
-		$settings[ $prefix . 'publishable_key' ] = self::env( 'STRIPE_PUBLISHABLE_KEY' );
-		$settings[ $prefix . 'secret_key' ]      = self::env( 'STRIPE_SECRET_KEY' );
-		if ( self::env( 'STRIPE_WEBHOOK_SECRET' ) !== '' ) {
-			$settings[ $prefix . 'webhook_secret' ] = self::env( 'STRIPE_WEBHOOK_SECRET' );
-		}
-		return $settings + [
-			'enabled'                         => 'yes',
-			'upe_checkout_experience_enabled' => 'yes',
-			'optimized_checkout_element'      => 'yes',
+		return [
+			'mode'        => $mode,
+			'publishable' => self::env( 'STRIPE_PUBLISHABLE_KEY' ),
+			'secret'      => self::env( 'STRIPE_SECRET_KEY' ),
+			'webhook'     => self::env( 'STRIPE_WEBHOOK_SECRET' ),
 		];
 	}
 

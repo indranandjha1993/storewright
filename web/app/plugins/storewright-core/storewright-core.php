@@ -41,8 +41,14 @@ add_action(
 		if ( ! class_exists( \WooCommerce::class ) ) {
 			return;
 		}
-		Payments\StripeWebhooks::register();
 		Payments\GatewayRouting::register();
+		add_filter( 'woocommerce_payment_gateways', static fn( array $gateways ): array => [ ...$gateways, Payments\Stripe\StripeCheckoutGateway::class ] );
+		add_action( 'template_redirect', [ Payments\Stripe\StripeCheckoutGateway::class, 'confirmOnReturn' ] );
+		add_action( 'rest_api_init', [ Payments\Stripe\StripeWebhookEndpoint::class, 'register' ] );
+		add_action(
+			'woocommerce_blocks_payment_method_type_registration',
+			static fn( $registry ) => $registry->register( new Payments\Stripe\StripeCheckoutBlock() )
+		);
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			\WP_CLI::add_command( 'storewright seed', Cli\SeedCommand::class );
 			\WP_CLI::add_command( 'storewright setup', Cli\SetupCommand::class );

@@ -39,5 +39,3 @@ add_filter(
 	10,
 	2
 );
-
-add_filter( 'wc_stripe_optimized_checkout_title', static fn(): string => __( 'Card or wallet', 'storewright' ) );

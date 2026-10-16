@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e1e770e29ae31ae89d1740df01e0d8df",
+    "content-hash": "51c70a9acaec327539f3b02ae8ebc5c6",
     "packages": [
         {
             "name": "composer/installers",
@@ -968,37 +968,6 @@
                 "source": "https://plugins.svn.wordpress.org/woocommerce"
             },
             "time": "2026-10-09T18:09:51+00:00"
-        },
-        {
-            "name": "wp-plugin/woocommerce-gateway-stripe",
-            "version": "11.0.1",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/woocommerce-gateway-stripe/",
-                "reference": "tags/11.0.1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/woocommerce-gateway-stripe.11.0.1.zip"
-            },
-            "require": {
-                "composer/installers": "~1.0|~2.0"
-            },
-            "type": "wordpress-plugin",
-            "notification-url": "https://wp-packages.org/downloads",
-            "authors": [
-                {
-                    "name": "WooCommerce"
-                }
-            ],
-            "description": "Accept debit and credit cards in 135+ currencies, many local methods like Alipay, ACH, and SEPA, and express checkout with Apple Pay and Google Pay.",
-            "homepage": "https://wordpress.org/plugins/woocommerce-gateway-stripe/",
-            "support": {
-                "changelog": "https://wordpress.org/plugins/woocommerce-gateway-stripe/#developers",
-                "issues": "https://wordpress.org/support/plugin/woocommerce-gateway-stripe",
-                "source": "https://plugins.svn.wordpress.org/woocommerce-gateway-stripe"
-            },
-            "time": "2026-10-16T06:46:25+00:00"
         }
     ],
     "packages-dev": [

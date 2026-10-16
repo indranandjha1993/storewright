@@ -133,26 +133,31 @@ test('cash on delivery is not offered when the bag holds a download', async ({ p
 	await expect(page.getByRole('radio', { name: /Cash on delivery/ })).toHaveCount(0);
 });
 
-test('a guest pays for a mixed bag with a stripe test card', async ({ page }) => {
-	test.skip(!process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_') && !process.env.STRIPE_SECRET_KEY?.startsWith('rk_test_'), 'needs sandbox STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY in .env');
+test('a guest pays for a mixed bag on the stripe checkout page', async ({ page }) => {
+	test.skip(!/^(sk|rk)_test_/.test(process.env.STRIPE_SECRET_KEY ?? ''), 'needs sandbox STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY in .env');
+	test.setTimeout(120_000);
 
 	await addToBag(page, products.mug);
 	await addToBag(page, products.guide);
 
 	await page.goto('/checkout/');
 	await fillDeliveryAddress(page);
+	await page.getByRole('radio', { name: /^Stripe/ }).check();
+	await expect(page.locator('iframe[title="Secure payment input frame"]')).toHaveCount(0);
 
-	await page.getByRole('radio', { name: 'Card or wallet' }).check();
-	const card = page.frameLocator('iframe[title="Secure payment input frame"]').first();
-	await card.getByRole('textbox', { name: 'Card number' }).fill('4242424242424242');
-	await card.getByRole('textbox', { name: /Expiration date/ }).fill('12 / 34');
-	await card.getByRole('textbox', { name: 'Security code' }).fill('123');
 	const placeOrder = page.getByRole('button', { name: 'Place order' });
-	// The Stripe element drops a click that Playwright scrolls and fires in one step; a shopper scrolls first.
 	await placeOrder.scrollIntoViewIfNeeded();
 	await placeOrder.click();
 
-	await expect(page).toHaveURL(/order-received/, { timeout: 45_000 });
+	await page.waitForURL(/checkout\.stripe\.com/, { timeout: 30_000 });
+	await expect(page.getByText(/at Storewright/)).toBeVisible();
+	await page.getByRole('textbox', { name: 'Card number' }).fill('4242424242424242');
+	await page.getByRole('textbox', { name: 'Expiration' }).fill('12 / 34');
+	await page.getByRole('textbox', { name: /CVC/ }).fill('123');
+	await page.getByRole('textbox', { name: 'Cardholder name' }).fill('Asha Menon');
+	await page.getByRole('button', { name: 'Pay' }).click();
+
+	await expect(page).toHaveURL(/order-received/, { timeout: 60_000 });
 	await expect(page.getByText(/thank you/i).first()).toBeVisible();
 	await expect(page.getByRole('link', { name: 'guide.pdf' })).toBeVisible();
 });

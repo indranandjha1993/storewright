@@ -52,7 +52,7 @@ e2e-headless: .env ## browser tests without a window, as ci runs them
 	CI=1 npx playwright test
 
 stripe-listen: .env ## forward stripe sandbox webhooks to the local store
-	@stripe listen --api-key "$$STRIPE_SECRET_KEY" --all-snapshot --forward-to "http://localhost:$${WEB_PORT:-8600}/?wc-api=wc_stripe"
+	@stripe listen --api-key "$$STRIPE_SECRET_KEY" --all-snapshot --forward-to "http://localhost:$${WEB_PORT:-8600}/wp-json/storewright/v1/webhooks/stripe"
 
 shell: .env ## shell inside the application container
 	$(RUN) bash
