@@ -110,6 +110,29 @@ test('free delivery is offered from 999', async ({ page }) => {
 	await expect(page.getByRole('group', { name: 'Shipping options' }).getByText('Free delivery')).toBeVisible();
 });
 
+test('an indian checkout offers razorpay first and cash on delivery for goods that ship', async ({ page }) => {
+	await addToBag(page, products.mug);
+
+	await page.goto('/checkout/');
+	await fillDeliveryAddress(page);
+
+	const options = page.getByRole('group', { name: 'Payment options' }).getByRole('radio');
+	await expect(options.first()).toHaveAccessibleName(/Razorpay/);
+	await expect(options.first()).toBeChecked();
+	await expect(page.getByRole('radio', { name: /Cash on delivery/ })).toBeVisible();
+});
+
+test('cash on delivery is not offered when the bag holds a download', async ({ page }) => {
+	await addToBag(page, products.mug);
+	await addToBag(page, products.guide);
+
+	await page.goto('/checkout/');
+	await fillDeliveryAddress(page);
+
+	await expect(page.getByRole('radio', { name: /Razorpay/ })).toBeVisible();
+	await expect(page.getByRole('radio', { name: /Cash on delivery/ })).toHaveCount(0);
+});
+
 test('a guest pays for a mixed bag with a stripe test card', async ({ page }) => {
 	test.skip(!process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_') && !process.env.STRIPE_SECRET_KEY?.startsWith('rk_test_'), 'needs sandbox STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY in .env');
 

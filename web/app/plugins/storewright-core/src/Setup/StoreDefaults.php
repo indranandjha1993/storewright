@@ -29,6 +29,17 @@ final class StoreDefaults {
 			update_option( $option, $value );
 		}
 		update_option( 'woocommerce_onboarding_profile', [ 'skipped' => true ] );
+		add_option(
+			'woocommerce_cod_settings',
+			[
+				'enabled'            => 'yes',
+				'title'              => __( 'Cash on delivery', 'storewright' ),
+				'description'        => __( 'Pay in cash or by UPI when the parcel arrives.', 'storewright' ),
+				'instructions'       => __( 'Keep the amount ready when the parcel arrives.', 'storewright' ),
+				'enable_for_methods' => [],
+				'enable_for_virtual' => 'no',
+			]
+		);
 
 		return [
 			'options' => count( self::STORE_OPTIONS ) + 1,
