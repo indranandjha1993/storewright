@@ -57,6 +57,7 @@ jobs:
       - run: make up
       - run: make install
       - run: make seed
+      - run: make pins
       - name: smoke
         run: |
           curl -fsS http://localhost:8600/health | tee /dev/stderr | grep -q '"ok":true'

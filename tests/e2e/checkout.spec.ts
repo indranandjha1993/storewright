@@ -22,15 +22,25 @@ async function addToBag(page: Page, product: { slug: string; name: string }, opt
 	expect((await added).ok()).toBe(true);
 }
 
-async function fillDeliveryAddress(page: Page) {
+const places = {
+	mgRoad: { country: 'India', city: 'Bengaluru', state: 'Karnataka', pin: '560001' },
+	yelahanka: { country: 'India', city: 'Bengaluru', state: 'Karnataka', pin: '560064' },
+	pune: { country: 'India', city: 'Pune', state: 'Maharashtra', pin: '411001' },
+	sanFrancisco: { country: 'United States (US)', city: 'San Francisco', state: 'California', pin: '94103' },
+};
+
+async function fillDeliveryAddress(page: Page, place = places.mgRoad) {
 	await page.getByLabel('Email address').fill('asha.e2e@example.com');
 	const shipping = page.getByRole('group', { name: 'Shipping address' });
+	if (place.country !== 'India') {
+		await shipping.getByLabel('Country/Region').selectOption({ label: place.country });
+	}
 	await shipping.getByLabel('First name').fill('Asha');
 	await shipping.getByLabel('Last name').fill('Menon');
 	await shipping.getByLabel('Address', { exact: true }).fill('12 Market Street');
-	await shipping.getByLabel('City').fill('Bengaluru');
-	await shipping.getByLabel('State').selectOption({ label: 'Karnataka' });
-	await shipping.getByLabel('PIN Code').fill('560001');
+	await shipping.getByLabel('City').fill(place.city);
+	await shipping.getByLabel('State').selectOption({ label: place.state });
+	await shipping.getByLabel(/PIN Code|ZIP Code/).fill(place.pin);
 	await shipping.getByLabel('Phone').fill('9123456780');
 	await shipping.getByLabel('Phone').blur();
 }
@@ -92,7 +102,7 @@ test('an indian address below 999 is offered standard delivery only', async ({ p
 	await addToBag(page, products.guide);
 
 	await page.goto('/checkout/');
-	await fillDeliveryAddress(page);
+	await fillDeliveryAddress(page, places.pune);
 
 	const options = page.getByRole('group', { name: 'Shipping options' });
 	await expect(options.getByText('Standard delivery')).toBeVisible();
@@ -106,9 +116,41 @@ test('free delivery is offered from 999', async ({ page }) => {
 	await addToBag(page, products.guide);
 
 	await page.goto('/checkout/');
-	await fillDeliveryAddress(page);
+	await fillDeliveryAddress(page, places.pune);
 
 	await expect(page.getByRole('group', { name: 'Shipping options' }).getByText('Free delivery')).toBeVisible();
+});
+
+test('an address within 12 km of the store gets same-day delivery', async ({ page }) => {
+	await addToBag(page, products.mug);
+
+	await page.goto('/checkout/');
+	await fillDeliveryAddress(page, places.mgRoad);
+
+	const options = page.getByRole('group', { name: 'Shipping options' });
+	await expect(options.getByText('Same-day delivery')).toBeVisible();
+	await expect(options.getByText('₹49.00')).toBeVisible();
+	await expect(options.getByText('Standard delivery')).toHaveCount(0);
+});
+
+test('a bengaluru pin beyond the same-day radius falls back to standard delivery', async ({ page }) => {
+	await addToBag(page, products.mug);
+
+	await page.goto('/checkout/');
+	await fillDeliveryAddress(page, places.yelahanka);
+
+	const options = page.getByRole('group', { name: 'Shipping options' });
+	await expect(options.getByText('Standard delivery')).toBeVisible();
+	await expect(options.getByText('Same-day delivery')).toHaveCount(0);
+});
+
+test('an address outside every delivery area is refused with a reason', async ({ page }) => {
+	await addToBag(page, products.mug);
+
+	await page.goto('/checkout/');
+	await fillDeliveryAddress(page, places.sanFrancisco);
+
+	await expect(page.getByText('We do not deliver to 94103 yet. Please use another delivery address.')).toBeVisible();
 });
 
 test('an indian checkout offers razorpay first and cash on delivery for goods that ship', async ({ page }) => {
