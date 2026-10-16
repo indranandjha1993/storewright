@@ -23,7 +23,7 @@ final class GatewayCredentials {
 
 	public static function register(): void {
 		foreach ( [ 'option', 'default_option' ] as $hook ) {
-			add_filter( $hook . '_woocommerce_stripe_settings', static fn( mixed $settings ): mixed => self::merge( $settings, self::STRIPE ) );
+			add_filter( $hook . '_woocommerce_stripe_settings', static fn( mixed $settings ): array => self::testModeOutsideProduction( self::merge( $settings, self::STRIPE ), wp_get_environment_type() ) );
 			add_filter( $hook . '_woocommerce_razorpay_settings', static fn( mixed $settings ): mixed => self::merge( $settings, self::razorpayMap() ) );
 		}
 	}
@@ -38,6 +38,13 @@ final class GatewayCredentials {
 			];
 		}
 		return $map;
+	}
+
+	public static function testModeOutsideProduction( array $settings, string $environment ): array {
+		if ( $environment !== 'production' ) {
+			$settings['testmode'] = 'yes';
+		}
+		return $settings;
 	}
 
 	public static function merge( mixed $settings, array $map ): array {
