@@ -15,3 +15,7 @@ All notable changes are listed here. Versions follow semantic versioning once th
 - Stripe stays in test mode on every store that is not production.
 - `wp storewright setup` applies store defaults and a domestic shipping zone.
 - Browser tests for the bag and checkout on phone and desktop viewports.
+- Gateways switch on when their keys are in the environment; Stripe uses the optimized checkout.
+- Product page on the Interactivity API gallery and add to bag form, without the jQuery gallery scripts.
+- Header fits a phone screen; the closed bag drawer is out of the tab order.
+- Home page built from reusable patterns: hero, category grid, new in, trust strip.
