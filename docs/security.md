@@ -9,8 +9,8 @@ network. The rest of this page covers what a scanner sees.
 Staff sign in at `/sign-in/` (set `LOGIN_PATH` to use another word). `/wp/wp-login.php` answers
 404 at nginx and again in PHP, so login forms, password resets and logouts all go through the
 chosen path. Shoppers keep using the account page. After five failed attempts for a name from
-one address, further attempts are refused for 15 minutes, and nginx allows at most 60 requests a
-minute per address on the sign-in path, with a burst of 30. Login errors never say whether the name exists.
+one address, further attempts are refused for 15 minutes, and nginx allows at most 120 requests a
+minute per address on the sign-in path, with a burst of 60. Login errors never say whether the name exists.
 
 ## What is hidden
 
