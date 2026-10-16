@@ -51,8 +51,9 @@ make install   # install WordPress and WooCommerce, create the admin user
 make seed      # demo catalogue with physical and digital products
 ```
 
-The store answers on `http://localhost:8080` and caught email on `http://localhost:8025`.
-Change `WEB_PORT` and `MAIL_PORT` in `.env` if those ports are taken.
+The store answers on `http://localhost:8600`, caught email on `http://localhost:8601`, and the
+database on `127.0.0.1:8602` for a desktop client. Storewright keeps to ports 8600 to 8619;
+change `WEB_PORT`, `MAIL_PORT` and `DB_PORT` in `.env` if you need others.
 
 ## Deploying
 

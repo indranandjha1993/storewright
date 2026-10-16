@@ -16,7 +16,7 @@ build: .env ## build the application image
 
 up: .env ## start the local stack on http://localhost:8080
 	$(COMPOSE) up -d
-	@echo "store: http://localhost:$${WEB_PORT:-8080}  mail: http://localhost:$${MAIL_PORT:-8025}"
+	@echo "store: http://localhost:$${WEB_PORT:-8600}  mail: http://localhost:$${MAIL_PORT:-8601}"
 
 install: .env ## install wordpress, activate woocommerce and the gateways, enable hpos
 	$(RUN) bin/install
@@ -32,6 +32,13 @@ reset: ## stop the stack and drop the database volume
 
 logs: ## follow application logs
 	$(COMPOSE) logs -f app web
+
+lint: .env ## phpcs and phpstan
+	$(RUN) composer lint
+	$(RUN) composer analyse
+
+test: .env ## unit tests
+	$(RUN) composer test
 
 shell: .env ## shell inside the application container
 	$(RUN) bash
