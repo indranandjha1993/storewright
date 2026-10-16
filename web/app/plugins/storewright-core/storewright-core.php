@@ -54,6 +54,8 @@ add_action(
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			\WP_CLI::add_command( 'storewright seed', Cli\SeedCommand::class );
 			\WP_CLI::add_command( 'storewright setup', Cli\SetupCommand::class );
+			\WP_CLI::add_command( 'storewright area', Cli\AreaCommand::class );
+			\WP_CLI::add_command( 'storewright deliver', Cli\DeliverCommand::class );
 		}
 	}
 );

@@ -6,7 +6,7 @@ namespace Storewright\Core;
 
 final class Schema {
 
-	public const VERSION = '1';
+	public const VERSION = '2';
 	private const OPTION = 'storewright_schema_version';
 
 	public static function register(): void {
@@ -38,6 +38,14 @@ final class Schema {
   PRIMARY KEY  (id),
   UNIQUE KEY gateway_event (gateway, event_id),
   KEY status_received (status, received_at)
+) {$charset};"
+		);
+		dbDelta(
+			"CREATE TABLE {$wpdb->prefix}storewright_area_geometry (
+  zone_id bigint(20) unsigned NOT NULL,
+  shape longtext NOT NULL,
+  updated_at datetime NOT NULL,
+  PRIMARY KEY  (zone_id)
 ) {$charset};"
 		);
 		update_option( self::OPTION, self::VERSION, false );
