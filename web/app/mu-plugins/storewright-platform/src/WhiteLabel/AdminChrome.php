@@ -26,7 +26,6 @@ final class AdminChrome {
 		add_filter( 'update_footer', '__return_empty_string', PHP_INT_MAX );
 		add_action( 'wp_dashboard_setup', [ self::class, 'dashboard' ], 99 );
 		add_action( 'admin_menu', [ self::class, 'menuIcons' ], 999 );
-		add_action( 'admin_enqueue_scripts', [ self::class, 'colours' ] );
 		add_action( 'admin_head', [ self::class, 'help' ] );
 		remove_action( 'welcome_panel', 'wp_welcome_panel' );
 	}
@@ -75,19 +74,5 @@ final class AdminChrome {
 				$menu[ $position ][6] = $icon; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 			}
 		}
-	}
-
-	public static function colours(): void {
-		$accent = Brand::accent();
-		wp_add_inline_style(
-			'colors',
-			sprintf(
-				':root{--wp-admin-theme-color:%1$s;--wp-admin-theme-color--rgb:%2$s;--wp-admin-theme-color-darker-10:%3$s;--wp-admin-theme-color-darker-20:%4$s}.wp-core-ui .button-primary{background:%1$s;border-color:%1$s}.wp-core-ui .button-primary:hover,.wp-core-ui .button-primary:focus{background:%3$s;border-color:%3$s}#adminmenu li.current a.menu-top,#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,#adminmenu .wp-has-current-submenu .wp-submenu-head{background:%1$s}',
-				$accent,
-				Brand::rgb( $accent ),
-				Brand::darken( $accent, 0.1 ),
-				Brand::darken( $accent, 0.2 )
-			)
-		);
 	}
 }
