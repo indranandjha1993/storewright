@@ -1,28 +1,11 @@
-import { execFileSync } from 'node:child_process';
-import { randomBytes } from 'node:crypto';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { account, logIn, type Account } from './support/accounts';
 
-const operator = { email: 'operator.e2e@example.com', password: randomBytes(18).toString('base64url') };
 const productNames = /WooCommerce|WordPress/;
-
-function wp(...args: string[]) {
-	execFileSync('docker', ['compose', '--progress', 'quiet', 'run', '--rm', 'cli', 'wp', ...args], { stdio: 'pipe' });
-}
-
-async function logIn(page: Page) {
-	await page.goto('/wp/wp-login.php');
-	await page.getByLabel('Username or Email Address').fill(operator.email);
-	await page.getByLabel('Password', { exact: true }).fill(operator.password);
-	await page.getByRole('button', { name: 'Log In' }).click();
-	await page.waitForURL(/wp-admin/);
-}
+let operator: Account;
 
 test.beforeAll(() => {
-	try {
-		wp('user', 'update', operator.email, `--user_pass=${operator.password}`, '--role=shop_manager', '--skip-email');
-	} catch {
-		wp('user', 'create', 'e2e-operator', operator.email, '--role=shop_manager', '--display_name=Store Operator', `--user_pass=${operator.password}`);
-	}
+	operator = account('operator.e2e', 'shop_manager', 'Store Operator');
 });
 
 test.beforeEach(({}, testInfo) => {
@@ -38,7 +21,7 @@ test('the login page carries the store brand only', async ({ page }) => {
 });
 
 test('an operator never reads WordPress or WooCommerce in the admin', async ({ page }) => {
-	await logIn(page);
+	await logIn(page, operator);
 
 	for (const path of ['index.php', 'admin.php?page=wc-orders', 'edit.php?post_type=product', 'admin.php?page=wc-settings', 'admin.php?page=wc-settings&tab=checkout', 'admin.php?page=wc-admin']) {
 		await page.goto(`/wp/wp-admin/${path}`);
@@ -51,7 +34,7 @@ test('an operator never reads WordPress or WooCommerce in the admin', async ({ p
 });
 
 test('the operator menu leaves out posts, comments, tools and the marketplace', async ({ page }) => {
-	await logIn(page);
+	await logIn(page, operator);
 	await page.goto('/wp/wp-admin/index.php');
 	const menu = page.locator('#adminmenu');
 
