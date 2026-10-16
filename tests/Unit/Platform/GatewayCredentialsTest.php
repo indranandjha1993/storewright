@@ -63,7 +63,7 @@ final class GatewayCredentialsTest extends TestCase {
 
 		self::assertSame( 'yes', $settings['testmode'] );
 		self::assertArrayNotHasKey( 'secret_key', $settings );
-		self::assertArrayNotHasKey( 'enabled', $settings );
+		self::assertSame( 'no', $settings['enabled'] );
 		self::assertSame( 'refused', GatewayCredentials::modes( 'staging' )['stripe'] );
 	}
 
@@ -85,7 +85,7 @@ final class GatewayCredentialsTest extends TestCase {
 		putenv( 'STRIPE_PUBLISHABLE_KEY=pk_live_abc' );
 		putenv( 'STRIPE_SECRET_KEY=sk_test_abc' );
 
-		self::assertArrayNotHasKey( 'enabled', GatewayCredentials::stripe( false, 'production' ) );
+		self::assertSame( 'no', GatewayCredentials::stripe( false, 'production' )['enabled'] );
 		self::assertSame( 'off', GatewayCredentials::modes( 'production' )['stripe'] );
 	}
 
@@ -127,7 +127,7 @@ final class GatewayCredentialsTest extends TestCase {
 
 		self::assertSame( '', $settings['key_id'] );
 		self::assertSame( '', $settings['description'] );
-		self::assertArrayNotHasKey( 'enabled', $settings );
+		self::assertSame( 'no', $settings['enabled'] );
 		self::assertSame(
 			[
 				'stripe'   => 'off',
@@ -135,5 +135,42 @@ final class GatewayCredentialsTest extends TestCase {
 			],
 			GatewayCredentials::modes( 'development' )
 		);
+	}
+
+	public function test_keys_from_the_environment_are_never_written_to_the_database(): void {
+		$this->stripeKeys( 'test' );
+		$settings = GatewayCredentials::stripe( false, 'development' );
+
+		$saved = GatewayCredentials::keepOutOfDatabase( $settings, GatewayCredentials::stripeMode(), GatewayCredentials::stripeFields() );
+
+		self::assertArrayNotHasKey( 'test_secret_key', $saved );
+		self::assertArrayNotHasKey( 'test_publishable_key', $saved );
+		self::assertArrayNotHasKey( 'test_webhook_secret', $saved );
+		self::assertSame( 'yes', $saved['enabled'] );
+	}
+
+	public function test_keys_an_operator_typed_in_are_saved_when_the_environment_has_none(): void {
+		$typed = [
+			'test_secret_key' => 'sk_test_typed',
+			'enabled'         => 'yes',
+		];
+
+		self::assertSame( $typed, GatewayCredentials::keepOutOfDatabase( $typed, GatewayCredentials::stripeMode(), GatewayCredentials::stripeFields() ) );
+	}
+
+	public function test_a_saved_switch_without_keys_never_offers_the_gateway(): void {
+		self::assertSame( 'no', GatewayCredentials::stripe( [ 'enabled' => 'yes' ], 'development' )['enabled'] );
+		self::assertSame( 'no', GatewayCredentials::razorpay( [ 'enabled' => 'yes' ], 'development' )['enabled'] );
+	}
+
+	public function test_keys_an_operator_saved_keep_the_gateway_on(): void {
+		$saved = [
+			'enabled'              => 'yes',
+			'testmode'             => 'yes',
+			'test_publishable_key' => 'pk_test_typed',
+			'test_secret_key'      => 'sk_test_typed',
+		];
+
+		self::assertSame( 'yes', GatewayCredentials::stripe( $saved, 'development' )['enabled'] );
 	}
 }

@@ -11,11 +11,27 @@ final class GatewayCredentials {
 	public const REFUSED = 'refused';
 	public const OFF     = 'off';
 
+	private const STRIPE_FIELDS   = [ 'test_publishable_key', 'test_secret_key', 'test_webhook_secret', 'publishable_key', 'secret_key', 'webhook_secret' ];
+	private const RAZORPAY_FIELDS = [ 'key_id', 'key_secret', 'webhook_secret' ];
+
 	public static function register(): void {
 		foreach ( [ 'option', 'default_option' ] as $hook ) {
 			add_filter( $hook . '_woocommerce_stripe_settings', static fn( mixed $saved ): array => self::stripe( $saved, wp_get_environment_type() ) );
 			add_filter( $hook . '_woocommerce_razorpay_settings', static fn( mixed $saved ): array => self::razorpay( $saved, wp_get_environment_type() ) );
 		}
+		add_filter( 'pre_update_option_woocommerce_stripe_settings', static fn( mixed $value ): mixed => self::keepOutOfDatabase( $value, self::stripeMode(), self::STRIPE_FIELDS ) );
+		add_filter( 'pre_update_option_woocommerce_razorpay_settings', static fn( mixed $value ): mixed => self::keepOutOfDatabase( $value, self::razorpayMode(), self::RAZORPAY_FIELDS ) );
+	}
+
+	public static function keepOutOfDatabase( mixed $value, ?string $mode, array $fields ): mixed {
+		if ( $mode === null || ! is_array( $value ) ) {
+			return $value;
+		}
+		return array_diff_key( $value, array_flip( $fields ) );
+	}
+
+	public static function stripeFields(): array {
+		return self::STRIPE_FIELDS;
 	}
 
 	public static function modes( string $environment ): array {
@@ -32,7 +48,9 @@ final class GatewayCredentials {
 		}
 		$mode = self::stripeMode();
 		if ( $mode === null || ! self::allowed( $mode, $environment ) ) {
-			return $settings + [ 'testmode' => 'no' ];
+			$settings += [ 'testmode' => 'no' ];
+			$prefix    = $settings['testmode'] === 'yes' ? 'test_' : '';
+			return self::offWithoutKeys( $settings, [ $prefix . 'publishable_key', $prefix . 'secret_key' ] );
 		}
 		$prefix                                  = $mode === self::SANDBOX ? 'test_' : '';
 		$settings['testmode']                    = $mode === self::SANDBOX ? 'yes' : 'no';
@@ -55,7 +73,7 @@ final class GatewayCredentials {
 		];
 		$mode     = self::razorpayMode();
 		if ( $mode === null || ! self::allowed( $mode, $environment ) ) {
-			return $settings;
+			return self::offWithoutKeys( $settings, [ 'key_id', 'key_secret' ] );
 		}
 		$settings['key_id']     = self::env( 'RAZORPAY_KEY_ID' );
 		$settings['key_secret'] = self::env( 'RAZORPAY_KEY_SECRET' );
@@ -65,13 +83,13 @@ final class GatewayCredentials {
 		return $settings + [ 'enabled' => 'yes' ];
 	}
 
-	private static function stripeMode(): ?string {
+	public static function stripeMode(): ?string {
 		$secret      = self::mode( self::env( 'STRIPE_SECRET_KEY' ), [ 'sk_test_', 'rk_test_' ], [ 'sk_live_', 'rk_live_' ] );
 		$publishable = self::mode( self::env( 'STRIPE_PUBLISHABLE_KEY' ), [ 'pk_test_' ], [ 'pk_live_' ] );
 		return $secret !== null && $secret === $publishable ? $secret : null;
 	}
 
-	private static function razorpayMode(): ?string {
+	public static function razorpayMode(): ?string {
 		if ( self::env( 'RAZORPAY_KEY_SECRET' ) === '' ) {
 			return null;
 		}
@@ -101,6 +119,16 @@ final class GatewayCredentials {
 			return self::OFF;
 		}
 		return self::allowed( $mode, $environment ) ? $mode : self::REFUSED;
+	}
+
+	private static function offWithoutKeys( array $settings, array $required ): array {
+		foreach ( $required as $field ) {
+			if ( trim( (string) ( $settings[ $field ] ?? '' ) ) === '' ) {
+				$settings['enabled'] = 'no';
+				break;
+			}
+		}
+		return $settings;
 	}
 
 	private static function settings( mixed $saved ): array {
