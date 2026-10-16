@@ -21,7 +21,7 @@ final class Catalogue {
 	public function run(): array {
 		$categories = [
 			'apparel'  => $this->category( 'Apparel', 'apparel' ),
-			'home'     => $this->category( 'Home', 'home' ),
+			'desk'     => $this->category( 'Kitchen and Desk', 'kitchen-and-desk' ),
 			'books'    => $this->category( 'Books', 'books' ),
 			'software' => $this->category( 'Software', 'software' ),
 		];
@@ -43,7 +43,7 @@ final class Catalogue {
 			'Stoneware Mug',
 			'A 350 ml stoneware mug, dishwasher safe.',
 			449,
-			$categories['home'],
+			$categories['desk'],
 			'#c0603a',
 			[
 				'weight' => '0.4',
@@ -58,7 +58,7 @@ final class Catalogue {
 			'Dot Grid Notebook',
 			'A5, 160 pages of 100 gsm paper, lay-flat binding.',
 			349,
-			$categories['home'],
+			$categories['desk'],
 			'#5b6b3a',
 			[
 				'weight' => '0.3',
