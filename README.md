@@ -52,6 +52,7 @@ make seed      # demo catalogue with physical and digital products
 ```
 
 The store answers on `http://localhost:8080` and caught email on `http://localhost:8025`.
+Change `WEB_PORT` and `MAIL_PORT` in `.env` if those ports are taken.
 
 ## Deploying
 

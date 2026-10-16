@@ -1,0 +1,16 @@
+.git
+.github
+node_modules
+vendor
+web/wp
+web/app/uploads
+web/app/plugins/*
+!web/app/plugins/storewright-*
+web/app/themes/*
+!web/app/themes/storewright
+.env
+.env.*
+*.log
+*.sql
+*.sql.gz
+tests
