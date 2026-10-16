@@ -17,8 +17,9 @@ completed Stripe test order; progress is recorded in [CHANGELOG.md](CHANGELOG.md
 ## What it will do
 
 - Physical, digital and mixed orders from one catalogue, with secure downloads and stock.
-- Stripe for cards, Apple Pay, Google Pay and Link; Razorpay for UPI, cards, netbanking,
-  wallets, EMI and cash on delivery. The gateway is picked by currency and country.
+- Three ways to pay at checkout: Razorpay, Stripe and cash on delivery. Razorpay and Stripe each
+  open their own secure page with every method enabled on the account, so card details never
+  touch the store. An INR store offers Razorpay first.
 - Shipments built on WooCommerce fulfillments, with carrier integrations (manual, Shiprocket,
   Delhivery first), a tracking page for the customer and delivery notifications.
 - An operator console: dashboard, orders, fulfillments, products, customers, payments and
@@ -54,7 +55,7 @@ make install           # install WordPress and WooCommerce, create the admin use
 make seed              # demo catalogue with physical and digital products
 make lint test         # what CI runs on the php
 make e2e               # browser tests in a visible Chrome window
-make stripe-listen     # forward Stripe sandbox webhooks to the local store
+make stripe-listen     # forward Stripe sandbox webhooks to /wp-json/storewright/v1/webhooks/stripe
 ```
 
 The store answers on `http://localhost:8600`, caught email on `http://localhost:8601`, and the

@@ -4,6 +4,10 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- Stripe payments on Stripe's hosted checkout page through our own gateway, with refunds; the official Stripe plugin is no longer bundled.
+- Payment routing by currency: an INR store offers Razorpay first.
+- Cash on delivery with rules: every item must ship, an order value limit and an optional PIN list.
+
 ## 0.1.0 - 2026-10-16
 
 The walking skeleton: a running store you can install with one command and pay for with a Stripe
