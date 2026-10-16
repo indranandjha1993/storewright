@@ -29,12 +29,13 @@ final class PinsCommand {
 		$report = $directory->report;
 		WP_CLI::success(
 			sprintf(
-				'%d PINs from %d offices; %d with a point, %d placeholder coordinates dropped, %d points rejected as far from their district.',
+				'%d PINs from %d offices; %d with a point, %d placeholder coordinates dropped, %d points rejected as far from their district, %d army post rows skipped.',
 				$report['pins'],
 				$report['offices'],
 				$report['with_point'],
 				$report['placeholders'],
-				$report['off_prefix']
+				$report['off_prefix'],
+				$report['army_post']
 			)
 		);
 		if ( $report['unmatched_states'] ) {

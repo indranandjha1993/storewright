@@ -17,6 +17,7 @@ final class PincodeDirectory {
 		'with_point'       => 0,
 		'placeholders'     => 0,
 		'off_prefix'       => 0,
+		'army_post'        => 0,
 		'unmatched_states' => [],
 	];
 
@@ -28,6 +29,10 @@ final class PincodeDirectory {
 		foreach ( $offices as $office ) {
 			$pin = preg_replace( '/\D/', '', (string) ( $office['pincode'] ?? '' ) );
 			if ( strlen( $pin ) !== 6 ) {
+				continue;
+			}
+			if ( $pin[0] === '9' || $pin[0] === '0' ) {
+				++$this->report['army_post'];
 				continue;
 			}
 			++$this->report['offices'];

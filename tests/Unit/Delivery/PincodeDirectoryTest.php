@@ -101,10 +101,10 @@ final class PincodeDirectoryTest extends TestCase {
 	public function test_unknown_state_names_are_reported_and_bad_pins_skipped(): void {
 		$directory = new PincodeDirectory( self::STATES );
 
-		$pins = $directory->build( [ self::office( '123', '12', '77' ), self::office( '999999', '12.9', '77.6', 'X', 'ATLANTIS' ) ] );
+		$pins = $directory->build( [ self::office( '123', '12', '77' ), self::office( '777777', '12.9', '77.6', 'X', 'ATLANTIS' ) ] );
 
 		self::assertArrayNotHasKey( '123', $pins );
-		self::assertSame( '', $pins['999999']['state'] );
+		self::assertSame( '', $pins['777777']['state'] );
 		self::assertArrayHasKey( 'ATLANTIS', $directory->report['unmatched_states'] );
 	}
 
@@ -112,5 +112,14 @@ final class PincodeDirectoryTest extends TestCase {
 		self::assertSame( 'DADRAANDNAGARHAVELIANDDAMANANDDIU', PincodeDirectory::stateKey( 'The Dadra & Nagar Haveli and Daman & Diu' ) );
 		self::assertSame( 'JAMMUANDKASHMIR', PincodeDirectory::stateKey( 'JAMMU AND KASHMIR' ) );
 		self::assertSame( PincodeDirectory::stateKey( 'THE DADRA AND NAGAR HAVELI AND DAMAN AND DIU' ), PincodeDirectory::stateKey( 'Dādra and Nagar Haveli and Damān and Diu' ) );
+	}
+
+	public function test_army_post_pins_are_not_delivery_addresses(): void {
+		$directory = new PincodeDirectory( self::STATES );
+
+		$pins = $directory->build( [ self::office( '999999', '18.6', '78.1' ), self::office( '900056', '22.5', '88.3' ), self::office( '560001', '12.98', '77.59' ) ] );
+
+		self::assertSame( [ '560001' ], array_map( 'strval', array_keys( $pins ) ) );
+		self::assertSame( 2, $directory->report['army_post'] );
 	}
 }
