@@ -128,3 +128,21 @@ Text Domain: storewright
 	font-weight: 600;
 	text-decoration: none;
 }
+
+.sw-deliverability {
+	margin: var(--wp--preset--spacing--10) 0 0;
+	font-size: var(--wp--preset--font-size--small);
+	font-weight: 600;
+}
+
+.sw-deliverability--deliverable {
+	color: var(--wp--preset--color--accent);
+}
+
+.sw-deliverability--approximate {
+	color: var(--wp--preset--color--muted);
+}
+
+.sw-deliverability--undeliverable {
+	color: var(--wp--preset--color--sale);
+}
