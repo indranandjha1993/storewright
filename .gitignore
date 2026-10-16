@@ -15,7 +15,7 @@ research/
 /web/.htaccess
 
 # Dependencies and build output
-vendor/
+/vendor/
 node_modules/
 build/
 dist/
