@@ -3,12 +3,19 @@
   "private": true,
   "license": "GPL-2.0-or-later",
   "scripts": {
+    "fonts": "node bin/fonts.mjs",
     "console": "npm run build -w storewright-console",
     "console:dev": "npm run dev -w storewright-console",
     "e2e": "playwright test",
     "e2e:report": "playwright show-report tests/e2e/report"
   },
   "devDependencies": {
+    "@fontsource-variable/fraunces": "5.3.0",
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource-variable/playfair-display": "5.3.0",
+    "@fontsource-variable/source-serif-4": "5.3.0",
+    "@fontsource-variable/space-grotesk": "5.3.0",
     "@playwright/test": "1.56.1"
   },
   "engines": {

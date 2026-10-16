@@ -12,11 +12,6 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: storewright
 */
 
-:root {
-	--sw-radius: 10px;
-	--sw-shadow: 0 1px 2px rgb(21 23 26 / 6%), 0 8px 24px rgb(21 23 26 / 6%);
-}
-
 .wp-block-woocommerce-product-collection .wc-block-product-template__responsive {
 	gap: var(--wp--preset--spacing--40);
 }
@@ -26,38 +21,38 @@ Text Domain: storewright
 	align-content: start;
 	gap: var(--wp--preset--spacing--20);
 	padding: var(--wp--preset--spacing--20);
-	border-radius: var(--sw-radius);
+	border-radius: var(--wp--custom--radius);
 	background: var(--wp--preset--color--surface);
 	transition: box-shadow 160ms ease, transform 160ms ease;
 }
 
 .wp-block-woocommerce-product-collection .wc-block-product:hover {
-	box-shadow: var(--sw-shadow);
+	box-shadow: var(--wp--custom--shadow);
 	transform: translateY(-2px);
 }
 
 .wc-block-components-product-image img,
 .wp-block-woocommerce-product-image img,
 .wc-block-product-gallery img {
-	border-radius: calc(var(--sw-radius) - 2px);
+	border-radius: calc(var(--wp--custom--radius) - 2px);
 }
 
 .wc-block-components-button,
 .wp-element-button,
 .wp-block-button__link {
-	border-radius: var(--sw-radius);
+	border-radius: var(--wp--custom--radius-button);
 	font-weight: 600;
 	letter-spacing: 0.01em;
 }
 
 .wc-block-components-notice-banner {
-	border-radius: var(--sw-radius);
+	border-radius: var(--wp--custom--radius);
 }
 
 .wc-block-components-form .wc-block-components-text-input input,
 .wc-block-components-select .components-custom-select-control__button,
 .wc-block-components-country-input input {
-	border-radius: 8px;
+	border-radius: var(--wp--custom--radius-small);
 }
 
 .sw-trust {
@@ -81,6 +76,20 @@ Text Domain: storewright
 
 .sw-header .wp-block-site-title {
 	flex-shrink: 0;
+}
+
+.sw-header__brand:has(.wp-block-site-logo) .wp-block-site-title,
+.sw-footer__brand:has(.wp-block-site-logo) .wp-block-site-title {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+}
+
+.wp-block-site-logo img {
+	max-height: 2.5rem;
+	width: auto;
 }
 
 .sw-header__actions .wp-block-search__button {
@@ -116,7 +125,7 @@ Text Domain: storewright
 	align-items: center;
 	min-height: 5.5rem;
 	padding: var(--wp--preset--spacing--20) var(--wp--preset--spacing--30);
-	border-radius: var(--sw-radius);
+	border-radius: var(--wp--custom--radius);
 	background: var(--wp--preset--color--surface);
 	border: 1px solid var(--wp--preset--color--line);
 	transition: border-color 160ms ease, box-shadow 160ms ease;
@@ -124,7 +133,7 @@ Text Domain: storewright
 
 .sw-categories .wp-block-term:hover {
 	border-color: var(--wp--preset--color--accent);
-	box-shadow: var(--sw-shadow);
+	box-shadow: var(--wp--custom--shadow);
 }
 
 .sw-categories .wp-block-term-name a {
@@ -188,16 +197,16 @@ Text Domain: storewright
 	width: min(20rem, calc(100vw - 2rem));
 	padding: var(--wp--preset--spacing--20);
 	border: 1px solid var(--wp--preset--color--line);
-	border-radius: var(--sw-radius);
+	border-radius: var(--wp--custom--radius);
 	background: var(--wp--preset--color--surface);
-	box-shadow: var(--sw-shadow);
+	box-shadow: var(--wp--custom--shadow);
 }
 
 .sw-delivery--product {
 	margin-top: var(--wp--preset--spacing--20);
 	padding: var(--wp--preset--spacing--20);
 	border: 1px solid var(--wp--preset--color--line);
-	border-radius: var(--sw-radius);
+	border-radius: var(--wp--custom--radius);
 }
 
 .sw-delivery--product .sw-delivery__panel {
@@ -243,7 +252,7 @@ Text Domain: storewright
 	min-width: 0;
 	padding: 0 0.75rem;
 	border: 1px solid var(--wp--preset--color--line);
-	border-radius: 8px;
+	border-radius: var(--wp--custom--radius-small);
 }
 
 .sw-delivery__form .wp-element-button {

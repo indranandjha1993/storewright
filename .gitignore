@@ -19,6 +19,7 @@ research/
 node_modules/
 build/
 dist/
+/web/app/themes/storewright/assets/fonts/
 *.zip
 *.log
 

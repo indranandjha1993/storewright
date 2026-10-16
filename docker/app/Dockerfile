@@ -10,9 +10,10 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY web/app/plugins/storewright-console/package.json web/app/plugins/storewright-console/
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --workspace storewright-console --no-audit --no-fund
+    npm ci --workspace storewright-console --include-workspace-root --no-audit --no-fund
+COPY bin/fonts.mjs bin/
 COPY web/app/plugins/storewright-console web/app/plugins/storewright-console
-RUN npm run build --workspace storewright-console
+RUN npm run fonts && npm run build --workspace storewright-console
 
 FROM php:8.4-fpm-alpine AS base
 COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
@@ -42,6 +43,7 @@ COPY web/app/plugins/storewright-console ./web/app/plugins/storewright-console
 COPY --from=console /build/web/app/plugins/storewright-console/build ./web/app/plugins/storewright-console/build
 COPY web/app/mu-plugins ./web/app/mu-plugins
 COPY web/app/themes/storewright ./web/app/themes/storewright
+COPY --from=console /build/web/app/themes/storewright/assets/fonts ./web/app/themes/storewright/assets/fonts
 COPY config ./config
 COPY web/index.php web/wp-config.php ./web/
 COPY wp-cli.yml ./

@@ -59,6 +59,7 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: npm run fonts
       - run: npm run console
       - run: make up
       - run: make install

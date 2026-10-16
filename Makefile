@@ -26,8 +26,11 @@ vendor/autoload.php: composer.lock
 install: .env vendor/autoload.php ## install wordpress, activate woocommerce and the gateways, enable hpos
 	$(RUN) bin/install
 
-console: ## build the operator console (npm run console:dev to watch)
+console: fonts ## build the operator console (npm run console:dev to watch)
 	npm run console
+
+fonts: ## copy the bundled typefaces into the theme
+	npm run fonts
 
 seed: .env ## demo catalogue, coupon and customers
 	$(RUN) wp storewright seed
