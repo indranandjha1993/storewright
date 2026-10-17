@@ -44,7 +44,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: build app
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/app/Dockerfile
@@ -57,7 +57,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: build web
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/app/Dockerfile
