@@ -18,15 +18,8 @@ volume shared by both, so nothing in the images changes at run time.
 Pushing a `v*` tag runs the release workflow (`.github/workflows/release.yml`): it builds both
 images, scans them with Trivy and stops on any critical issue that has a fix, pushes them to GHCR
 and creates the GitHub release from that version's section of `CHANGELOG.md` if it does not exist
-yet. It can also be started by hand for an existing tag. The packages are private, so each server
-logs in once with a token that can only read packages:
-
-```
-echo "$TOKEN" | docker login ghcr.io -u indranandjha1993 --password-stdin
-```
-
-Create the token under GitHub settings, Developer settings, Personal access tokens (classic), with
-only the `read:packages` scope.
+yet. It can also be started by hand for an existing tag. The images are public, so a server pulls
+them without logging in.
 
 ## The server
 
@@ -36,7 +29,6 @@ Point the store's domain at it, then copy `deploy/` over:
 ```
 scp -r deploy/ store-server:/srv/acme-store
 ssh store-server
-echo "$TOKEN" | docker login ghcr.io -u indranandjha1993 --password-stdin
 cd /srv/acme-store
 ./deploy.sh init            # writes .env with fresh salts and passwords, readable by the owner only
 nano .env                   # DOMAIN, WP_HOME, ADMIN_EMAIL, SITE_TITLE, mail, gateway keys
@@ -86,6 +78,32 @@ with a nightly cron entry on the host:
 ```
 30 2 * * * cd /srv/acme-store && ./deploy.sh backup && rclone sync backups remote:acme-store
 ```
+
+## Updates from this repository
+
+A store can update itself to every release. After the release workflow publishes the images, its
+deploy job goes through the servers listed in the repository variable `DEPLOY_TARGETS`, one at a
+time: it copies that release's `deploy.sh`, compose file and Caddyfile to the server and runs
+`./deploy.sh update <version>`, which backs up first and goes back by itself if the new version
+is unhealthy. A failed server does not stop the others. Only tags and manual runs start it, never
+pull requests, so forks cannot reach the secrets.
+
+To connect a store that is already installed with `./deploy.sh up` (see The server above):
+
+1. On the server, create a user for deployments that belongs to the `docker` group and owns the
+   store's folder, and add a new SSH public key to its `authorized_keys`.
+2. In the repository settings, under Environments, create an environment with a neutral name such
+   as `store-3`; the name shows in the public run log, so it should not name the client. Limit it
+   to tags matching `v*`.
+3. Give the environment these secrets: `DEPLOY_HOST` (address), `DEPLOY_USER`, `DEPLOY_PATH` (the
+   store's folder, such as `/srv/acme-store`), `DEPLOY_SSH_KEY` (the private key) and
+   `DEPLOY_KNOWN_HOSTS` (the output of `ssh-keyscan <address>`).
+4. Add the name to the repository variable `DEPLOY_TARGETS`, a JSON list such as
+   `["store-1","store-3"]`.
+
+Server addresses and keys live only in those secrets, never in the repository. To hold a store
+on its version, remove it from `DEPLOY_TARGETS`; to approve each update by hand, add a required
+reviewer to its environment.
 
 ## Drill
 

@@ -23,6 +23,9 @@ env:
 jobs:
   images:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -95,3 +98,36 @@ jobs:
           fi
           awk -v v="## $version " 'index($0, v) == 1 {on=1; next} on && /^## / {exit} on' CHANGELOG.md > notes.md
           gh release create "$tag" --title "$version" --notes-file notes.md
+
+  deploy:
+    needs: images
+    if: vars.DEPLOY_TARGETS != ''
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        target: ${{ fromJSON(vars.DEPLOY_TARGETS || '["none"]') }}
+    environment: ${{ matrix.target }}
+    concurrency: deploy-${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.images.outputs.tag }}
+      - name: ssh key
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: update
+        env:
+          SERVER: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+          FOLDER: ${{ secrets.DEPLOY_PATH }}
+          VERSION: ${{ needs.images.outputs.version }}
+        run: |
+          scp -q -i ~/.ssh/deploy deploy/deploy.sh deploy/docker-compose.yml deploy/Caddyfile deploy/.env.example "$SERVER:$FOLDER/"
+          ssh -i ~/.ssh/deploy "$SERVER" "cd '$FOLDER' && ./deploy.sh update '$VERSION'"
