@@ -176,6 +176,22 @@ test('staff keep store details, order emails and checkout options in settings', 
 	wp('eval', '$cod = get_option( "woocommerce_cod_settings" ); $cod["enabled"] = "yes"; update_option( "woocommerce_cod_settings", $cod ); $own = (array) get_option( "storewright_settings", [] ); unset( $own["store_gstin"] ); update_option( "storewright_settings", $own );');
 });
 
+test('a new store shows what is left to set up until staff hide it', async ({ page }) => {
+	wp('eval', 'delete_user_meta( get_user_by( "login", "console.e2e" )->ID, "storewright_setup_dismissed" ); delete_option( "storewright_brand" ); update_option( "site_logo", 0 );');
+	await logIn(page, staff);
+	const setup = page.getByRole('region', { name: 'Getting started' });
+	await expect(setup).toContainText(/\d of 7 done/);
+	const brand = setup.getByRole('listitem').filter({ hasText: 'Make it yours' });
+	await expect(brand.getByRole('link', { name: 'Open' })).toHaveAttribute('href', /p=%2Fbrand/);
+
+	await setup.getByRole('button', { name: 'Hide' }).click();
+	await expect(setup).toHaveCount(0);
+	await page.reload();
+	await expect(page.getByRole('heading', { level: 1, name: 'Today' })).toBeVisible();
+	await expect(page.getByRole('region', { name: 'Getting started' })).toHaveCount(0);
+	wp('eval', 'delete_user_meta( get_user_by( "login", "console.e2e" )->ID, "storewright_setup_dismissed" );');
+});
+
 test('staff change a price without leaving the console', async ({ page }) => {
 	await logIn(page, staff);
 	await page.getByRole('link', { name: 'Products' }).click();

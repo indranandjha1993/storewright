@@ -22,7 +22,10 @@ so a deployment needs nothing extra.
 
 ## Screens
 
-- **Today** (`/`): sales, orders, average order and refunds for today, the last 7 or 30 days
+- **Today** (`/`): on a new store, a Getting started list of seven steps (brand, store address,
+  payments, delivery areas, products, policy pages, a test order), each checked on the server and
+  linked to the screen that finishes it, until it is complete or hidden. Then sales, orders,
+  average order and refunds for today, the last 7 or 30 days
   against the period before, a sales chart, the queues to fulfil, awaiting payment and on hold,
   recent orders, payment gateway health from the webhook log, low stock and best sellers.
 - **Orders** (`/orders`): every order with status filters, search, a detail panel with items,

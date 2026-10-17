@@ -5,6 +5,7 @@ import { adminLink, consoleLink } from '../../lib/data';
 import { Card, Empty, Screen } from '../../lib/screen';
 import { count, localDate, money, shortDate, timeAgo } from '../../lib/format';
 import { loadDashboard } from './api';
+import { Setup } from './setup';
 import './style.scss';
 
 const periods = [
@@ -228,6 +229,7 @@ export const stage = () => {
 
 	return (
 		<Screen title={ __( 'Today', 'storewright' ) } actions={ switcher } className="sw-dash">
+			<Setup />
 			{ error && (
 				<Notice status="error" isDismissible={ false }>
 					{ error }
