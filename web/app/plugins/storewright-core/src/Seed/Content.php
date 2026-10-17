@@ -23,6 +23,7 @@ final class Content {
 			'home'           => $this->page( 'Home', 'home', '' ),
 		];
 		update_option( 'wp_page_for_privacy_policy', $pages['privacy-policy'] );
+		update_option( 'woocommerce_terms_page_id', $pages['terms'] );
 		update_option( 'show_on_front', 'page' );
 		update_option( 'page_on_front', $pages['home'] );
 		update_option( 'page_for_posts', $pages['journal'] );

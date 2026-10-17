@@ -256,3 +256,45 @@ test('a guest pays for a mixed bag on the stripe checkout page', async ({ page }
 	await expect(page.getByText(/thank you/i).first()).toBeVisible();
 	await expect(page.getByRole('link', { name: 'guide.pdf' })).toBeVisible();
 });
+
+test('the bag shows how far the order is from free delivery', async ({ page }) => {
+	await addToBag(page, products.mug);
+
+	await page.goto('/cart/');
+	const bar = page.locator('.wp-block-woocommerce-cart .sw-free-delivery');
+	await expect(bar).toHaveText('Add ₹550.00 more for free delivery.');
+
+	await page.getByRole('button', { name: /Increase quantity of Stoneware Mug/ }).click();
+	await page.getByRole('button', { name: /Increase quantity of Stoneware Mug/ }).click();
+	await expect(bar).toHaveText('Your order qualifies for free delivery.');
+});
+
+test('a pin code fills in the city and state', async ({ page }) => {
+	await addToBag(page, products.mug);
+
+	await page.goto('/checkout/');
+	const shipping = page.getByRole('group', { name: 'Shipping address' });
+	await shipping.getByLabel(/PIN Code/).fill('411001');
+
+	await expect(shipping.getByLabel('City')).toHaveValue('Pune');
+	await expect(shipping.getByLabel('State')).toHaveValue('MH');
+});
+
+test('a business buyer adds a gstin that is checked and kept on the order', async ({ page }) => {
+	await addToBag(page, products.mug);
+
+	await page.goto('/checkout/');
+	await fillDeliveryAddress(page);
+	await page.getByLabel('Business name, for a tax invoice (optional)').fill('Menon Studio LLP');
+	const gstin = page.getByLabel('GSTIN (optional)');
+	await gstin.fill('29ABCDE1234F1Z5');
+	await page.getByRole('radio', { name: /Cash on delivery/ }).check();
+	await placeOrder(page);
+	await expect(page.getByText('That GSTIN does not look right. It has 15 characters, such as 29ABCDE1234F1Z5.')).toBeVisible();
+
+	await gstin.fill('29abcde1234f1zw');
+	await placeOrder(page);
+	await expect(page).toHaveURL(/order-received/, { timeout: 30_000 });
+	await expect(page.getByText('29ABCDE1234F1ZW')).toBeVisible();
+	await expect(page.getByText('Menon Studio LLP')).toBeVisible();
+});

@@ -1,10 +1,18 @@
-<!-- wp:group {"tagName":"header","align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|20","bottom":"var:preset|spacing|20"}},"border":{"bottom":{"color":"var:preset|color|line","width":"1px"}}},"backgroundColor":"surface","layout":{"type":"constrained","contentSize":"78rem"}} -->
-<header class="wp-block-group alignfull has-surface-background-color has-background" style="border-bottom-color:var(--wp--preset--color--line);border-bottom-width:1px;padding-top:var(--wp--preset--spacing--20);padding-bottom:var(--wp--preset--spacing--20)">
-	<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->
-	<div class="wp-block-group">
-		<!-- wp:site-title {"level":0} /-->
-		<!-- wp:paragraph {"fontSize":"small","textColor":"muted"} -->
-		<p class="has-muted-color has-text-color has-small-font-size">Secure checkout</p>
+<!-- wp:group {"tagName":"header","align":"full","className":"sw-checkout-bar","layout":{"type":"constrained","contentSize":"80rem"}} -->
+<header class="wp-block-group alignfull sw-checkout-bar">
+	<!-- wp:group {"className":"sw-checkout-bar__row","layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->
+	<div class="wp-block-group sw-checkout-bar__row">
+		<!-- wp:group {"className":"sw-header__brand","layout":{"type":"flex","flexWrap":"nowrap"}} -->
+		<div class="wp-block-group sw-header__brand">
+			<!-- wp:site-logo {"width":140,"shouldSyncIcon":false} /-->
+			<!-- wp:site-title {"level":0} /-->
+		</div>
+		<!-- /wp:group -->
+		<!-- wp:paragraph {"className":"sw-checkout-bar__note"} -->
+		<p class="sw-checkout-bar__note"><strong>Secure checkout</strong><span class="sw-checkout-bar__methods"> · UPI, cards, netbanking and cash on delivery</span></p>
+		<!-- /wp:paragraph -->
+		<!-- wp:paragraph {"className":"sw-checkout-bar__back"} -->
+		<p class="sw-checkout-bar__back"><a href="/shop/">Back to shop</a></p>
 		<!-- /wp:paragraph -->
 	</div>
 	<!-- /wp:group -->

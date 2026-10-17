@@ -71,6 +71,11 @@ How areas, shapes and the PIN directory work is in [docs/delivery.md](docs/deliv
 
 Keys, webhooks and local testing for Razorpay and Stripe are in [docs/payments.md](docs/payments.md).
 
+## Checkout
+
+GSTIN for business buyers, PIN code autofill and a free delivery progress bar. See
+[docs/checkout.md](docs/checkout.md).
+
 ## Content
 
 About, Contact, Shipping and returns, Terms, Privacy and a Journal come seeded and ready to edit.
