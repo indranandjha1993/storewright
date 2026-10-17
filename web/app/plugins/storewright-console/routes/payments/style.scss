@@ -1,0 +1,102 @@
+@use '../../lib/screen';
+
+.sw-payments__gateways {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+	gap: 1rem;
+}
+
+.sw-gateway__facts {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.4rem 1rem;
+	margin: 0;
+
+	dt {
+		color: var(--sw-muted);
+	}
+
+	dd {
+		margin: 0;
+		font-weight: 600;
+		text-align: right;
+
+		&.is-bad {
+			color: var(--sw-sale);
+		}
+	}
+}
+
+.sw-gateway__webhook {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 0.25rem 0.5rem;
+	align-items: center;
+	margin-top: 1rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--sw-line);
+
+	span {
+		grid-column: 1 / -1;
+		color: var(--sw-muted);
+		font-size: 0.75rem;
+	}
+
+	code {
+		overflow: hidden;
+		padding: 0.35rem 0.5rem;
+		border-radius: var(--sw-radius-small);
+		background: var(--sw-accent-soft);
+		font-size: 0.75rem;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.sw-payments__note,
+.sw-payments__lead {
+	margin: 0;
+	color: var(--sw-muted);
+}
+
+.sw-payments__lead {
+	padding: 0 1.25rem 1rem;
+}
+
+.sw-payments__table td:first-child small {
+	display: block;
+	color: var(--sw-muted);
+}
+
+.sw-payments__check {
+	display: grid;
+	gap: 0.35rem;
+	justify-items: end;
+
+	small {
+		max-width: 22rem;
+		color: var(--sw-muted);
+		text-align: right;
+	}
+}
+
+.sw-payments__filters {
+	display: flex;
+	gap: 0.35rem;
+}
+
+.sw-payments__id {
+	display: block;
+	color: var(--sw-muted);
+	font-size: 0.75rem;
+}
+
+.sw-payments__pager {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+	justify-content: flex-end;
+	padding: 0.75rem 1.25rem;
+	color: var(--sw-muted);
+	font-size: 0.8125rem;
+}

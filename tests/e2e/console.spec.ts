@@ -129,6 +129,26 @@ test('staff ship an order in parts with carrier and tracking', async ({ page }) 
 	await expect(shipments).toContainText('Part of the order has been sent.');
 });
 
+test('the payments screen shows gateway health and orders still waiting for money', async ({ page }) => {
+	const id = wp('eval', '$order = wc_create_order(); $order->add_product( wc_get_product( wc_get_product_id_by_sku( "SW-NOTE" ) ), 1 ); $order->set_address( [ "first_name" => "Pay", "last_name" => "Check", "email" => "pay.check@example.com" ], "billing" ); $order->set_payment_method( "razorpay" ); $order->set_payment_method_title( "Razorpay" ); $order->calculate_totals(); $order->set_date_created( time() - 20 * MINUTE_IN_SECONDS ); $order->save(); echo $order->get_order_number();');
+	await logIn(page, staff);
+	await page.getByRole('link', { name: 'Payments' }).click();
+
+	await expect(page.getByRole('heading', { level: 1, name: 'Payments' })).toBeVisible();
+	for (const name of ['Razorpay', 'Stripe', 'Cash on delivery']) {
+		await expect(page.getByRole('region', { name, exact: true })).toBeVisible();
+	}
+	await expect(page.getByRole('region', { name: 'Stripe', exact: true })).toContainText('/wp-json/storewright/v1/webhooks/stripe');
+
+	const waiting = page.getByRole('region', { name: 'Waiting for payment' });
+	const row = waiting.getByRole('row').filter({ hasText: `#${id}` });
+	await expect(row).toContainText('Pay Check');
+	await row.getByRole('button', { name: 'Check with Razorpay' }).click();
+	await expect(row.getByRole('status')).not.toBeEmpty();
+
+	await expect(page.getByRole('region', { name: 'Webhook log' })).toBeVisible();
+});
+
 test('staff change a price without leaving the console', async ({ page }) => {
 	await logIn(page, staff);
 	await page.getByRole('link', { name: 'Products' }).click();

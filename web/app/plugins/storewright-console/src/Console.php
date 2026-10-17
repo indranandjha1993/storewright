@@ -42,6 +42,7 @@ final class Console {
 			'orders'    => [ __( 'Orders', 'storewright' ), '/orders' ],
 			'products'  => [ __( 'Products', 'storewright' ), '/products' ],
 			'customers' => [ __( 'Customers', 'storewright' ), '/customers' ],
+			'payments'  => [ __( 'Payments', 'storewright' ), '/payments' ],
 			'areas'     => [ __( 'Delivery areas', 'storewright' ), '/areas' ],
 			'content'   => [ __( 'Pages and journal', 'storewright' ), '/content' ],
 			'brand'     => [ __( 'Brand', 'storewright' ), '/brand' ],

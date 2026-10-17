@@ -28,6 +28,10 @@ so a deployment needs nothing extra.
 - **Orders** (`/orders`): every order with status filters, search, a detail panel with items,
   shipments (see [fulfilment.md](fulfilment.md)), customer, delivery address, payment and notes,
   and the next status one click away. Refunds and line edits open the advanced order screen.
+- **Payments** (`/payments`): each gateway's mode, webhook health and webhook address to copy
+  into the gateway dashboard, online orders still unpaid after 15 minutes with a button that asks
+  the gateway and records the payment if it arrived, and the webhook log. See
+  [payments.md](payments.md).
 - **Products** (`/products`): the catalogue with stock filters and search; price, sale price and
   stock are edited in the row. Variations and everything else open the full editor.
 - **Customers** (`/customers`): shoppers with a profile panel: contact, delivery address and
