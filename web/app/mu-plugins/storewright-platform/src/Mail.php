@@ -11,7 +11,19 @@ final class Mail {
 		add_filter( 'wp_mail_from_name', [ self::class, 'fromName' ] );
 		if ( wp_get_environment_type() !== 'production' ) {
 			add_action( 'phpmailer_init', [ self::class, 'captureLocally' ] );
+		} elseif ( getenv( 'MAIL_HOST' ) ) {
+			add_action( 'phpmailer_init', [ self::class, 'smtp' ] );
 		}
+	}
+
+	public static function smtp( \PHPMailer\PHPMailer\PHPMailer $mailer ): void {
+		$mailer->isSMTP();
+		$mailer->Host       = (string) getenv( 'MAIL_HOST' );
+		$mailer->Port       = (int) ( getenv( 'MAIL_SMTP_PORT' ) ?: 587 );
+		$mailer->SMTPSecure = getenv( 'MAIL_ENCRYPTION' ) === 'ssl' ? 'ssl' : 'tls';
+		$mailer->SMTPAuth   = (string) getenv( 'MAIL_USER' ) !== '';
+		$mailer->Username   = (string) getenv( 'MAIL_USER' );
+		$mailer->Password   = (string) getenv( 'MAIL_PASSWORD' );
 	}
 
 	public static function fromAddress( string $address ): string {
