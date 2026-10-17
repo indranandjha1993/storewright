@@ -105,6 +105,18 @@ Server addresses and keys live only in those secrets, never in the repository. T
 on its version, remove it from `DEPLOY_TARGETS`; to approve each update by hand, add a required
 reviewer to its environment.
 
+## Keeping WordPress and WooCommerce current
+
+Stores never update WordPress, WooCommerce or plugins from their own admin: `DISALLOW_FILE_MODS`
+removes install, update and delete everywhere. New versions arrive as a release instead.
+
+Every Monday Dependabot opens pull requests for new versions: WordPress, WooCommerce and the
+Razorpay plugin together, then the JavaScript packages and the CI actions. CI runs the full suite
+on each and `wp storewright templates` fails if WooCommerce changed a template the theme
+overrides. Merge with a short message such as `update woocommerce to 11.3.0`, add the change to
+`CHANGELOG.md`, and tag a patch release; connected stores then update on their own. Security
+releases go the same way, the day they appear.
+
 ## Drill
 
 Run on 2026-10-17 against images built from 0.2.0, as a staging store on port 8610:
