@@ -1,4 +1,5 @@
 import { expect, test, type Page, type Request } from '@playwright/test';
+import { mailFor } from './support/mail';
 
 const storeApiInFlight = new WeakMap<Page, Set<Request>>();
 
@@ -25,20 +26,6 @@ async function placeOrder(page: Page) {
 	const button = page.getByRole('button', { name: 'Place order' });
 	await button.scrollIntoViewIfNeeded();
 	await button.click();
-}
-
-const mailpit = `http://localhost:${process.env.MAIL_PORT ?? '8601'}/api/v1`;
-
-async function mailFor(page: Page, query: string): Promise<string> {
-	let id = '';
-	await expect
-		.poll(async () => {
-			const found = await (await page.request.get(`${mailpit}/search?query=${encodeURIComponent(query)}`)).json();
-			id = found.messages?.[0]?.ID ?? '';
-			return id;
-		}, { timeout: 20_000 })
-		.not.toBe('');
-	return (await (await page.request.get(`${mailpit}/message/${id}`)).json()).HTML;
 }
 
 const products = {
@@ -321,13 +308,14 @@ test('order emails carry the store brand and point each reader to the right plac
 	await placeOrder(page);
 	await expect(page).toHaveURL(/order-received\/(\d+)/, { timeout: 30_000 });
 	const order = page.url().match(/order-received\/(\d+)/)?.[1] ?? '';
+	await expect(page.getByText('Thank you. We have your order and you pay when it arrives.')).toBeVisible();
 
-	const customer = await mailFor(page, `to:"asha.e2e@example.com" "Order #${order}"`);
+	const { html: customer } = await mailFor(page, `to:"asha.e2e@example.com" "Order #${order}"`);
 	expect(customer).toContain('View your order');
 	expect(customer).toContain(`/order-received/${order}/`);
 	expect(customer).not.toMatch(/WooCommerce|WordPress/);
 
-	const staff = await mailFor(page, `subject:"new order: #${order}"`);
+	const { html: staff } = await mailFor(page, `subject:"new order: #${order}"`);
 	expect(staff).toContain(`p=%2Forders&amp;order=${order}`);
 	expect(staff).not.toContain('Get the app');
 	expect(staff).not.toMatch(/WooCommerce|WordPress/);
