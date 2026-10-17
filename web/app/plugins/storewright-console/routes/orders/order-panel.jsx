@@ -114,6 +114,9 @@ export function OrderPanel( { id, onClose, onChanged } ) {
 	}
 
 	const customer = personName( order.billing, __( 'Guest', 'storewright' ) );
+	const meta = ( key ) => order.meta_data.find( ( item ) => item.key.endsWith( key ) )?.value ?? '';
+	const business = meta( 'storewright/business' );
+	const gstin = meta( 'storewright/gstin' );
 	const steps = NEXT_STEPS[ order.status ] ?? [];
 	const primary = steps[ 0 ];
 
@@ -200,6 +203,8 @@ export function OrderPanel( { id, onClose, onChanged } ) {
 			<div className="sw-order__two">
 				<Block title={ __( 'Customer', 'storewright' ) }>
 					<p className="sw-order__strong">{ customer }</p>
+					{ business && <p>{ business }</p> }
+					{ gstin && <p className="sw-order__gstin">{ /* translators: %s: GST number */ sprintf( __( 'GSTIN %s', 'storewright' ), gstin ) }</p> }
 					{ order.billing.email && <p><a className="sw-link" href={ `mailto:${ order.billing.email }` }>{ order.billing.email }</a></p> }
 					{ order.billing.phone && <p><a className="sw-link" href={ `tel:${ order.billing.phone }` }>{ order.billing.phone }</a></p> }
 					{ order.customer_note && <p className="sw-order__customer-note">{ order.customer_note }</p> }

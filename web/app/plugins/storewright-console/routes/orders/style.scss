@@ -176,6 +176,12 @@
 	word-break: break-all;
 }
 
+.sw-order__gstin {
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 0.8125rem;
+	letter-spacing: 0.02em;
+}
+
 .sw-order__customer-note {
 	padding: 0.5rem 0.75rem;
 	border-left: 3px solid var(--sw-accent);
