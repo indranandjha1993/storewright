@@ -40,6 +40,20 @@ Their files are not in git. `npm run fonts` copies the Latin subsets and licence
 runs it, the image build runs it, and CI runs it. Only the typefaces a store uses are loaded on
 its pages.
 
+## Emails
+
+Order and account emails use WooCommerce's own templates with the brand applied on top. The logo
+heads each email, or the store name as a wordmark when there is no logo. Titles take the heading
+typeface and text the body typeface, each as its closest email-safe family (Georgia for serif
+faces, Helvetica for sans faces), because most mail apps ignore web fonts. Colours come from the
+palette: the accent for buttons and links, the background behind the card, text and muted text.
+
+Order received, on hold and completed emails end with a "View your order" button: the account
+order page for customers with an account, the order confirmation page for guests. The new order
+email to staff links the order number to the order in the console.
+
+To see them, place an order on the local stack and open Mailpit on `http://localhost:8601`.
+
 ## Where the choices live
 
 The option `storewright_brand` holds the colours, typefaces and corner style. The name is the

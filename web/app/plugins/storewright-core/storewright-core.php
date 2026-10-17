@@ -47,6 +47,7 @@ add_action(
 		Checkout\PinAutofill::register();
 		Checkout\FreeDelivery::register();
 		Account\AccountPages::register();
+		Emails\OrderButton::register();
 		Payments\RazorpayWebhooks::register();
 		Delivery\PackageRouting::register();
 		add_filter( 'woocommerce_payment_gateways', static fn( array $gateways ): array => [ ...$gateways, Payments\Stripe\StripeCheckoutGateway::class ] );

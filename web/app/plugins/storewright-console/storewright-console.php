@@ -33,4 +33,5 @@ spl_autoload_register(
 if ( is_file( __DIR__ . '/build/build.php' ) ) {
 	require_once __DIR__ . '/build/build.php';
 	Console::register();
+	EmailLinks::register();
 }

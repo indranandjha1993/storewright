@@ -27,6 +27,20 @@ async function placeOrder(page: Page) {
 	await button.click();
 }
 
+const mailpit = `http://localhost:${process.env.MAIL_PORT ?? '8601'}/api/v1`;
+
+async function mailFor(page: Page, query: string): Promise<string> {
+	let id = '';
+	await expect
+		.poll(async () => {
+			const found = await (await page.request.get(`${mailpit}/search?query=${encodeURIComponent(query)}`)).json();
+			id = found.messages?.[0]?.ID ?? '';
+			return id;
+		}, { timeout: 20_000 })
+		.not.toBe('');
+	return (await (await page.request.get(`${mailpit}/message/${id}`)).json()).HTML;
+}
+
 const products = {
 	mug: { slug: 'stoneware-mug', name: 'Stoneware Mug' },
 	notebook: { slug: 'dot-grid-notebook', name: 'Dot Grid Notebook' },
@@ -298,3 +312,24 @@ test('a business buyer adds a gstin that is checked and kept on the order', asyn
 	await expect(page.getByText('29ABCDE1234F1ZW')).toBeVisible();
 	await expect(page.getByText('Menon Studio LLP')).toBeVisible();
 });
+
+test('order emails carry the store brand and point each reader to the right place', async ({ page }) => {
+	await addToBag(page, products.mug);
+	await page.goto('/checkout/');
+	await fillDeliveryAddress(page);
+	await page.getByRole('radio', { name: /Cash on delivery/ }).check();
+	await placeOrder(page);
+	await expect(page).toHaveURL(/order-received\/(\d+)/, { timeout: 30_000 });
+	const order = page.url().match(/order-received\/(\d+)/)?.[1] ?? '';
+
+	const customer = await mailFor(page, `to:"asha.e2e@example.com" "Order #${order}"`);
+	expect(customer).toContain('View your order');
+	expect(customer).toContain(`/order-received/${order}/`);
+	expect(customer).not.toMatch(/WooCommerce|WordPress/);
+
+	const staff = await mailFor(page, `subject:"new order: #${order}"`);
+	expect(staff).toContain(`p=%2Forders&amp;order=${order}`);
+	expect(staff).not.toContain('Get the app');
+	expect(staff).not.toMatch(/WooCommerce|WordPress/);
+});
+
