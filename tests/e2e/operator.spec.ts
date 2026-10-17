@@ -47,3 +47,19 @@ test('the operator menu shows the journal and leaves out comments, tools and the
 	await expect(page.locator('#wp-admin-bar-wp-logo')).toHaveCount(0);
 	await expect(page.locator('#wp-admin-bar-my-account > a')).toHaveText(/^Store Operator/);
 });
+
+test('the plugins and the theme a store needs cannot be switched off', async ({ page }) => {
+	await logIn(page, account('owner.e2e', 'administrator', 'Store Owner'));
+	await page.goto('/wp/wp-admin/plugins.php');
+	for (const slug of ['woocommerce', 'woo-razorpay', 'storewright-core', 'storewright-console']) {
+		const row = page.locator(`tr[data-slug="${slug}"]`);
+		await expect(row).toContainText('Required by Storewright');
+		await expect(row.getByRole('link', { name: /^Deactivate/ })).toHaveCount(0);
+	}
+	await expect(page.locator('#bulk-action-selector-top option[value="deactivate-selected"]')).toHaveCount(0);
+	await expect(page.getByRole('link', { name: /Add New Plugin|Add New/ })).toHaveCount(0);
+
+	await page.goto('/wp/wp-admin/themes.php');
+	await expect(page.locator('.theme')).toHaveCount(1);
+	await expect(page.locator('.theme.active')).toContainText('Storewright');
+});

@@ -27,6 +27,16 @@ minute per address on the sign-in path, with a burst of 60. Login errors never s
 - `robots.txt` names no admin or upload paths, and the sitemap lives at `/sitemap.xml`; the
   `wp-sitemap` addresses answer 404.
 
+## What cannot change from the admin
+
+- Plugins, themes and WordPress itself cannot be installed, updated or deleted
+  (`DISALLOW_FILE_MODS`); new versions arrive only as a release.
+- WooCommerce, the Razorpay plugin, Storewright Core and Storewright Console stay active. The
+  Plugins screen marks them "Required by Storewright" without a Deactivate link, bulk deactivation
+  is gone, and a deactivation through REST or WP-CLI is undone.
+- The theme stays Storewright, or a child theme built on it; switching to anything else is refused
+  and the Themes screen lists only those.
+
 ## Headers
 
 Every response carries `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`,
