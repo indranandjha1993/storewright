@@ -23,6 +23,21 @@ add_action(
 	'wp_enqueue_scripts',
 	static function (): void {
 		wp_enqueue_style( 'storewright', get_stylesheet_uri(), [], (string) filemtime( get_stylesheet_directory() . '/style.css' ) );
+		wp_enqueue_script( 'storewright-search', get_theme_file_uri( 'assets/js/search.js' ), [], (string) filemtime( get_theme_file_path( 'assets/js/search.js' ) ), true );
+		wp_add_inline_script(
+			'storewright-search',
+			'window.storewrightSearch = ' . wp_json_encode(
+				[
+					'endpoint' => rest_url( 'wc/store/v1/products' ),
+					'results'  => home_url( '/' ),
+					'label'    => __( 'Search suggestions', 'storewright' ),
+					'empty'    => __( 'No products match yet.', 'storewright' ),
+					/* translators: %s: search terms */
+					'all'      => __( 'See all results for "%s"', 'storewright' ),
+				]
+			) . ';',
+			'before'
+		);
 	}
 );
 

@@ -63,6 +63,11 @@ The store answers on `http://localhost:8600`, caught email on `http://localhost:
 database on `127.0.0.1:8602` for a desktop client. Storewright keeps to ports 8600 to 8619;
 change `WEB_PORT`, `MAIL_PORT` and `DB_PORT` in `.env` if you need others.
 
+## Catalogue
+
+Category, price and availability filters on the shop, and search suggestions as you type. See
+[docs/catalogue.md](docs/catalogue.md).
+
 ## Delivery areas
 
 How areas, shapes and the PIN directory work is in [docs/delivery.md](docs/delivery.md).
