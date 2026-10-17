@@ -1296,6 +1296,20 @@ html body .sw-product__details.is-style-minimal ul.tabs.wc-tabs li a {
 	margin: 0;
 }
 
+.sw-related {
+	margin-top: var(--wp--preset--spacing--50);
+	padding-top: var(--wp--preset--spacing--40);
+	border-top: 1px solid var(--wp--preset--color--line);
+}
+
+.sw-product .sw-related > h2 {
+	margin-top: 0;
+}
+
+.wc-block-product .wc-block-components-product-image > .wc-block-components-notices:not(:has(*)) {
+	display: none;
+}
+
 .sw-product .wp-block-woocommerce-related-products h2,
 .sw-product .wp-block-woocommerce-product-collection > h2 {
 	margin: var(--wp--preset--spacing--60) 0 var(--wp--preset--spacing--30);

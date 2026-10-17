@@ -45,7 +45,21 @@
 	</div>
 	<!-- /wp:columns -->
 	<!-- wp:woocommerce/product-details {"className":"is-style-minimal sw-product__details"} /-->
-	<!-- wp:pattern {"slug":"woocommerce-blocks/related-products"} /-->
+	<!-- wp:woocommerce/product-collection {"queryId":1,"query":{"perPage":4,"pages":1,"offset":0,"postType":"product","order":"asc","orderBy":"title","search":"","exclude":[],"inherit":false,"taxQuery":{},"isProductCollectionBlock":true,"featured":false,"woocommerceOnSale":false,"woocommerceStockStatus":["instock","onbackorder"],"woocommerceAttributes":[],"woocommerceHandPickedProducts":[],"filterable":false,"relatedBy":{"categories":true,"tags":true}},"tagName":"section","displayLayout":{"type":"flex","columns":4,"shrinkColumns":true},"dimensions":{"widthType":"fill"},"collection":"woocommerce/product-collection/related","hideControls":["inherit"],"queryContextIncludes":["collection"],"className":"sw-related"} -->
+	<section class="wp-block-woocommerce-product-collection sw-related">
+		<!-- wp:heading {"className":"sw-related__title"} -->
+		<h2 class="wp-block-heading sw-related__title">You may also like</h2>
+		<!-- /wp:heading -->
+		<!-- wp:woocommerce/product-template -->
+			<!-- wp:woocommerce/product-image {"showSaleBadge":false,"imageSizing":"single","isDescendentOfQueryLoop":true} -->
+				<!-- wp:woocommerce/product-sale-badge {"isDescendentOfQueryLoop":true,"align":"left"} /-->
+			<!-- /wp:woocommerce/product-image -->
+			<!-- wp:post-title {"level":3,"isLink":true,"fontSize":"medium","__woocommerceNamespace":"woocommerce/product-collection/product-title"} /-->
+			<!-- wp:woocommerce/product-price {"isDescendentOfQueryLoop":true,"fontSize":"small"} /-->
+			<!-- wp:woocommerce/product-button {"isDescendentOfQueryLoop":true,"fontSize":"small"} /-->
+		<!-- /wp:woocommerce/product-template -->
+	</section>
+	<!-- /wp:woocommerce/product-collection -->
 </main>
 <!-- /wp:group -->
 <!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
