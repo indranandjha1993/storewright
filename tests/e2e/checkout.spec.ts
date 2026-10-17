@@ -1,5 +1,6 @@
 import { expect, test, type Page, type Request } from '@playwright/test';
 import { mailFor } from './support/mail';
+import { wp } from './support/wp';
 
 const storeApiInFlight = new WeakMap<Page, Set<Request>>();
 
@@ -319,5 +320,36 @@ test('order emails carry the store brand and point each reader to the right plac
 	expect(staff).toContain(`p=%2Forders&amp;order=${order}`);
 	expect(staff).not.toContain('Get the app');
 	expect(staff).not.toMatch(/WooCommerce|WordPress/);
+});
+
+test('an order gets a numbered gst invoice that only its buyer can open', async ({ page, browser }) => {
+	wp('eval', '$s = (array) get_option( "storewright_settings", [] ); $s["store_gstin"] = "29ABCDE1234F1ZW"; update_option( "storewright_settings", $s );');
+	try {
+		await addToBag(page, products.mug);
+		await page.goto('/checkout/');
+		await fillDeliveryAddress(page);
+		await page.getByRole('radio', { name: /Cash on delivery/ }).check();
+		await placeOrder(page);
+		await expect(page).toHaveURL(/order-received/, { timeout: 30_000 });
+
+		const link = page.getByRole('link', { name: /^Invoice INV\/\d{2}-\d{2}\/\d{4,}$/ });
+		await expect(link).toBeVisible();
+		const href = (await link.getAttribute('href')) ?? '';
+		await page.goto(href);
+		await expect(page.getByText('Tax invoice')).toBeVisible();
+		await expect(page.getByText('Karnataka (29)').first()).toBeVisible();
+		const head = page.locator('table.lines thead');
+		await expect(head).toContainText('CGST');
+		await expect(head).toContainText('SGST');
+		await expect(page.locator('table.lines tbody')).toContainText('6912');
+		await expect(page.getByText(/^Rupees .+ Only$/)).toBeVisible();
+
+		const stranger = await browser.newContext();
+		const withoutKey = href.replace(/&key=[^&]+/, '');
+		expect((await stranger.request.get(withoutKey)).status()).toBe(404);
+		await stranger.close();
+	} finally {
+		wp('eval', '$s = (array) get_option( "storewright_settings", [] ); unset( $s["store_gstin"] ); update_option( "storewright_settings", $s );');
+	}
 });
 

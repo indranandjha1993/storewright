@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Storewright\Core\Seed;
 
+use Storewright\Core\Invoice\ProductTax;
 use WC_Coupon;
 use WC_Product_Attribute;
 use WC_Product_Simple;
@@ -76,6 +77,7 @@ final class Catalogue {
 
 		$coupons = $this->coupon( 'WELCOME10', 10 );
 
+		$this->taxes();
 		return [
 			'categories' => count( $categories ),
 			'products'   => 5,
@@ -114,6 +116,24 @@ final class Catalogue {
 			update_term_meta( $id, 'thumbnail_id', $this->media->image( "{$name} category", '#dfdfdc', Photos::url( (string) $key ), Photos::credit( (string) $key ) ) );
 		}
 		return $id;
+	}
+
+	private function taxes(): void {
+		$codes = [
+			'SW-TEE'   => [ '6109', '5' ],
+			'SW-MUG'   => [ '6912', '12' ],
+			'SW-NOTE'  => [ '4820', '18' ],
+			'SW-EBOOK' => [ '998431', '18' ],
+			'SW-ICONS' => [ '998314', '18' ],
+		];
+		foreach ( $codes as $sku => [$hsn, $rate] ) {
+			$product = wc_get_product( wc_get_product_id_by_sku( $sku ) );
+			if ( $product && $product->get_meta( ProductTax::HSN ) === '' ) {
+				$product->update_meta_data( ProductTax::HSN, $hsn );
+				$product->update_meta_data( ProductTax::RATE, $rate );
+				$product->save();
+			}
+		}
 	}
 
 	private function hero(): void {

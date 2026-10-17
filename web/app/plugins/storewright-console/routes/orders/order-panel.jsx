@@ -218,6 +218,13 @@ export function OrderPanel( { id, onClose, onChanged } ) {
 					<p>{ __( 'Awaiting payment', 'storewright' ) }</p>
 				) }
 				{ order.transaction_id && <p className="sw-order__muted">{ order.transaction_id }</p> }
+				{ order.storewright_invoice && (
+					<p>
+						<a className="sw-link" href={ order.storewright_invoice.url } target="_blank" rel="noreferrer">
+							{ /* translators: %s: invoice number */ sprintf( __( 'Invoice %s', 'storewright' ), order.storewright_invoice.number ) }
+						</a>
+					</p>
+				) }
 			</Block>
 			<Notes orderId={ order.id } />
 		</aside>

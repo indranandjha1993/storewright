@@ -69,6 +69,15 @@ export const stage = () => {
 						<SelectControl __next40pxDefaultSize label={ __( 'State', 'storewright' ) } value={ draft.store.state } options={ data.states.map( ( state ) => ( { label: state.name, value: state.code } ) ) } onChange={ set( 'store', 'state' ) } />
 						<TextControl __next40pxDefaultSize label={ __( 'Phone', 'storewright' ) } type="tel" value={ draft.store.phone } onChange={ set( 'store', 'phone' ) } />
 						<TextControl __next40pxDefaultSize label={ __( 'GSTIN', 'storewright' ) } help={ __( 'Printed on invoices. Leave empty if the business is not registered for GST.', 'storewright' ) } value={ draft.store.gstin } maxLength={ 15 } onChange={ set( 'store', 'gstin' ) } />
+						<SelectControl
+							__next40pxDefaultSize
+							label={ __( 'Usual GST rate', 'storewright' ) }
+							help={ __( 'Used for products without their own rate. Prices already include it.', 'storewright' ) }
+							value={ draft.store.gstRate }
+							options={ data.gstRates.map( ( rate ) => ( { label: `${ rate }%`, value: String( rate ) } ) ) }
+							onChange={ set( 'store', 'gstRate' ) }
+						/>
+						<TextControl __next40pxDefaultSize label={ __( 'Invoice prefix', 'storewright' ) } help={ __( 'Invoices are numbered like INV/26-27/0001, starting again each April.', 'storewright' ) } value={ draft.store.prefix } maxLength={ 4 } onChange={ set( 'store', 'prefix' ) } />
 					</div>
 				</Card>
 				<Card title={ __( 'Emails', 'storewright' ) }>

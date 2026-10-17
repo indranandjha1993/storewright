@@ -1902,6 +1902,10 @@ html body .sw-product__details.is-style-minimal ul.tabs.wc-tabs li a {
 	font-weight: 600;
 }
 
+.sw-invoice-link {
+	margin: var(--wp--preset--spacing--20) 0 0;
+}
+
 /* Shipments on the order page */
 
 .sw-order-shipments {

@@ -73,6 +73,11 @@ Category, price and availability filters on the shop, and search suggestions as 
 Descriptions, Open Graph tags, store structured data, a sitemap at `/sitemap.xml` and a short
 robots file. See [docs/seo.md](docs/seo.md).
 
+## Invoices
+
+Numbered GST invoices with CGST and SGST or IGST by place of supply, HSN codes and the amount in
+words, ready to print or save as PDF. See [docs/invoices.md](docs/invoices.md).
+
 ## Shipping
 
 Ship an order in one parcel or several from the console, with carrier and tracking, and the

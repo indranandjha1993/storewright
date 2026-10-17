@@ -56,6 +56,8 @@ add_action(
 		Seo\Robots::register();
 		Seo\Meta::register();
 		Seo\StoreSchema::register();
+		Invoice\Invoices::register();
+		Invoice\ProductTax::register();
 		Payments\RazorpayWebhooks::register();
 		Delivery\PackageRouting::register();
 		add_filter( 'woocommerce_payment_gateways', static fn( array $gateways ): array => [ ...$gateways, Payments\Stripe\StripeCheckoutGateway::class ] );

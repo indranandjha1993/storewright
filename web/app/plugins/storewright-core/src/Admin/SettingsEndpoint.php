@@ -6,6 +6,7 @@ namespace Storewright\Core\Admin;
 
 use InvalidArgumentException;
 use Storewright\Core\Checkout\Gstin;
+use Storewright\Core\Invoice\Gst;
 use Storewright\Core\Settings;
 use WC_Email;
 use WP_Error;
@@ -63,7 +64,10 @@ final class SettingsEndpoint {
 				'state'    => $state,
 				'phone'    => (string) Settings::get( 'store_phone' ),
 				'gstin'    => (string) Settings::get( 'store_gstin' ),
+				'gstRate'  => (string) Settings::get( 'gst_rate' ),
+				'prefix'   => (string) Settings::get( 'invoice_prefix' ),
 			],
+			'gstRates' => Gst::RATES,
 			'states'   => array_map(
 				static fn( string $code ): array => [
 					'code' => $code,
@@ -110,6 +114,14 @@ final class SettingsEndpoint {
 		if ( $gstin !== '' && ! Gstin::isValid( $gstin ) ) {
 			throw new InvalidArgumentException( esc_html__( 'That GSTIN does not look right. It has 15 characters, such as 29ABCDE1234F1Z5.', 'storewright' ) );
 		}
+		$rate   = (int) ( $store['gstRate'] ?? Settings::get( 'gst_rate' ) );
+		$prefix = strtoupper( trim( (string) ( $store['prefix'] ?? Settings::get( 'invoice_prefix' ) ) ) );
+		if ( ! in_array( $rate, Gst::RATES, true ) ) {
+			throw new InvalidArgumentException( esc_html__( 'Choose a GST rate from the list.', 'storewright' ) );
+		}
+		if ( ! preg_match( '/^[A-Z0-9]{1,4}$/', $prefix ) ) {
+			throw new InvalidArgumentException( esc_html__( 'The invoice prefix is one to four letters or digits, such as INV.', 'storewright' ) );
+		}
 		$state = strtoupper( sanitize_key( (string) ( $store['state'] ?? '' ) ) );
 		if ( $state !== '' && ! array_key_exists( $state, WC()->countries->get_states( 'IN' ) ?: [] ) ) {
 			throw new InvalidArgumentException( esc_html__( 'Choose a state from the list.', 'storewright' ) );
@@ -123,8 +135,10 @@ final class SettingsEndpoint {
 		}
 		Settings::set(
 			[
-				'store_phone' => sanitize_text_field( (string) ( $store['phone'] ?? '' ) ),
-				'store_gstin' => $gstin,
+				'store_phone'    => sanitize_text_field( (string) ( $store['phone'] ?? '' ) ),
+				'store_gstin'    => $gstin,
+				'gst_rate'       => $rate,
+				'invoice_prefix' => $prefix,
 			]
 		);
 	}
