@@ -53,5 +53,6 @@ RUN mkdir -p web/app/uploads && chown -R www-data:www-data web/app/uploads
 USER www-data
 
 FROM nginx:1.27-alpine AS web
+RUN apk upgrade --no-cache
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=app /var/www/html/web /var/www/html/web
