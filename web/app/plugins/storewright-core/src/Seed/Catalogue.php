@@ -117,6 +117,11 @@ final class Catalogue {
 	}
 
 	private function hero(): void {
+		if ( get_option( 'woocommerce_store_address' ) === '' ) {
+			update_option( 'woocommerce_store_address', '14 Church Street' );
+			update_option( 'woocommerce_store_city', 'Bengaluru' );
+			update_option( 'woocommerce_store_postcode', '560001' );
+		}
 		if ( get_option( 'blogdescription' ) === '' ) {
 			update_option( 'blogdescription', __( 'Everyday goods for home and desk, made in small batches and delivered across India.', 'storewright' ) );
 		}
