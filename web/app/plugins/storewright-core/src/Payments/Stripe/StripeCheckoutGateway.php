@@ -56,6 +56,10 @@ final class StripeCheckoutGateway extends WC_Payment_Gateway {
 		];
 	}
 
+	public static function session( WC_Order $order ): string {
+		return (string) $order->get_meta( self::SESSION );
+	}
+
 	public static function keys(): ?array {
 		return GatewayCredentials::stripeKeys( wp_get_environment_type() );
 	}

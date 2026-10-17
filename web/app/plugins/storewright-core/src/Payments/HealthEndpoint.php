@@ -48,6 +48,7 @@ final class HealthEndpoint {
 			$row   = $events[ $gateway ] ?? [];
 			$out[] = [
 				'gateway' => $gateway,
+				'webhook' => $gateway === 'stripe' ? rest_url( 'storewright/v1/webhooks/stripe' ) : admin_url( 'admin-post.php?action=rzp_wc_webhook' ),
 				'mode'    => $modes[ $gateway ] ?? 'off',
 				'day'     => (int) ( $row['day'] ?? 0 ),
 				'failed'  => (int) ( $row['failed'] ?? 0 ),

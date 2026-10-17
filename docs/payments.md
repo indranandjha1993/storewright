@@ -60,3 +60,28 @@ container.
 Local development needs a public URL. The store can be reached through a Cloudflare tunnel, but
 Cloudflare's Bot Fight Mode challenges Razorpay's servers and the webhook never arrives. Turn it
 off for the zone the tunnel uses; on the free plan it cannot be skipped for a single path.
+
+## Payments screen
+
+The console's Payments screen (`/payments`) shows, for Razorpay and Stripe, the mode the keys put
+the gateway in, when the last webhook arrived, how many came in the last 24 hours, and how many
+failed or are still waiting to be processed. Each card has the webhook address to paste into the
+gateway dashboard.
+
+Waiting for payment lists online orders that are still unpaid 15 minutes after they were placed,
+from the last seven days. Check with Razorpay or Check with Stripe asks the gateway directly:
+Stripe for the order's Checkout session, Razorpay for the payments on the order's Razorpay order.
+A captured payment is recorded on the order at once; otherwise the answer says what the gateway
+has, for example that the payment page expired or was never opened.
+
+The webhook log lists every recorded event, newest first, with All, Failed and Waiting filters.
+
+REST, for staff with `manage_woocommerce`:
+
+```
+GET  /wp-json/storewright/v1/payments/health
+GET  /wp-json/storewright/v1/payments/events?gateway=stripe&status=failed&page=1
+GET  /wp-json/storewright/v1/payments/unsettled
+POST /wp-json/storewright/v1/payments/unsettled/{order id}
+```
+
