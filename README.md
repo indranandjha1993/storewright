@@ -10,9 +10,10 @@ deploy.
 
 ## Status
 
-Early development. `make up && make install && make seed` gives a running store with WooCommerce,
-both gateways, the Storewright theme and a demo catalogue. The first milestone closes with a
-completed Stripe test order; progress is recorded in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.1. A store can take orders and payments, deliver to the areas it chooses, ship in
+parcels, issue GST invoices and handle returns, all run from the console, and it deploys to its
+own server with one script. Carrier integrations come next. Every release is listed in
+[CHANGELOG.md](CHANGELOG.md).
 
 ## What it will do
 
@@ -135,6 +136,13 @@ What staff see in place of WordPress and WooCommerce is in [docs/white-label.md]
 One server per store. `deploy/` holds a compose file, a Caddyfile for TLS and `deploy.sh` with
 `init`, `up`, `update`, `rollback`, `backup` and `restore`; an update that fails its health check
 goes back to the previous version by itself. See [docs/deploy.md](docs/deploy.md).
+
+## Help with deployment
+
+I set up and look after Storewright stores for businesses: the server, domain and email, payment
+gateways, delivery areas and the first products. Stores I look after are connected to this
+repository and update themselves to each new release, with a backup before every update. Write to
+me at [indranandjha0@gmail.com](mailto:indranandjha0@gmail.com).
 
 ## Contributing
 
