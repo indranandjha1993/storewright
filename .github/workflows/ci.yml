@@ -61,6 +61,12 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run fonts
       - run: npm run console
+      - name: deploy files
+        run: |
+          bash -n deploy/deploy.sh bin/install
+          cp deploy/.env.example deploy/.env
+          STOREWRIGHT_VERSION=ci docker compose -f deploy/docker-compose.yml --env-file deploy/.env config --quiet
+          rm deploy/.env
       - run: make up
       - run: make install
       - run: make seed

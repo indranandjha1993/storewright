@@ -1,0 +1,73 @@
+name: ${STORE_NAME:-storewright-store}
+
+x-app: &app
+  image: ${STOREWRIGHT_IMAGE:-ghcr.io/indranandjha1993/storewright}:${STOREWRIGHT_VERSION:?set by deploy.sh}
+  env_file: .env
+  restart: unless-stopped
+  volumes:
+    - uploads:/var/www/html/web/app/uploads
+  depends_on:
+    db:
+      condition: service_healthy
+    cache:
+      condition: service_started
+
+services:
+  app:
+    <<: *app
+
+  cron:
+    <<: *app
+    entrypoint: []
+    command: ["sh", "-c", "while true; do wp cron event run --due-now --quiet || true; sleep 60; done"]
+
+  web:
+    image: ${STOREWRIGHT_IMAGE:-ghcr.io/indranandjha1993/storewright}-web:${STOREWRIGHT_VERSION:?set by deploy.sh}
+    restart: unless-stopped
+    ports:
+      - "${WEB_BIND:-127.0.0.1:8080}:80"
+    volumes:
+      - uploads:/var/www/html/web/app/uploads:ro
+    depends_on:
+      - app
+
+  proxy:
+    image: caddy:2-alpine
+    profiles: ["caddy"]
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - web
+
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  cache:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+
+volumes:
+  db_data:
+  uploads:
+  caddy_data:

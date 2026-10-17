@@ -30,6 +30,10 @@ dist/
 *.sql
 *.sql.gz
 
+# Deployment state and backups on a store's server
+/deploy/.deploy/
+/deploy/backups/
+
 # Tool caches
 /tests/e2e/results/
 /tests/e2e/report/

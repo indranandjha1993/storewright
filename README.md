@@ -132,8 +132,9 @@ What staff see in place of WordPress and WooCommerce is in [docs/white-label.md]
 
 ## Deploying
 
-One server per store. `deploy/` holds a compose file and a script that pulls a tagged image,
-runs migrations and restarts, with rollback and backups. Details land with the first release.
+One server per store. `deploy/` holds a compose file, a Caddyfile for TLS and `deploy.sh` with
+`init`, `up`, `update`, `rollback`, `backup` and `restore`; an update that fails its health check
+goes back to the previous version by itself. See [docs/deploy.md](docs/deploy.md).
 
 ## Contributing
 
