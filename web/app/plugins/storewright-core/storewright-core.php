@@ -52,6 +52,10 @@ add_action(
 		Fulfilment\Carriers::register();
 		Fulfilment\CustomerView::register();
 		Checkout\ThankYou::register();
+		Seo\Sitemap::register();
+		Seo\Robots::register();
+		Seo\Meta::register();
+		Seo\StoreSchema::register();
 		Payments\RazorpayWebhooks::register();
 		Delivery\PackageRouting::register();
 		add_filter( 'woocommerce_payment_gateways', static fn( array $gateways ): array => [ ...$gateways, Payments\Stripe\StripeCheckoutGateway::class ] );

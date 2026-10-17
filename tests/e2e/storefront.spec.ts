@@ -82,3 +82,23 @@ test('a product shows its rating summary and verified reviews', async ({ page })
 	await expect(page.getByText('Only logged in customers who have purchased this product may leave a review.')).toBeVisible();
 });
 
+test('product pages describe themselves to search engines and link previews', async ({ page }) => {
+	await page.goto('/product/stoneware-mug/');
+	await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'A 350 ml stoneware mug, dishwasher safe.');
+	await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'product');
+	await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /stoneware-mug/);
+	await expect(page.locator('meta[property="product:price:amount"]')).toHaveAttribute('content', '449.00');
+	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/product\/stoneware-mug\/$/);
+
+	await page.goto('/');
+	const schema = await page.locator('script[type="application/ld+json"]').allTextContents();
+	expect(schema.join('')).toContain('"@type":"WebSite"');
+	expect(schema.join('')).toContain('"@type":"SearchAction"');
+});
+
+test('crawlers get a plain robots file and no platform sitemap names', async ({ request }) => {
+	const robots = await (await request.get('/robots.txt')).text();
+	expect(robots).not.toMatch(/wp-admin|wc-logs|woocommerce/);
+	expect((await request.get('/wp-sitemap.xml')).status()).toBe(404);
+});
+

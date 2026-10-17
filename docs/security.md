@@ -24,6 +24,8 @@ minute per address on the sign-in path, with a burst of 60. Login errors never s
 - `readme.html`, `license.txt`, `wp-cron.php`, the installer and direct hits on files in
   `wp-includes` answer 404, as do the project's build files.
 - The admin bar shows only for staff.
+- `robots.txt` names no admin or upload paths, and the sitemap lives at `/sitemap.xml`; the
+  `wp-sitemap` addresses answer 404.
 
 ## Headers
 

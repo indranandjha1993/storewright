@@ -68,6 +68,11 @@ change `WEB_PORT`, `MAIL_PORT` and `DB_PORT` in `.env` if you need others.
 Category, price and availability filters on the shop, and search suggestions as you type. See
 [docs/catalogue.md](docs/catalogue.md).
 
+## Search and link previews
+
+Descriptions, Open Graph tags, store structured data, a sitemap at `/sitemap.xml` and a short
+robots file. See [docs/seo.md](docs/seo.md).
+
 ## Shipping
 
 Ship an order in one parcel or several from the console, with carrier and tracking, and the
