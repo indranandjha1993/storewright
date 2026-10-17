@@ -77,6 +77,7 @@ final class ShopperCheck {
 			'lookup'   => $lookup,
 			'pin'      => $pin,
 			'district' => $entry['district'] ?? '',
+			'state'    => $entry['state'] ?? '',
 			'status'   => $answer ? $answer->status : Answer::UNDELIVERABLE,
 			'area'     => $answer?->zone?->name,
 			'areaId'   => $answer?->zone?->id,
