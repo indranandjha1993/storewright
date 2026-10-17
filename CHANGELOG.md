@@ -4,9 +4,43 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+## 0.2.0 - 2026-10-17
+
+A store a client can run: payments on three methods, delivery areas, a branded storefront, and a
+console for orders, shipping, returns, invoices and settings.
+
+Payments
 - Stripe payments on Stripe's hosted checkout page through our own gateway, with refunds; the official Stripe plugin is no longer bundled.
 - Payment routing by currency: an INR store offers Razorpay first.
 - Cash on delivery with rules: every item must ship, an order value limit and an optional PIN list.
+- Razorpay webhooks recorded once, like Stripe's.
+- Payments screen: gateway mode, webhook health and address, online orders still unpaid after 15 minutes with a check against the gateway, and the webhook log.
+
+Delivery
+- Delivery areas from PIN rules, circles and drawn shapes, with India Post's PIN directory, edited on a map in the console.
+- Delivery check by PIN or location in the header and on products, with the options and charges for that address.
+- Shipments from the console: partial parcels, Indian and international carriers, tracking number and link, and an email to the customer.
+- Track an order page and a card per parcel on the customer's order.
+
+Storefront
+- One brand setting for name, logo, colours, typefaces and corners across storefront, checkout, emails, sign-in and console.
+- Finished home, shop, product, cart, checkout, account, pages, journal and 404 designs with open demo photos.
+- Shop filters by category, price and stock, search suggestions and a search results page.
+- Ratings and a review summary from verified buyers, and Save for later in the account.
+- Checkout takes a business name and checked GSTIN, fills city and state from the PIN code and shows progress to free delivery.
+- Account overview and an address book that says whether each address can be delivered to.
+- Descriptions, Open Graph tags, store structured data and a sitemap at /sitemap.xml.
+
+Operations
+- Full-screen console: Today with a getting started list, Orders, Returns, Products, Customers, Payments, Delivery areas, Pages and journal, Brand and Settings.
+- Printable GST invoices numbered per financial year, with CGST and SGST or IGST by place of supply and HSN codes.
+- Returns from the customer's order page, approved, received and refunded from the console.
+- Branded emails with links to the right order for customers and staff.
+- Seeded business pages and journal entries written for a small shop.
+
+Security and white label
+- Sign-in at /sign-in/ with a lockout after repeated failures, fewer platform fingerprints, quiet REST index and a plain robots file.
+- The store's name in place of WordPress and WooCommerce for staff, without marketplace promotions.
 
 ## 0.1.0 - 2026-10-16
 
