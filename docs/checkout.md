@@ -19,9 +19,9 @@ if the shopper has already typed a city.
 
 ## Free delivery progress
 
-When the delivery area that covers the bag has free delivery from an order amount, the cart, the
-bag drawer and the checkout summary show how much more to add and a progress bar, and confirm
-once the order qualifies. The amount comes from the Store API cart response
+When the delivery area that covers the bag has free delivery from an order amount, the cart and
+the checkout summary show how much more to add and a progress bar, and confirm once the order
+qualifies. The script loads only on those two pages. The amount comes from the Store API cart response
 (`extensions.storewright.freeDeliveryFrom` and `remaining`), so it always matches what checkout
 will charge.
 

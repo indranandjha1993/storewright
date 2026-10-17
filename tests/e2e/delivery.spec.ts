@@ -38,9 +38,9 @@ test.describe('with a shared location near MG Road', () => {
 		await chip.getByRole('button', { name: 'Use my location' }).click();
 		await expect(chip.getByRole('status')).toHaveText('We deliver to 560030, Bengaluru Urban.');
 
-		const added = page.waitForResponse((r) => /wc\/store\/v1\/(cart\/add-item|batch)/.test(r.url()));
+		const added = page.waitForResponse((r) => r.request().method() === 'POST' && /wc\/store\/v1\/(cart\/add-item|batch)/.test(r.url()));
 		await page.getByRole('button', { name: 'Add to bag: “Stoneware Mug”' }).click();
-		await added;
+		expect((await added).ok()).toBe(true);
 		await page.goto('/checkout/');
 		await expect(page.getByRole('group', { name: 'Shipping address' }).getByLabel('PIN Code')).toHaveValue('560030');
 		await expect(page.getByRole('group', { name: 'Shipping options' }).getByText('Same-day delivery')).toBeVisible();

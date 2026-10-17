@@ -290,7 +290,7 @@ test('a business buyer adds a gstin that is checked and kept on the order', asyn
 	await gstin.fill('29ABCDE1234F1Z5');
 	await page.getByRole('radio', { name: /Cash on delivery/ }).check();
 	await placeOrder(page);
-	await expect(page.getByText('That GSTIN does not look right. It has 15 characters, such as 29ABCDE1234F1Z5.')).toBeVisible();
+	await expect(page.getByText('That GSTIN does not look right. It has 15 characters, such as 29ABCDE1234F1Z5.').first()).toBeVisible();
 
 	await gstin.fill('29abcde1234f1zw');
 	await placeOrder(page);

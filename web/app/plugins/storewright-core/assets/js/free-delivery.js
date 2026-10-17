@@ -9,7 +9,6 @@
 	}
 	const anchors = [
 		{ selector: '.wc-block-cart__totals-title', where: 'afterend' },
-		{ selector: '.wc-block-mini-cart__footer', where: 'beforebegin' },
 		{ selector: '.wc-block-checkout__sidebar .wc-block-components-order-summary', where: 'beforebegin' },
 	];
 

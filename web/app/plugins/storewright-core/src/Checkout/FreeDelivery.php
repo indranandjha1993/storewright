@@ -67,7 +67,7 @@ final class FreeDelivery {
 	}
 
 	public static function enqueue(): void {
-		if ( wp_script_is( 'wc-blocks-data-store', 'registered' ) || wp_script_is( 'wc-blocks-data-store', 'enqueued' ) ) {
+		if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() ) ) {
 			Asset::script( 'storewright-free-delivery', 'assets/js/free-delivery.js', [ 'wp-data', 'wp-i18n', 'wc-blocks-data-store' ] );
 		}
 	}
