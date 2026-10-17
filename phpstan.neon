@@ -10,6 +10,8 @@ parameters:
 		- web/app/mu-plugins/storewright-platform
 		- web/app/mu-plugins/storewright-platform.php
 		- web/app/themes/storewright/functions.php
+	excludePaths:
+		- web/app/plugins/storewright-core/templates
 	scanFiles:
 		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 		- vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php

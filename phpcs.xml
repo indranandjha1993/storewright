@@ -38,6 +38,9 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound">
 		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound">
+		<exclude-pattern>*/themes/storewright/woocommerce/*</exclude-pattern>
+	</rule>
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound">
 		<exclude-pattern>*/tests/bootstrap.php</exclude-pattern>
 	</rule>
