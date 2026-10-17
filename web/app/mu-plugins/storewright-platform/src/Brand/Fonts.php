@@ -91,6 +91,12 @@ final class Fonts {
 		return ( self::CATALOGUE[ $slug ]['kind'] ?? 'sans' ) === 'serif' ? 'Georgia' : 'Helvetica';
 	}
 
+	public static function emailStack( string $slug ): string {
+		return self::emailFamily( $slug ) === 'Georgia'
+			? "Georgia, 'Times New Roman', serif"
+			: "'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif";
+	}
+
 	public static function fontFaceCss( array $faces ): string {
 		$css = '';
 		foreach ( $faces as $face ) {

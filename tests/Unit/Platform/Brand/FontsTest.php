@@ -31,6 +31,8 @@ final class FontsTest extends TestCase {
 	public function test_emails_get_the_closest_safe_family(): void {
 		self::assertSame( 'Georgia', Fonts::emailFamily( 'fraunces' ) );
 		self::assertSame( 'Helvetica', Fonts::emailFamily( 'inter' ) );
+		self::assertStringStartsWith( 'Georgia', Fonts::emailStack( 'playfair-display' ) );
+		self::assertStringEndsWith( 'sans-serif', Fonts::emailStack( 'wingdings' ) );
 	}
 
 	public function test_font_face_css_is_built_from_the_faces(): void {
