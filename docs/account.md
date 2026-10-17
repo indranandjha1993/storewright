@@ -1,10 +1,11 @@
 # Customer account
 
-The account page is WooCommerce's account with Storewright's own menu, overview and address book.
+The account page is WooCommerce's account with Storewright's own menu, overview, saved products
+and address book.
 
 ## Menu
 
-Overview, Orders, Downloads, Addresses, Account details and Sign out. Payment methods are not
+Overview, Orders, Saved, Downloads, Addresses, Account details and Sign out. Payment methods are not
 listed because payments are taken on the gateways' own pages.
 
 ## Overview
@@ -12,6 +13,14 @@ listed because payments are taken on the gateways' own pages.
 A greeting by first name, three cards (orders placed, the default delivery PIN code, the account
 email) that open their pages, and the three most recent orders with status and total. The
 template is `web/app/themes/storewright/woocommerce/myaccount/dashboard.php`.
+
+## Saved
+
+Signed-in shoppers can press "Save for later" on any product page; guests see "Sign in to save".
+The Saved page lists those products with today's price and stock, a button to add simple
+products to the bag or open the options of variable ones, and Remove. Up to 100 products are kept
+in the user meta `storewright_saved`. The button is the block `storewright/save-button`, which
+toggles through `POST /wp-json/storewright/v1/saved/{product id}` (signed-in users, REST nonce).
 
 ## Addresses
 

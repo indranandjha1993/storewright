@@ -58,6 +58,8 @@ add_action(
 		add_action( 'rest_api_init', [ Payments\HealthEndpoint::class, 'register' ] );
 		add_action( 'woocommerce_delete_shipping_zone', [ Delivery\ShapeStore::class, 'zoneDeleted' ] );
 		add_action( 'init', [ Delivery\DeliveryBlock::class, 'register' ] );
+		add_action( 'init', [ Account\SaveButton::class, 'register' ] );
+		add_action( 'rest_api_init', [ Account\SaveButton::class, 'routes' ] );
 		add_action(
 			'woocommerce_blocks_payment_method_type_registration',
 			static fn( $registry ) => $registry->register( new Payments\Stripe\StripeCheckoutBlock() )

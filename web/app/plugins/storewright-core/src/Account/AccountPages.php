@@ -12,22 +12,28 @@ use Storewright\Core\Delivery\Messages;
 
 final class AccountPages {
 
-	public const ENDPOINT = 'addresses';
-	private const NONCE   = 'storewright_addresses';
-	private const VERSION = '1';
+	public const ENDPOINT    = 'addresses';
+	public const SAVED       = 'saved';
+	private const NONCE      = 'storewright_addresses';
+	private const SAVE_NONCE = 'storewright_saved';
+	private const VERSION    = '2';
 
 	public static function register(): void {
 		add_filter( 'woocommerce_get_query_vars', [ self::class, 'queryVars' ] );
 		add_filter( 'woocommerce_account_menu_items', [ self::class, 'menu' ] );
 		add_filter( 'woocommerce_endpoint_' . self::ENDPOINT . '_title', static fn(): string => __( 'Addresses', 'storewright' ) );
+		add_filter( 'woocommerce_endpoint_' . self::SAVED . '_title', static fn(): string => __( 'Saved', 'storewright' ) );
 		add_action( 'woocommerce_account_' . self::ENDPOINT . '_endpoint', [ self::class, 'render' ] );
+		add_action( 'woocommerce_account_' . self::SAVED . '_endpoint', [ self::class, 'renderSaved' ] );
 		add_action( 'template_redirect', [ self::class, 'handle' ] );
+		add_action( 'template_redirect', [ self::class, 'handleSaved' ] );
 		add_action( 'init', [ self::class, 'flushOnce' ], 99 );
 		add_action( 'wp_enqueue_scripts', [ self::class, 'checkoutChooser' ] );
 	}
 
 	public static function queryVars( array $vars ): array {
 		$vars[ self::ENDPOINT ] = self::ENDPOINT;
+		$vars[ self::SAVED ]    = self::SAVED;
 		return $vars;
 	}
 
@@ -42,12 +48,13 @@ final class AccountPages {
 		$labels = [
 			'dashboard'       => __( 'Overview', 'storewright' ),
 			'orders'          => __( 'Orders', 'storewright' ),
+			self::SAVED       => __( 'Saved', 'storewright' ),
 			'downloads'       => __( 'Downloads', 'storewright' ),
 			self::ENDPOINT    => __( 'Addresses', 'storewright' ),
 			'edit-account'    => __( 'Account details', 'storewright' ),
 			'customer-logout' => __( 'Sign out', 'storewright' ),
 		];
-		return array_filter( $labels, static fn( string $key ): bool => $key === self::ENDPOINT || isset( $items[ $key ] ), ARRAY_FILTER_USE_KEY );
+		return array_filter( $labels, static fn( string $key ): bool => in_array( $key, [ self::ENDPOINT, self::SAVED ], true ) || isset( $items[ $key ] ), ARRAY_FILTER_USE_KEY );
 	}
 
 	public static function handle(): void {
@@ -77,6 +84,29 @@ final class AccountPages {
 		}
 		wp_safe_redirect( wc_get_account_endpoint_url( self::ENDPOINT ) );
 		exit;
+	}
+
+	public static function handleSaved(): void {
+		if ( ! is_user_logged_in() || ( $_POST['storewright_saved_action'] ?? '' ) !== 'remove' ) {
+			return;
+		}
+		check_admin_referer( self::SAVE_NONCE );
+		( new SavedItems( get_current_user_id() ) )->remove( absint( wp_unslash( $_POST['product'] ?? 0 ) ) );
+		wc_add_notice( __( 'Removed from your saved products.', 'storewright' ) );
+		wp_safe_redirect( wc_get_account_endpoint_url( self::SAVED ) );
+		exit;
+	}
+
+	public static function renderSaved(): void {
+		wc_get_template(
+			'myaccount/storewright-saved.php',
+			[
+				'products' => ( new SavedItems( get_current_user_id() ) )->products(),
+				'nonce'    => self::SAVE_NONCE,
+			],
+			'',
+			dirname( __DIR__, 2 ) . '/templates/'
+		);
 	}
 
 	public static function render(): void {

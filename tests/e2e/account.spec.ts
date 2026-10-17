@@ -7,7 +7,7 @@ let shopper: Account;
 test.beforeEach(({}, testInfo) => {
 	test.skip(testInfo.project.name !== 'desktop', 'the account is checked at desktop width');
 	shopper = account('account.e2e', 'customer', 'Meera Rao');
-	wp('eval', '$id = get_user_by( "login", "account.e2e" )->ID; delete_user_meta( $id, "storewright_addresses" ); $c = new WC_Customer( $id ); $c->set_first_name( "Meera" ); $c->set_shipping_first_name( "Meera" ); $c->set_shipping_last_name( "Rao" ); $c->set_shipping_address_1( "4 Lavelle Road" ); $c->set_shipping_address_2( "" ); $c->set_shipping_city( "Bengaluru" ); $c->set_shipping_state( "KA" ); $c->set_shipping_postcode( "560001" ); $c->set_shipping_country( "IN" ); $c->save(); WC()->cart?->empty_cart();');
+	wp('eval', '$id = get_user_by( "login", "account.e2e" )->ID; delete_user_meta( $id, "storewright_addresses" ); delete_user_meta( $id, "storewright_saved" ); $c = new WC_Customer( $id ); $c->set_first_name( "Meera" ); $c->set_shipping_first_name( "Meera" ); $c->set_shipping_last_name( "Rao" ); $c->set_shipping_address_1( "4 Lavelle Road" ); $c->set_shipping_address_2( "" ); $c->set_shipping_city( "Bengaluru" ); $c->set_shipping_state( "KA" ); $c->set_shipping_postcode( "560001" ); $c->set_shipping_country( "IN" ); $c->save(); WC()->cart?->empty_cart();');
 });
 
 async function addAddress(page: Page, street: string, pin: string, city: string, state: string) {
@@ -28,7 +28,7 @@ test('the overview greets the shopper and links their account', async ({ page })
 
 	await expect(page.getByRole('heading', { name: 'Hello, Meera' })).toBeVisible();
 	const menu = page.getByRole('navigation', { name: /account/i });
-	for (const item of ['Overview', 'Orders', 'Downloads', 'Addresses', 'Account details', 'Sign out']) {
+	for (const item of ['Overview', 'Orders', 'Saved', 'Downloads', 'Addresses', 'Account details', 'Sign out']) {
 		await expect(menu.getByRole('link', { name: item })).toBeVisible();
 	}
 	await expect(page.getByRole('link', { name: /560001\s*Delivery address/ })).toHaveAttribute('href', /\/my-account\/addresses\/$/);
@@ -79,3 +79,30 @@ test('checkout offers the saved addresses', async ({ page }) => {
 	await expect(shipping.getByLabel('City')).toHaveValue('Pune');
 	await expect(chooser.getByRole('button', { name: /12 FC Road/ })).toHaveAttribute('aria-pressed', 'true');
 });
+
+test('a product saved for later waits in the account until it is removed', async ({ page }) => {
+	await logIn(page, shopper);
+	await page.goto('/product/stoneware-mug/');
+	const save = page.getByRole('button', { name: 'Save for later' });
+	await save.click();
+	await expect(page.getByRole('button', { name: 'Saved' })).toHaveAttribute('aria-pressed', 'true');
+
+	await page.reload();
+	await expect(page.getByRole('button', { name: 'Saved' })).toBeVisible();
+
+	await page.goto('/my-account/saved/');
+	const item = page.locator('.sw-saved__item').filter({ hasText: 'Stoneware Mug' });
+	await expect(item).toBeVisible();
+	await expect(item.getByRole('link', { name: 'Add to bag' })).toBeVisible();
+
+	await item.getByRole('button', { name: 'Remove' }).click();
+	await expect(page.getByText('Removed from your saved products.')).toBeVisible();
+	await expect(page.locator('.sw-saved__item')).toHaveCount(0);
+	await expect(page.getByText('Nothing saved yet.')).toBeVisible();
+});
+
+test('a guest is asked to sign in before saving', async ({ page }) => {
+	await page.goto('/product/stoneware-mug/');
+	await expect(page.getByRole('link', { name: 'Sign in to save' })).toHaveAttribute('href', /\/my-account\/$/);
+});
+
