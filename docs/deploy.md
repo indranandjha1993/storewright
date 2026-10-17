@@ -15,6 +15,19 @@ A release is two images with the same tag:
 `make images VERSION=0.2.0` builds both locally; `IMAGE=` changes the name. Uploads live in a
 volume shared by both, so nothing in the images changes at run time.
 
+Pushing a `v*` tag runs the release workflow (`.github/workflows/release.yml`): it builds both
+images, scans them with Trivy and stops on any critical issue that has a fix, pushes them to GHCR
+and creates the GitHub release from that version's section of `CHANGELOG.md` if it does not exist
+yet. It can also be started by hand for an existing tag. The packages are private, so each server
+logs in once with a token that can only read packages:
+
+```
+echo "$TOKEN" | docker login ghcr.io -u indranandjha1993 --password-stdin
+```
+
+Create the token under GitHub settings, Developer settings, Personal access tokens (classic), with
+only the `read:packages` scope.
+
 ## The server
 
 A small Linux VPS (2 vCPU and 4 GB is plenty for most stores) with Docker and the compose plugin.
@@ -23,6 +36,7 @@ Point the store's domain at it, then copy `deploy/` over:
 ```
 scp -r deploy/ store-server:/srv/acme-store
 ssh store-server
+echo "$TOKEN" | docker login ghcr.io -u indranandjha1993 --password-stdin
 cd /srv/acme-store
 ./deploy.sh init            # writes .env with fresh salts and passwords, readable by the owner only
 nano .env                   # DOMAIN, WP_HOME, ADMIN_EMAIL, SITE_TITLE, mail, gateway keys
