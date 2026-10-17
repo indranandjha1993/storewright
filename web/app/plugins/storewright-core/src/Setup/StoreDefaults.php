@@ -16,6 +16,8 @@ final class StoreDefaults {
 	private const STORE_OPTIONS = [
 		'woocommerce_default_country'                     => 'IN:KA',
 		'woocommerce_currency'                            => 'INR',
+		'woocommerce_weight_unit'                         => 'kg',
+		'woocommerce_dimension_unit'                      => 'cm',
 		'woocommerce_ship_to_countries'                   => '',
 		'woocommerce_ship_to_destination'                 => 'shipping',
 		'woocommerce_checkout_phone_field'                => 'required',
