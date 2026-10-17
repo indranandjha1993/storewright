@@ -13,6 +13,8 @@ final class DeliveryBlock {
 			'storewright/delivery',
 			[
 				'api_version'     => '3',
+				'title'           => __( 'Delivery check', 'storewright' ),
+				'category'        => 'widgets',
 				'attributes'      => [
 					'variant' => [
 						'type'    => 'string',

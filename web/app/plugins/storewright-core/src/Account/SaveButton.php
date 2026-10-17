@@ -15,6 +15,8 @@ final class SaveButton {
 			'storewright/save-button',
 			[
 				'api_version'     => '3',
+				'title'           => __( 'Save for later', 'storewright' ),
+				'category'        => 'widgets',
 				'render_callback' => [ self::class, 'render' ],
 			]
 		);
@@ -47,11 +49,11 @@ final class SaveButton {
 	}
 
 	public static function render(): string {
+		$heart   = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>';
 		$product = wc_get_product( get_the_ID() );
 		if ( ! $product instanceof \WC_Product ) {
-			return '';
+			return wp_is_serving_rest_request() ? '<span class="sw-save">' . $heart . '<span>' . esc_html__( 'Save for later', 'storewright' ) . '</span></span>' : '';
 		}
-		$heart = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>';
 		if ( ! is_user_logged_in() ) {
 			return sprintf(
 				'<a class="sw-save" href="%s">%s<span>%s</span></a>',

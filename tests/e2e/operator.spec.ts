@@ -63,3 +63,22 @@ test('the plugins and the theme a store needs cannot be switched off', async ({ 
 	await expect(page.locator('.theme')).toHaveCount(1);
 	await expect(page.locator('.theme.active')).toContainText('Storewright');
 });
+
+test('every template opens in the site editor without broken blocks', async ({ page }) => {
+	test.setTimeout(180_000);
+	const problems: string[] = [];
+	page.on('console', (message) => {
+		if (message.text().startsWith('Block validation')) {
+			problems.push(message.text().slice(0, 120));
+		}
+	});
+	await logIn(page, account('owner.e2e', 'administrator', 'Store Owner'));
+	for (const [type, slug] of [['wp_template', 'front-page'], ['wp_template', 'archive-product'], ['wp_template', 'product-search-results'], ['wp_template', 'single-product'], ['wp_template', 'order-confirmation'], ['wp_template_part', 'header'], ['wp_template_part', 'footer']]) {
+		await page.goto(`/wp/wp-admin/site-editor.php?p=%2F${type}%2Fstorewright%2F%2F${slug}&canvas=edit`);
+		const canvas = page.frameLocator('iframe[name="editor-canvas"]');
+		await expect(canvas.locator('body')).toBeVisible({ timeout: 30_000 });
+		await page.waitForTimeout(4000);
+		await expect(canvas.getByText(/doesn.t include support|Block rendered as empty/i), `${slug} has an unsupported block`).toHaveCount(0);
+	}
+	expect(problems, 'blocks that fail validation').toEqual([]);
+});
