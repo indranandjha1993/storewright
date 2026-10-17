@@ -31,3 +31,14 @@ Results use the `product-search-results` template: the search terms as the headi
 filters and grid as the shop, and, when nothing matches, the `storewright/no-results` pattern with
 the category chips and a link back to everything. A search with exactly one match goes straight to
 that product.
+
+## Reviews
+
+Reviews are WooCommerce product reviews with star ratings. A new store accepts reviews only from
+customers who bought the product (`woocommerce_review_rating_verification_required`), and does not
+load Gravatar pictures (`show_avatars` off). Product cards show the stars when a product has
+ratings. The Reviews tab opens with a summary beside the list: the average, the number of reviews
+and the share of each star rating. The Additional information tab is called Details.
+
+Demo stores get a few sample reviews from `make seed`; real stores start with none.
+

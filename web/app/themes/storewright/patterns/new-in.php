@@ -33,6 +33,7 @@
 				<!-- wp:woocommerce/product-sale-badge {"isDescendentOfQueryLoop":true,"align":"left"} /-->
 			<!-- /wp:woocommerce/product-image -->
 			<!-- wp:post-title {"level":3,"isLink":true,"fontSize":"medium","__woocommerceNamespace":"woocommerce/product-collection/product-title"} /-->
+			<!-- wp:woocommerce/product-rating {"isDescendentOfQueryLoop":true} /-->
 			<!-- wp:woocommerce/product-price {"isDescendentOfQueryLoop":true,"fontSize":"small"} /-->
 			<!-- wp:woocommerce/product-button {"isDescendentOfQueryLoop":true,"fontSize":"small"} /-->
 		<!-- /wp:woocommerce/product-template -->

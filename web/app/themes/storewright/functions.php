@@ -44,6 +44,7 @@ add_action(
 add_filter( 'woocommerce_product_single_add_to_cart_text', static fn(): string => __( 'Add to bag', 'storewright' ) );
 add_filter( 'woocommerce_product_description_heading', '__return_empty_string' );
 add_filter( 'woocommerce_product_additional_information_heading', '__return_empty_string' );
+add_filter( 'woocommerce_product_additional_information_tab_title', static fn(): string => __( 'Details', 'storewright' ) );
 add_filter( 'woocommerce_product_add_to_cart_text', static fn( string $text, WC_Product $product ): string => $product->is_type( 'variable' ) ? __( 'Choose options', 'storewright' ) : __( 'Add to bag', 'storewright' ), 10, 2 );
 
 add_filter(
@@ -56,6 +57,68 @@ add_filter(
 	10,
 	2
 );
+
+add_filter(
+	'woocommerce_reviews_title',
+	/* translators: %d: number of reviews */
+	static fn( string $title, int $count ): string => esc_html( sprintf( _n( '%d review', '%d reviews', $count, 'storewright' ), $count ) ),
+	10,
+	2
+);
+
+add_filter(
+	'woocommerce_product_tabs',
+	static function ( array $tabs ): array {
+		if ( isset( $tabs['reviews'] ) ) {
+			$tabs['reviews']['callback'] = 'storewright_reviews_tab';
+		}
+		return $tabs;
+	},
+	98
+);
+
+function storewright_reviews_tab(): void {
+	global $product;
+	echo '<div class="sw-reviews">';
+	if ( $product instanceof WC_Product && $product->get_review_count() > 0 ) {
+		storewright_review_summary( $product );
+	}
+	comments_template();
+	echo '</div>';
+}
+
+function storewright_review_summary( WC_Product $product ): void {
+	$count   = $product->get_review_count();
+	$average = (float) $product->get_average_rating();
+	$ratings = $product->get_rating_counts();
+	?>
+	<aside class="sw-reviews__summary" aria-label="<?php esc_attr_e( 'Rating summary', 'storewright' ); ?>">
+		<p class="sw-reviews__score"><?php echo esc_html( number_format_i18n( $average, 1 ) ); ?></p>
+		<?php echo wp_kses_post( wc_get_rating_html( $average, $count ) ); ?>
+		<p class="sw-reviews__count">
+			<?php
+			/* translators: %d: number of reviews */
+			echo esc_html( sprintf( _n( 'Based on %d review', 'Based on %d reviews', $count, 'storewright' ), $count ) );
+			?>
+		</p>
+		<ul class="sw-reviews__bars">
+			<?php for ( $storewright_stars = 5; $storewright_stars >= 1; $storewright_stars-- ) : ?>
+				<?php $storewright_share = (int) round( (int) ( $ratings[ $storewright_stars ] ?? 0 ) / $count * 100 ); ?>
+				<li>
+					<span>
+						<?php
+						/* translators: %d: star rating from 1 to 5 */
+						echo esc_html( sprintf( _n( '%d star', '%d stars', $storewright_stars, 'storewright' ), $storewright_stars ) );
+						?>
+					</span>
+					<span class="sw-reviews__bar"><span style="width: <?php echo esc_attr( (string) $storewright_share ); ?>%"></span></span>
+					<span><?php echo esc_html( $storewright_share . '%' ); ?></span>
+				</li>
+			<?php endfor; ?>
+		</ul>
+	</aside>
+	<?php
+}
 
 function storewright_hero_image( string $size = 'full' ): string {
 	$id  = (int) get_option( 'storewright_hero_image' );

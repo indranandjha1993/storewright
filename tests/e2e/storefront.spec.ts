@@ -68,3 +68,17 @@ test('a search with no matches offers a way back into the catalogue', async ({ p
 	await page.getByRole('link', { name: 'Books' }).last().click();
 	await expect(page.getByRole('heading', { level: 1, name: 'Books' })).toBeVisible();
 });
+
+test('a product shows its rating summary and verified reviews', async ({ page }) => {
+	await page.goto('/product/stoneware-mug/');
+	await page.getByRole('tab', { name: 'Reviews (3)' }).click();
+
+	const summary = page.getByRole('complementary', { name: 'Rating summary' });
+	await expect(summary).toContainText('4.7');
+	await expect(summary).toContainText('Based on 3 reviews');
+	await expect(summary.getByText('67%')).toBeVisible();
+	await expect(page.getByRole('heading', { name: '3 reviews' })).toBeVisible();
+	await expect(page.locator('.commentlist > li').first()).toContainText('verified owner');
+	await expect(page.getByText('Only logged in customers who have purchased this product may leave a review.')).toBeVisible();
+});
+

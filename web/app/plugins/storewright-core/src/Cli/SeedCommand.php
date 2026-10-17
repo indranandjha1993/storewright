@@ -8,6 +8,7 @@ use Storewright\Core\Seed\Catalogue;
 use Storewright\Core\Seed\Content;
 use Storewright\Core\Seed\Customers;
 use Storewright\Core\Seed\DeliveryAreas;
+use Storewright\Core\Seed\Reviews;
 use WP_CLI;
 
 final class SeedCommand {
@@ -19,14 +20,16 @@ final class SeedCommand {
 		$catalogue = ( new Catalogue() )->run();
 		$customers = ( new Customers() )->run();
 		$content   = ( new Content() )->run();
+		$reviews   = ( new Reviews() )->run();
 		( new DeliveryAreas() )->run();
 		WP_CLI::success(
 			sprintf(
-				'%d categories, %d products, %d coupon(s), %d customers, %d pages, %d journal posts and a same-day area in place.',
+				'%d categories, %d products, %d coupon(s), %d customers, %d new reviews, %d pages, %d journal posts and a same-day area in place.',
 				$catalogue['categories'],
 				$catalogue['products'],
 				$catalogue['coupons'],
 				$customers,
+				$reviews,
 				$content['pages'],
 				$content['posts']
 			)
