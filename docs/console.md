@@ -40,6 +40,11 @@ so a deployment needs nothing extra.
   each opening in the block editor.
 - **Brand** (`/brand`): name, logo, colours, typefaces and corners for every surface, with a live
   preview. See [branding.md](branding.md).
+- **Settings** (`/settings`): the store's address, phone and GSTIN (shown on emails and
+  invoices), the sender of store emails, who receives new-order emails, which emails customers get,
+  and checkout options: cash on delivery on or off with an order limit, guest checkout and account
+  creation at checkout. Everything else stays in the advanced admin. Over REST at
+  `GET` and `PUT /wp-json/storewright/v1/settings`.
 
 Links into a screen carry their state in the query string: `p=/orders&status=processing` opens
 the fulfilment queue and `p=/orders&order=42` opens one order.

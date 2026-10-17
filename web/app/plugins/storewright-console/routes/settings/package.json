@@ -1,0 +1,8 @@
+{
+  "name": "storewright-console-settings",
+  "private": true,
+  "route": {
+    "path": "/settings",
+    "page": "storewright"
+  }
+}

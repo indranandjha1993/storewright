@@ -149,6 +149,33 @@ test('the payments screen shows gateway health and orders still waiting for mone
 	await expect(page.getByRole('region', { name: 'Webhook log' })).toBeVisible();
 });
 
+test('staff keep store details, order emails and checkout options in settings', async ({ page }) => {
+	const address = wp('option', 'get', 'woocommerce_store_address');
+	await logIn(page, staff);
+	await page.goto('/wp/wp-admin/admin.php?page=storewright&p=%2Fsettings');
+	const form = page.getByRole('form', { name: 'Settings' });
+
+	await form.getByLabel('Address', { exact: true }).fill('22 Residency Road');
+	await form.getByLabel('GSTIN').fill('29ABCDE1234F1Z5');
+	await form.getByRole('button', { name: 'Save settings' }).click();
+	const notice = form.locator('.sw-settings__save .components-notice');
+	await expect(notice).toContainText('That GSTIN does not look right.');
+
+	await form.getByLabel('GSTIN').fill('29ABCDE1234F1ZW');
+	await form.getByLabel('Offer cash on delivery').uncheck();
+	await form.getByRole('button', { name: 'Save settings' }).click();
+	await expect(notice).toContainText('Settings saved.');
+	expect(wp('option', 'get', 'woocommerce_store_address')).toBe('22 Residency Road');
+	expect(wp('eval', 'echo get_option( "woocommerce_cod_settings" )["enabled"];')).toBe('no');
+
+	await page.reload();
+	await expect(form.getByLabel('GSTIN')).toHaveValue('29ABCDE1234F1ZW');
+	await expect(form.getByLabel('Offer cash on delivery')).not.toBeChecked();
+
+	wp('option', 'update', 'woocommerce_store_address', address);
+	wp('eval', '$cod = get_option( "woocommerce_cod_settings" ); $cod["enabled"] = "yes"; update_option( "woocommerce_cod_settings", $cod ); $own = (array) get_option( "storewright_settings", [] ); unset( $own["store_gstin"] ); update_option( "storewright_settings", $own );');
+});
+
 test('staff change a price without leaving the console', async ({ page }) => {
 	await logIn(page, staff);
 	await page.getByRole('link', { name: 'Products' }).click();

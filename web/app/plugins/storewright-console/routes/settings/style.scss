@@ -1,0 +1,66 @@
+@use '../../lib/screen';
+
+.sw-settings {
+	display: grid;
+	gap: 1rem;
+	max-width: 52rem;
+}
+
+.sw-settings__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+	gap: 0.75rem 1rem;
+
+	.components-base-control {
+		margin: 0;
+	}
+
+	.is-wide {
+		grid-column: 1 / -1;
+	}
+}
+
+.sw-settings__emails {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+	gap: 0.25rem 1rem;
+	margin: 1.25rem 0 0;
+	padding: 1rem 0 0;
+	border: 0;
+	border-top: 1px solid var(--sw-line);
+
+	legend {
+		margin-bottom: 0.5rem;
+		padding: 0;
+		color: var(--sw-muted);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.components-base-control {
+		margin: 0;
+	}
+}
+
+.sw-settings__limit {
+	max-width: 16rem;
+	margin: 0 0 1rem 3rem;
+}
+
+.sw-settings__save {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+	justify-content: flex-end;
+	padding: 0.75rem 0;
+	background: var(--sw-surface);
+
+	.components-notice {
+		flex: 1;
+		margin: 0;
+	}
+}
