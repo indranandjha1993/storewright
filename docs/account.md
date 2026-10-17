@@ -22,6 +22,11 @@ products to the bag or open the options of variable ones, and Remove. Up to 100 
 in the user meta `storewright_saved`. The button is the block `storewright/save-button`, which
 toggles through `POST /wp-json/storewright/v1/saved/{product id}` (signed-in users, REST nonce).
 
+## Returns
+
+A completed order's page offers Return items within the return window; see
+[returns.md](returns.md).
+
 ## Addresses
 
 Shoppers keep up to ten delivery addresses. The default one is WooCommerce's shipping address;

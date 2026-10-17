@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { account, logIn, type Account } from './support/accounts';
+import { mailFor } from './support/mail';
 import { wp } from './support/wp';
 
 let shopper: Account;
@@ -104,5 +105,40 @@ test('a product saved for later waits in the account until it is removed', async
 test('a guest is asked to sign in before saving', async ({ page }) => {
 	await page.goto('/product/stoneware-mug/');
 	await expect(page.getByRole('link', { name: 'Sign in to save' })).toHaveAttribute('href', /\/my-account\/$/);
+});
+
+test('a delivered order can be returned and refunded', async ({ page, browser }) => {
+	const id = wp('eval', '$user = get_user_by( "login", "account.e2e" ); $order = wc_create_order( [ "customer_id" => $user->ID ] ); $order->add_product( wc_get_product( wc_get_product_id_by_sku( "SW-MUG" ) ), 2 ); $order->set_address( [ "first_name" => "Meera", "last_name" => "Rao", "email" => $user->user_email, "state" => "KA", "country" => "IN" ], "billing" ); $order->set_payment_method( "cod" ); $order->set_payment_method_title( "Cash on delivery" ); $order->calculate_totals(); $order->save(); $order->update_status( "completed" ); echo $order->get_id();');
+	await logIn(page, shopper);
+	await page.goto(`/my-account/view-order/${id}/`);
+
+	const returns = page.getByRole('region', { name: 'Returns' });
+	await returns.getByText('Return items').click();
+	const form = returns.getByRole('form', { name: 'Return items' });
+	await form.getByLabel('How many of Stoneware Mug').selectOption('1');
+	await form.getByLabel('Why').selectOption({ label: 'Arrived damaged' });
+	await form.getByRole('button', { name: 'Request the return' }).click();
+	await expect(page.getByText('Return requested. We will email you about the pickup.')).toBeVisible();
+	await expect(page.locator('.sw-return')).toContainText('Requested');
+	await expect(page.locator('.sw-return')).toContainText('1 x Stoneware Mug');
+	const ack = await mailFor(page, `to:"${shopper.email}" subject:"We have your return request"`);
+	expect(ack.html).toContain('1 x Stoneware Mug');
+
+	const staffContext = await browser.newContext();
+	const staffPage = await staffContext.newPage();
+	await logIn(staffPage, account('returns.e2e', 'shop_manager', 'Returns Staff'));
+	await staffPage.goto('/wp/wp-admin/admin.php?page=storewright&p=%2Freturns');
+	const row = staffPage.locator('.sw-return-row').filter({ hasText: `#${id}` });
+	await row.getByRole('button', { name: 'Approve and arrange pickup' }).click();
+	await expect(row).toContainText('Pickup arranged');
+	await row.getByRole('button', { name: 'Mark as received' }).click();
+	await expect(row).toContainText('Back with us');
+	await row.getByRole('button', { name: 'Refund' }).click();
+	await expect(row).toContainText('Refunded');
+	await staffContext.close();
+
+	expect(wp('eval', `echo wc_get_order( ${id} )->get_total_refunded();`)).toBe('449');
+	await page.reload();
+	await expect(page.locator('.sw-return')).toContainText('Refunded');
 });
 

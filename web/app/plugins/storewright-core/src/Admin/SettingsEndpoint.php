@@ -86,6 +86,7 @@ final class SettingsEndpoint {
 				'codLimit'          => (float) Settings::get( 'cod_max_total' ),
 				'guestCheckout'     => get_option( 'woocommerce_enable_guest_checkout', 'yes' ) === 'yes',
 				'accountAtCheckout' => get_option( 'woocommerce_enable_signup_and_login_from_checkout', 'no' ) === 'yes',
+				'returnDays'        => (int) Settings::get( 'return_days' ),
 			],
 		];
 	}
@@ -177,10 +178,19 @@ final class SettingsEndpoint {
 		if ( $limit < 0 ) {
 			throw new InvalidArgumentException( esc_html__( 'The cash on delivery limit cannot be negative.', 'storewright' ) );
 		}
+		$days = (int) ( $checkout['returnDays'] ?? Settings::get( 'return_days' ) );
+		if ( $days < 0 || $days > 90 ) {
+			throw new InvalidArgumentException( esc_html__( 'The return window is between 0 and 90 days.', 'storewright' ) );
+		}
 		$cod            = (array) get_option( 'woocommerce_cod_settings', [] );
 		$cod['enabled'] = ! empty( $checkout['cod'] ) ? 'yes' : 'no';
 		update_option( 'woocommerce_cod_settings', $cod );
-		Settings::set( [ 'cod_max_total' => $limit ] );
+		Settings::set(
+			[
+				'cod_max_total' => $limit,
+				'return_days'   => $days,
+			]
+		);
 		update_option( 'woocommerce_enable_guest_checkout', ! empty( $checkout['guestCheckout'] ) ? 'yes' : 'no' );
 		update_option( 'woocommerce_enable_signup_and_login_from_checkout', ! empty( $checkout['accountAtCheckout'] ) ? 'yes' : 'no' );
 	}

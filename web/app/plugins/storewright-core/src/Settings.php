@@ -15,6 +15,7 @@ final class Settings {
 		'store_gstin'    => '',
 		'gst_rate'       => 18,
 		'invoice_prefix' => 'INV',
+		'return_days'    => 7,
 	];
 
 	public static function get( string $key ): mixed {

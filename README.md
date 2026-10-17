@@ -73,6 +73,11 @@ Category, price and availability filters on the shop, and search suggestions as 
 Descriptions, Open Graph tags, store structured data, a sitemap at `/sitemap.xml` and a short
 robots file. See [docs/seo.md](docs/seo.md).
 
+## Returns
+
+Customers ask to return items from their order page within the return window; staff approve,
+collect and refund from the console. See [docs/returns.md](docs/returns.md).
+
 ## Invoices
 
 Numbered GST invoices with CGST and SGST or IGST by place of supply, HSN codes and the amount in
