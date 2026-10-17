@@ -82,6 +82,7 @@ final class ShopperCheck {
 			'area'     => $answer?->zone?->name,
 			'areaId'   => $answer?->zone?->id,
 			'point'    => isset( $entry['point'] ) ? [ $entry['point']->lat, $entry['point']->lng ] : null,
+			'options'  => $answer?->zone && $answer->status !== Answer::UNDELIVERABLE ? DeliveryMethods::offered( $answer->zone->id ) : [],
 			'message'  => Messages::forShopper( $lookup, $pin, (string) ( $entry['district'] ?? '' ), $answer ),
 		];
 	}

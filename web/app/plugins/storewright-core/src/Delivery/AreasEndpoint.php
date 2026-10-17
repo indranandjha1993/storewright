@@ -124,31 +124,7 @@ final class AreasEndpoint {
 		$result = $lat !== null && $lng !== null
 			? ShopperCheck::byPoint( new Point( (float) $lat, (float) $lng ), false )
 			: ShopperCheck::byPin( (string) $request->get_param( 'pin' ), false );
-		return new WP_REST_Response(
-			[
-				...$result,
-				'options' => self::options( $result ),
-			]
-		);
-	}
-
-	private static function options( array $result ): array {
-		if ( $result['areaId'] === null || $result['status'] === Answer::UNDELIVERABLE ) {
-			return [];
-		}
-		$zone = \WC_Shipping_Zones::get_zone( (int) $result['areaId'] );
-		if ( ! $zone ) {
-			return [];
-		}
-		return array_values(
-			array_map(
-				static fn( $method ): array => [
-					'title'  => $method->get_title(),
-					'charge' => DeliveryMethods::charge( $method ),
-				],
-				$zone->get_shipping_methods( true )
-			)
-		);
+		return new WP_REST_Response( $result );
 	}
 
 	private static function change( callable $change, int $status = 200 ): WP_REST_Response|WP_Error {

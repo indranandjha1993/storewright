@@ -90,7 +90,14 @@ final class DeliveryBlock {
 					<?php echo $product ? '' : $result; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</div>
 			</details>
-			<?php echo $product ? $result : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php if ( $product ) : ?>
+				<?php echo $result; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<ul class="sw-delivery__options" data-sw-delivery-options>
+					<?php foreach ( $current['options'] ?? [] as $storewright_option ) : ?>
+						<li><span><?php echo esc_html( $storewright_option['title'] ); ?></span><span><?php echo esc_html( $storewright_option['charge'] ); ?></span></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
 		</div>
 		<?php
 		return (string) ob_get_clean();

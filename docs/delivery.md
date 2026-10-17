@@ -6,6 +6,12 @@ enabled delivery method. A zone can also carry a shape, a radius around a point 
 then the shopper's location has to fall inside it, and a location outside moves on to the next
 zone.
 
+## On the storefront
+
+The header and product page carry a delivery check. After a shopper enters a PIN code or shares
+their location, the product page lists the delivery options for that address with their charges,
+for example "Same-day delivery, ₹49.00", so the cost is known before the bag.
+
 ## Editing areas
 
 Staff edit areas in the console under Delivery areas. The list shows the areas in the order

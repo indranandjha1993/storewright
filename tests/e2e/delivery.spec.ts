@@ -56,7 +56,9 @@ test('the product page shows the answer for the chosen pin code', async ({ page 
 	await expect(chip.getByRole('status')).toHaveText('We deliver to 411001, Pune.');
 
 	await page.goto('/product/stoneware-mug/');
-	await expect(page.locator('.sw-delivery--product').getByRole('status')).toHaveText('We deliver to 411001, Pune.');
+	const product = page.locator('.sw-delivery--product');
+	await expect(product.getByRole('status')).toHaveText('We deliver to 411001, Pune.');
+	await expect(product.locator('.sw-delivery__options li')).toHaveText(['Standard delivery₹79.00', 'Free deliveryFree on orders of ₹999.00 or more']);
 });
 
 test.describe('without javascript', () => {

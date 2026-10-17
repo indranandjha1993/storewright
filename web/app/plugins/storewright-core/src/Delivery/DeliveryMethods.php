@@ -21,6 +21,22 @@ final class DeliveryMethods {
 		];
 	}
 
+	public static function offered( int $zoneId ): array {
+		$zone = \WC_Shipping_Zones::get_zone( $zoneId );
+		if ( ! $zone instanceof \WC_Shipping_Zone ) {
+			return [];
+		}
+		return array_values(
+			array_map(
+				static fn( WC_Shipping_Method $method ): array => [
+					'title'  => $method->get_title(),
+					'charge' => self::charge( $method ),
+				],
+				$zone->get_shipping_methods( true )
+			)
+		);
+	}
+
 	public static function charge( WC_Shipping_Method $method ): string {
 		if ( $method->id === 'free_shipping' ) {
 			$minimum = (string) $method->get_option( 'min_amount', '' );

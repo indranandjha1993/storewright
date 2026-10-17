@@ -15,6 +15,20 @@
 				block.querySelector( '[data-sw-delivery-label]' ).textContent = answer.pin;
 				block.querySelector( 'input[name="storewright_pin"]' ).value = answer.pin;
 			}
+			const options = block.querySelector( '[data-sw-delivery-options]' );
+			if ( options ) {
+				options.replaceChildren(
+					...( answer.options || [] ).map( ( option ) => {
+						const item = document.createElement( 'li' );
+						const title = document.createElement( 'span' );
+						const charge = document.createElement( 'span' );
+						title.textContent = option.title;
+						charge.textContent = option.charge;
+						item.append( title, charge );
+						return item;
+					} )
+				);
+			}
 		} );
 	}
 
