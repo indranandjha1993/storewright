@@ -1,0 +1,14 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "storewright/product-promises",
+	"title": "Product promises",
+	"category": "theme",
+	"description": "Dispatch, returns and payment lines under the add to bag button.",
+	"textdomain": "storewright",
+	"supports": {
+		"html": false,
+		"inserter": true
+	},
+	"render": "file:./render.php"
+}

@@ -1,0 +1,14 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "storewright/search-title",
+	"title": "Search title",
+	"category": "theme",
+	"description": "The search terms as the page heading.",
+	"textdomain": "storewright",
+	"supports": {
+		"html": false,
+		"inserter": false
+	},
+	"render": "file:./render.php"
+}

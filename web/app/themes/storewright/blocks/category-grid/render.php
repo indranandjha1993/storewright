@@ -1,11 +1,4 @@
 <?php
-/**
- * Title: Category grid
- * Slug: storewright/category-grid
- * Categories: storewright
- * Description: Every product category that has products, as photo tiles linking to the category.
- */
-
 $storewright_terms = get_terms(
 	[
 		'taxonomy'   => 'product_cat',

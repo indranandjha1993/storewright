@@ -1,12 +1,4 @@
 <?php
-/**
- * Title: Category chips
- * Slug: storewright/category-chips
- * Categories: storewright
- * Description: Every product category as a pill, the current one highlighted.
- * Inserter: no
- */
-
 $storewright_terms = get_terms(
 	[
 		'taxonomy'   => 'product_cat',

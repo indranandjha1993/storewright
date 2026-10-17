@@ -1,0 +1,14 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "storewright/announcement",
+	"title": "Announcement",
+	"category": "theme",
+	"description": "The line above the header, from the Brand screen.",
+	"textdomain": "storewright",
+	"supports": {
+		"html": false,
+		"inserter": true
+	},
+	"render": "file:./render.php"
+}

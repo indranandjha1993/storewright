@@ -1,0 +1,14 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "storewright/trust-strip",
+	"title": "Promises",
+	"category": "theme",
+	"description": "Delivery, returns, payment and quality promises.",
+	"textdomain": "storewright",
+	"supports": {
+		"html": false,
+		"inserter": true
+	},
+	"render": "file:./render.php"
+}

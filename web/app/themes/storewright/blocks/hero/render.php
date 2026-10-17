@@ -1,11 +1,4 @@
 <?php
-/**
- * Title: Hero
- * Slug: storewright/hero
- * Categories: storewright
- * Description: Full width opening section with a photograph, a headline, a line of copy and two calls to action.
- */
-
 $storewright_image = storewright_hero_image();
 ?>
 <section class="sw-hero alignfull<?php echo $storewright_image ? ' sw-hero--photo' : ''; ?>">

@@ -1,11 +1,4 @@
 <?php
-/**
- * Title: Promises
- * Slug: storewright/trust-strip
- * Categories: storewright
- * Description: Four short promises about delivery, returns, payment and support.
- */
-
 $storewright_promises = [
 	[ 'truck', __( 'Tracked delivery', 'storewright' ), __( 'Follow every parcel from dispatch to your door, with same-day options where we are close by.', 'storewright' ) ],
 	[ 'return', __( 'Simple returns', 'storewright' ), __( 'Changed your mind? Request a return from your account in a minute and we collect it.', 'storewright' ) ],

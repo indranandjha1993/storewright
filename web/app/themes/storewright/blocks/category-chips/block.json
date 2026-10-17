@@ -1,0 +1,14 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "storewright/category-chips",
+	"title": "Category chips",
+	"category": "theme",
+	"description": "Every category as a pill, the current one highlighted.",
+	"textdomain": "storewright",
+	"supports": {
+		"html": false,
+		"inserter": true
+	},
+	"render": "file:./render.php"
+}

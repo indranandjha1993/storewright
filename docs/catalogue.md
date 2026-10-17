@@ -28,7 +28,7 @@ keys move through the list, Enter opens a product and Escape closes it. The last
 results.
 
 Results use the `product-search-results` template: the search terms as the heading, the same
-filters and grid as the shop, and, when nothing matches, the `storewright/no-results` pattern with
+filters and grid as the shop, and, when nothing matches, the `storewright/no-results` block with
 the category chips and a link back to everything. A search with exactly one match goes straight to
 that product.
 

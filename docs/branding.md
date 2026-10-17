@@ -43,6 +43,15 @@ Their files are not in git. `npm run fonts` copies the Latin subsets and licence
 runs it, the image build runs it, and CI runs it. Only the typefaces a store uses are loaded on
 its pages.
 
+## Theme blocks
+
+The templates are built from Storewright blocks that render on every request, so they always show
+the current brand, photo, announcement and categories: Announcement, Hero, Category grid, Category
+chips, Promises, Product promises, Footer note, Search title and No results, plus Delivery check
+and Save for later from the core plugin. They preview in the Site Editor (Appearance, Editor) and
+can be moved or removed there like any block; the theme registers them from
+`web/app/themes/storewright/blocks/`.
+
 ## Emails
 
 Order and account emails use WooCommerce's own templates with the brand applied on top. The logo

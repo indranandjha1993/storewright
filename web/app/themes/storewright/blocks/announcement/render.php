@@ -1,12 +1,4 @@
 <?php
-/**
- * Title: Announcement
- * Slug: storewright/announcement
- * Categories: storewright
- * Description: One line above the header, from the announcement setting. Hidden when empty.
- * Inserter: no
- */
-
 $storewright_message = storewright_announcement();
 if ( $storewright_message === '' ) {
 	return;

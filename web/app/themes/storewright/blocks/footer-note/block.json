@@ -1,0 +1,14 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "storewright/footer-note",
+	"title": "Footer note",
+	"category": "theme",
+	"description": "The year, store name and GST line.",
+	"textdomain": "storewright",
+	"supports": {
+		"html": false,
+		"inserter": true
+	},
+	"render": "file:./render.php"
+}

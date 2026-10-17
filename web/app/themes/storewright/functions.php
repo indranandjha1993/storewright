@@ -120,6 +120,15 @@ function storewright_review_summary( WC_Product $product ): void {
 	<?php
 }
 
+add_action(
+	'init',
+	static function (): void {
+		foreach ( array_diff( scandir( __DIR__ . '/blocks' ) ?: [], [ '.', '..' ] ) as $storewright_block ) {
+			register_block_type( __DIR__ . '/blocks/' . $storewright_block );
+		}
+	}
+);
+
 function storewright_hero_image( string $size = 'full' ): string {
 	$id  = (int) get_option( 'storewright_hero_image' );
 	$url = $id ? wp_get_attachment_image_url( $id, $size ) : false;

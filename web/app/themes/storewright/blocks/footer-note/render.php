@@ -1,13 +1,3 @@
-<?php
-/**
- * Title: Footer note
- * Slug: storewright/footer-note
- * Categories: storewright
- * Description: Copyright line with the store name and the current year.
- * Inserter: no
- */
-
-?>
 <p class="sw-footer__note">
 	<?php
 	/* translators: 1: year, 2: store name */
