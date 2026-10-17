@@ -25,6 +25,7 @@ Change any of them in the site editor and the login page and admin follow.
   `wc-analytics` and `wc/v3`. Domains such as WooCommerce.com are left as they are.
 - Marketplace suggestions, the Extensions screens and the Marketing overview are gone. Coupons
   stay under Marketing.
+- The new order email to staff no longer advertises the WooCommerce mobile app.
 
 Staff without the `manage_options` capability, such as shop managers, also do not see Comments,
 Tools or the system status page. Administrators keep everything. Posts appear as the Journal, the

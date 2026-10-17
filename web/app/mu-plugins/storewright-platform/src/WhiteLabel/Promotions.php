@@ -16,6 +16,14 @@ final class Promotions {
 		add_filter( 'pre_option_woocommerce_show_marketplace_suggestions', static fn(): string => 'no' );
 		add_filter( 'woocommerce_helper_suppress_admin_notices', '__return_true' );
 		add_action( 'admin_menu', [ self::class, 'menus' ], 999 );
+		add_action( 'woocommerce_email', [ self::class, 'emails' ] );
+	}
+
+	public static function emails( \WC_Emails $mailer ): void {
+		$newOrder = $mailer->emails['WC_Email_New_Order'] ?? null;
+		if ( $newOrder ) {
+			remove_action( 'woocommerce_email_footer', [ $newOrder, 'mobile_messaging' ], 9 );
+		}
 	}
 
 	public static function menus(): void {
