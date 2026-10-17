@@ -4,6 +4,15 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+## 0.2.1 - 2026-10-17
+
+Running a store on its own server.
+
+- `deploy/` with a compose file, Caddy for TLS and `deploy.sh`: init, up, update with backup and automatic rollback on a failed health check, rollback, backup, restore, status, logs and wp.
+- A web image beside the app image, both built by `make images` and published to GHCR by the release workflow on each tag after a Trivy scan.
+- Production stores send mail over SMTP from MAIL_HOST and related settings; before this they could not send order emails.
+- nginx takes the shopper's address from proxies on private networks, so the sign-in lockout and rate limit apply per shopper.
+
 ## 0.2.0 - 2026-10-17
 
 A store a client can run: payments on three methods, delivery areas, a branded storefront, and a
