@@ -1,4 +1,5 @@
 <?php
+// @version 7.0.1
 
 defined( 'ABSPATH' ) || exit;
 

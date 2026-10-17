@@ -71,6 +71,7 @@ jobs:
           rm deploy/.env
       - run: make up
       - run: make install
+      - run: make wp -- storewright templates
       - run: make seed
       - run: make pins
       - name: smoke
