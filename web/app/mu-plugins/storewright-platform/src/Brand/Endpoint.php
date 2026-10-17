@@ -73,6 +73,9 @@ final class Endpoint {
 			}
 			update_option( 'storewright_hero_image', $hero );
 		}
+		if ( array_key_exists( 'description', $input ) ) {
+			update_option( 'blogdescription', mb_substr( trim( sanitize_text_field( (string) $input['description'] ) ), 0, 160 ) );
+		}
 		if ( array_key_exists( 'announcement', $input ) ) {
 			update_option( 'storewright_announcement', mb_substr( trim( sanitize_text_field( (string) $input['announcement'] ) ), 0, 140 ) );
 		}
@@ -86,6 +89,7 @@ final class Endpoint {
 		$hero     = (int) get_option( 'storewright_hero_image' );
 		return [
 			'name'         => Brand::name(),
+			'description'  => (string) get_option( 'blogdescription', '' ),
 			'announcement' => (string) get_option( 'storewright_announcement', '' ),
 			'logo'         => [
 				'id'  => $logo,

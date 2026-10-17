@@ -1,4 +1,4 @@
-import { Button, Notice, Spinner, TextControl } from '@wordpress/components';
+import { Button, Notice, Spinner, TextareaControl, TextControl } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { loadBrand, saveBrand, uploadImage } from './api';
@@ -34,7 +34,7 @@ export const stage = () => {
 	const take = ( data ) => {
 		setBrand( data );
 		setPending( {} );
-		setDraft( { ...data.settings, name: data.name, announcement: data.announcement, logo: data.logo.id, heroImage: data.heroImage.id } );
+		setDraft( { ...data.settings, name: data.name, description: data.description, announcement: data.announcement, logo: data.logo.id, heroImage: data.heroImage.id } );
 		const tokens = document.getElementById( 'storewright-tokens' );
 		if ( tokens ) {
 			tokens.textContent = data.adminCss;
@@ -97,7 +97,7 @@ export const stage = () => {
 		return <div className="sw-brand__loading">{ error ? <Notice status="error" isDismissible={ false }>{ error }</Notice> : <Spinner /> }</div>;
 	}
 
-	const dirty = JSON.stringify( draft ) !== JSON.stringify( { ...brand.settings, name: brand.name, announcement: brand.announcement, logo: brand.logo.id, heroImage: brand.heroImage.id } );
+	const dirty = JSON.stringify( draft ) !== JSON.stringify( { ...brand.settings, name: brand.name, description: brand.description, announcement: brand.announcement, logo: brand.logo.id, heroImage: brand.heroImage.id } );
 	const logo = image( 'logo' );
 
 	return (
@@ -127,6 +127,14 @@ export const stage = () => {
 						hint={ __( 'PNG or SVG with a transparent background works best, about 400 pixels wide.', 'storewright' ) }
 						onUpload={ upload( 'logo' ) }
 						onRemove={ remove( 'logo' ) }
+					/>
+					<TextareaControl
+						label={ __( 'Store description', 'storewright' ) }
+						help={ __( 'One or two sentences on what the store sells. Search results and link previews show it under the store name.', 'storewright' ) }
+						value={ draft.description }
+						rows={ 2 }
+						maxLength={ 160 }
+						onChange={ set( 'description' ) }
 					/>
 					<TextControl
 						label={ __( 'Announcement', 'storewright' ) }

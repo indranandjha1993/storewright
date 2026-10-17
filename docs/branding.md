@@ -25,6 +25,9 @@ Brand. The same choices reach:
 Derived shades (hover, soft tint, line, muted text, the text colour on top of the accent) are
 worked out from these, so a client never has to pick eleven colours.
 
+The store description (the site tagline, up to 160 characters) is what search results and link
+previews show for the home page; see [seo.md](seo.md).
+
 Two more pieces of the storefront come from the same screen: the announcement line above the
 header (option `storewright_announcement`, hidden when empty) and the home page hero photograph
 (option `storewright_hero_image`, an attachment id; without one the hero sits on the soft accent

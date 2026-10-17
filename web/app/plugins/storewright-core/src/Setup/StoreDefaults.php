@@ -29,7 +29,6 @@ final class StoreDefaults {
 		'woocommerce_feature_fulfillments_enabled'        => 'yes',
 		'auto_fulfill_downloadable'                       => 'yes',
 		'auto_fulfill_virtual'                            => 'yes',
-		'blogdescription'                                 => '',
 	];
 
 	public function apply(): array {
@@ -37,6 +36,9 @@ final class StoreDefaults {
 			update_option( $option, $value );
 		}
 		update_option( 'woocommerce_onboarding_profile', [ 'skipped' => true ] );
+		if ( get_option( 'blogdescription' ) === 'Just another WordPress site' ) {
+			update_option( 'blogdescription', '' );
+		}
 		add_option(
 			'woocommerce_cod_settings',
 			[

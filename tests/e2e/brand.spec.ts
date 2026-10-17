@@ -82,6 +82,19 @@ test('a logo replaces the store name in the header', async ({ page }) => {
 	await expect(page.locator('header .wp-block-site-title')).toBeVisible();
 });
 
+test('the store description is what search results and link previews show', async ({ page }) => {
+	const before = wp('option', 'get', 'blogdescription');
+	const form = await openBrand(page);
+	await form.getByLabel('Store description').fill('Hand thrown mugs and paper goods from a small studio.');
+	await form.getByRole('button', { name: 'Save brand' }).click();
+	await expect(savedNotice(page)).toContainText('Saved.');
+
+	await page.goto('/');
+	await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'Hand thrown mugs and paper goods from a small studio.');
+	await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute('content', /.+/);
+	wp('option', 'update', 'blogdescription', before);
+});
+
 test('unreadable text is refused and nothing changes', async ({ page }) => {
 	const form = await openBrand(page);
 

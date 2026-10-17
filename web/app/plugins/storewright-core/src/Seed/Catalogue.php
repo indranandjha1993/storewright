@@ -23,7 +23,7 @@ final class Catalogue {
 	public function run(): array {
 		$categories = [
 			'apparel'  => $this->category( 'Apparel', 'apparel', 'Everyday basics' ),
-			'desk'     => $this->category( 'Kitchen and Desk', 'kitchen-and-desk', 'Mugs, notebooks and the small things' ),
+			'desk'     => $this->category( 'Kitchen and Desk', 'kitchen-and-desk', 'Mugs, notebooks and the small things on a desk' ),
 			'books'    => $this->category( 'Books', 'books', 'Short guides you can read tonight' ),
 			'software' => $this->category( 'Software', 'software', 'Icons and templates, delivered instantly' ),
 		];
@@ -117,6 +117,9 @@ final class Catalogue {
 	}
 
 	private function hero(): void {
+		if ( get_option( 'blogdescription' ) === '' ) {
+			update_option( 'blogdescription', __( 'Everyday goods for home and desk, made in small batches and delivered across India.', 'storewright' ) );
+		}
 		if ( get_post( (int) get_option( 'storewright_hero_image' ) ) ) {
 			return;
 		}
