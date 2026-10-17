@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { wp } from './support/wp';
 
 test('the home page links to every category that has products', async ({ page }) => {
 	await page.goto('/');
@@ -100,5 +101,30 @@ test('crawlers get a plain robots file and no platform sitemap names', async ({ 
 	const robots = await (await request.get('/robots.txt')).text();
 	expect(robots).not.toMatch(/wp-admin|wc-logs|woocommerce/);
 	expect((await request.get('/wp-sitemap.xml')).status()).toBe(404);
+});
+
+test('a shopper tracks an order with its number and email', async ({ page }) => {
+	const number = wp('eval', '$order = wc_create_order(); $order->add_product( wc_get_product( wc_get_product_id_by_sku( "SW-MUG" ) ), 2 ); $order->set_address( [ "first_name" => "Track", "last_name" => "Check", "email" => "track.check@example.com" ], "billing" ); $order->calculate_totals(); $order->set_status( "processing" ); $order->save(); $item = array_key_first( $order->get_items() ); $f = new Automattic\\WooCommerce\\Admin\\Features\\Fulfillments\\Fulfillment(); $f->set_entity_type( WC_Order::class ); $f->set_entity_id( (string) $order->get_id() ); $f->set_status( "fulfilled" ); $f->set_items( [ [ "item_id" => $item, "qty" => 1 ] ] ); $f->update_meta_data( "_shipment_provider", "bluedart" ); $f->update_meta_data( "_tracking_number", "70012345678" ); $f->save(); echo $order->get_order_number();');
+	await page.goto('/');
+	await page.getByRole('contentinfo').getByRole('link', { name: 'Track an order' }).click();
+	await expect(page.getByRole('heading', { level: 1, name: 'Track an order' })).toBeVisible();
+
+	const form = page.getByRole('form', { name: 'Track an order' });
+	await form.getByLabel('Order number').fill(number);
+	await form.getByLabel('Email you ordered with').fill('someone.else@example.com');
+	await form.getByRole('button', { name: 'Track order' }).click();
+	await expect(page.getByText('Sorry, the order could not be found.', { exact: false })).toBeVisible();
+
+	await form.getByLabel('Order number').fill(number);
+	await form.getByLabel('Email you ordered with').fill('track.check@example.com');
+	await form.getByRole('button', { name: 'Track order' }).click();
+	const status = page.locator('.order-info');
+	await expect(status).toContainText(`Order #${number}, placed on`);
+	await expect(status).toContainText('is being prepared. Part of it has been sent.');
+	const shipments = page.getByRole('region', { name: 'Shipments' });
+	await expect(shipments).toContainText('Blue Dart');
+	await expect(shipments).toContainText('70012345678');
+	await expect(shipments).toContainText('Still to ship: 1 x Stoneware Mug');
+	await expect(page.getByText('Pending items')).toHaveCount(0);
 });
 

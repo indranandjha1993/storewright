@@ -13,6 +13,6 @@ final class SetupCommand {
 	public function __invoke(): void {
 		$result  = ( new StoreDefaults() )->apply();
 		$removed = ( new SampleContent() )->remove();
-		WP_CLI::success( sprintf( '%d store settings applied, shipping zone %d in place, %d sample items removed.', $result['options'], $result['zone'], $removed ) );
+		WP_CLI::success( sprintf( '%d store settings applied, shipping zone %d and tracking page %d in place, %d sample items removed.', $result['options'], $result['zone'], $result['tracking'], $removed ) );
 	}
 }

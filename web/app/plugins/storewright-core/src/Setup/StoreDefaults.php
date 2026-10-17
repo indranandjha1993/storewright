@@ -12,6 +12,7 @@ final class StoreDefaults {
 	public const ZONE           = 'India';
 	public const FLAT_RATE      = '79';
 	public const FREE_FROM      = '999';
+	public const TRACKING       = 'track';
 	private const STORE_OPTIONS = [
 		'woocommerce_default_country'                     => 'IN:KA',
 		'woocommerce_currency'                            => 'INR',
@@ -59,9 +60,27 @@ final class StoreDefaults {
 		);
 
 		return [
-			'options' => count( self::STORE_OPTIONS ) + 1,
-			'zone'    => $this->domesticZone(),
+			'options'  => count( self::STORE_OPTIONS ) + 1,
+			'zone'     => $this->domesticZone(),
+			'tracking' => $this->trackingPage(),
 		];
+	}
+
+	private function trackingPage(): int {
+		$existing = get_page_by_path( self::TRACKING, OBJECT, 'page' );
+		if ( $existing ) {
+			return $existing->ID;
+		}
+		$intro = __( 'Enter the order number from your confirmation email and the email address you ordered with. You will see where the order is and every parcel sent so far.', 'storewright' );
+		return (int) wp_insert_post(
+			[
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => __( 'Track an order', 'storewright' ),
+				'post_name'    => self::TRACKING,
+				'post_content' => "<!-- wp:paragraph -->\n<p>{$intro}</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:shortcode -->\n[woocommerce_order_tracking]\n<!-- /wp:shortcode -->",
+			]
+		);
 	}
 
 	private function domesticZone(): int {

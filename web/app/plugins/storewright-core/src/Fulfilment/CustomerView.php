@@ -13,6 +13,40 @@ final class CustomerView {
 
 	public static function register(): void {
 		add_action( 'init', [ self::class, 'replace' ], 20 );
+		add_filter( 'wc_get_template', [ self::class, 'plainTable' ], 10, 2 );
+		add_filter( 'woocommerce_order_tracking_status', [ self::class, 'status' ], 20, 2 );
+	}
+
+	public static function plainTable( string $located, string $name ): string {
+		return $name === 'order/order-details-fulfillments.php' ? wc_locate_template( 'order/order-details.php' ) : $located;
+	}
+
+	public static function status( string $text, mixed $order ): string {
+		if ( ! $order instanceof WC_Order ) {
+			return $text;
+		}
+		$state = match ( $order->get_status() ) {
+			'pending'    => __( 'is waiting for payment', 'storewright' ),
+			'on-hold'    => __( 'is on hold while we check something', 'storewright' ),
+			'processing' => __( 'is being prepared', 'storewright' ),
+			'completed'  => __( 'is complete', 'storewright' ),
+			'cancelled'  => __( 'was cancelled', 'storewright' ),
+			'refunded'   => __( 'was refunded', 'storewright' ),
+			'failed'     => __( 'did not go through', 'storewright' ),
+			default      => wc_get_order_status_name( $order->get_status() ),
+		};
+		$sent = match ( (string) $order->get_meta( '_fulfillment_status' ) ) {
+			'fulfilled'           => ' ' . __( 'Everything in it has been sent.', 'storewright' ),
+			'partially_fulfilled' => ' ' . __( 'Part of it has been sent.', 'storewright' ),
+			default               => '',
+		};
+		return sprintf(
+			/* translators: 1: order number, 2: order date, 3: order state such as "is being prepared" */
+			__( 'Order %1$s, placed on %2$s, %3$s.', 'storewright' ),
+			'<strong>#' . esc_html( $order->get_order_number() ) . '</strong>',
+			esc_html( wc_format_datetime( $order->get_date_created() ) ),
+			'<strong>' . esc_html( $state ) . '</strong>'
+		) . esc_html( $sent );
 	}
 
 	public static function replace(): void {

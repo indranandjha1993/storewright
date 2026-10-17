@@ -1850,6 +1850,58 @@ html body .sw-product__details.is-style-minimal ul.tabs.wc-tabs li a {
 	}
 }
 
+/* Order tracking */
+
+.sw-track {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+	gap: var(--wp--preset--spacing--20);
+	align-items: end;
+	padding: var(--wp--preset--spacing--30);
+	border: 1px solid var(--wp--preset--color--line);
+	border-radius: var(--wp--custom--radius);
+	background: var(--wp--preset--color--surface);
+}
+
+.sw-track p {
+	margin: 0;
+}
+
+.sw-track__field label {
+	display: block;
+	margin-bottom: 0.35rem;
+	font-weight: 600;
+}
+
+.sw-track__field input {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 0.7rem 0.85rem;
+	border: 1px solid var(--wp--preset--color--line);
+	border-radius: var(--wp--custom--radius-small);
+	background: var(--wp--preset--color--base);
+	font: inherit;
+}
+
+.sw-track__submit .wp-element-button {
+	width: 100%;
+}
+
+.woocommerce .order-info,
+.order-info {
+	margin: 0 0 var(--wp--preset--spacing--30);
+	padding: var(--wp--preset--spacing--20) var(--wp--preset--spacing--30);
+	border-radius: var(--wp--custom--radius);
+	background: var(--wp--preset--color--accent-soft);
+	font-size: var(--wp--preset--font-size--medium);
+}
+
+.order-info mark {
+	background: none;
+	color: inherit;
+	font-weight: 600;
+}
+
 /* Shipments on the order page */
 
 .sw-order-shipments {
@@ -1904,6 +1956,7 @@ html body .sw-product__details.is-style-minimal ul.tabs.wc-tabs li a {
 
 .sw-order-shipment__track {
 	justify-self: start;
+	text-decoration: none;
 	margin-top: 0.35rem;
 	padding: 0.45rem 1rem;
 	font-size: var(--wp--preset--font-size--small);

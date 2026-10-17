@@ -36,3 +36,12 @@ meta as `[{"item_id": 12, "qty": 1}]`, the carrier key in `_shipment_provider`, 
 `_tracking_number`, `_tracking_url` and `_provider_name` (for "Another carrier") alongside.
 Carriers are registered on `woocommerce_fulfillment_shipping_providers` in
 `storewright-core/src/Fulfilment/Carriers.php`.
+
+## Tracking page
+
+`wp storewright setup` creates a Track an order page at `/track/`, linked from the footer. A
+shopper enters the order number and the email they ordered with and sees where the order is in
+plain words ("is being prepared. Part of it has been sent."), a card per parcel and what is still
+to ship. It is WooCommerce's `[woocommerce_order_tracking]` shortcode with Storewright's form
+(`web/app/themes/storewright/woocommerce/order/form-tracking.php`); signed-in customers see the same
+cards on their account's order page.
