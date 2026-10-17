@@ -76,6 +76,11 @@ Keys, webhooks and local testing for Razorpay and Stripe are in [docs/payments.m
 GSTIN for business buyers, PIN code autofill and a free delivery progress bar. See
 [docs/checkout.md](docs/checkout.md).
 
+## Customer account
+
+An overview, saved delivery addresses that say whether the store delivers there, and a
+saved-address chooser at checkout. See [docs/account.md](docs/account.md).
+
 ## Content
 
 About, Contact, Shipping and returns, Terms, Privacy and a Journal come seeded and ready to edit.
