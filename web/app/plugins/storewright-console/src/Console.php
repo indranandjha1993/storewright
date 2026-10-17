@@ -40,6 +40,7 @@ final class Console {
 		$items = [
 			'today'     => [ __( 'Today', 'storewright' ), '/' ],
 			'orders'    => [ __( 'Orders', 'storewright' ), '/orders' ],
+			'returns'   => [ __( 'Returns', 'storewright' ), '/returns' ],
 			'products'  => [ __( 'Products', 'storewright' ), '/products' ],
 			'customers' => [ __( 'Customers', 'storewright' ), '/customers' ],
 			'payments'  => [ __( 'Payments', 'storewright' ), '/payments' ],

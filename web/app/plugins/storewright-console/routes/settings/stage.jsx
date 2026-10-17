@@ -110,6 +110,17 @@ export const stage = () => {
 					) }
 					<ToggleControl label={ __( 'Let people check out without an account', 'storewright' ) } checked={ draft.checkout.guestCheckout } onChange={ set( 'checkout', 'guestCheckout' ) } />
 					<ToggleControl label={ __( 'Offer to create an account at checkout', 'storewright' ) } checked={ draft.checkout.accountAtCheckout } onChange={ set( 'checkout', 'accountAtCheckout' ) } />
+					<TextControl
+						__next40pxDefaultSize
+						className="sw-settings__days"
+						type="number"
+						min={ 0 }
+						max={ 90 }
+						label={ __( 'Returns accepted for', 'storewright' ) }
+						help={ __( 'Days after an order is completed. 0 turns returns off.', 'storewright' ) }
+						value={ String( draft.checkout.returnDays ) }
+						onChange={ ( value ) => set( 'checkout', 'returnDays' )( Number( value ) ) }
+					/>
 				</Card>
 				<footer className="sw-settings__save">
 					{ notice && (

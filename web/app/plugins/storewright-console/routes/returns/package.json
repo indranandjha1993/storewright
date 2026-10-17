@@ -1,0 +1,8 @@
+{
+  "name": "storewright-console-returns",
+  "private": true,
+  "route": {
+    "path": "/returns",
+    "page": "storewright"
+  }
+}

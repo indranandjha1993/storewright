@@ -35,6 +35,8 @@ so a deployment needs nothing extra.
   into the gateway dashboard, online orders still unpaid after 15 minutes with a button that asks
   the gateway and records the payment if it arrived, and the webhook log. See
   [payments.md](payments.md).
+- **Returns** (`/returns`): return requests from customers, approved, received and refunded in
+  three steps. See [returns.md](returns.md).
 - **Products** (`/products`): the catalogue with stock filters and search; price, sale price and
   stock are edited in the row. Variations and everything else open the full editor.
 - **Customers** (`/customers`): shoppers with a profile panel: contact, delivery address and
