@@ -24,3 +24,11 @@ export const NEXT_STEPS = {
 	failed: [ 'pending', 'cancelled' ],
 	refunded: [],
 };
+
+const SHIPPING = {
+	fulfilled: __( 'Shipped', 'storewright' ),
+	partially_fulfilled: __( 'Part shipped', 'storewright' ),
+};
+
+export const shippingLabel = ( order ) => SHIPPING[ order.meta_data?.find( ( item ) => item.key === '_fulfillment_status' )?.value ] ?? '';
+

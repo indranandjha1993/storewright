@@ -5,16 +5,9 @@ import { adminLink } from '../../lib/data';
 import { money, timeAgo } from '../../lib/format';
 import { addressLines, personName } from '../../lib/wc';
 import { addNote, loadNotes, loadOrder, setStatus } from './api';
+import { Block } from './block';
 import { NEXT_STEPS, statusLabel, statusTone } from './labels';
-
-function Block( { title, children } ) {
-	return (
-		<section className="sw-order__block" aria-label={ title }>
-			<h3 className="sw-order__block-title">{ title }</h3>
-			{ children }
-		</section>
-	);
-}
+import { Shipments } from './shipments';
 
 function Notes( { orderId } ) {
 	const [ notes, setNotes ] = useState( null );
@@ -200,6 +193,7 @@ export function OrderPanel( { id, onClose, onChanged } ) {
 					<dd className="is-total">{ money( order.total, 2 ) }</dd>
 				</dl>
 			</Block>
+			<Shipments order={ order } />
 			<div className="sw-order__two">
 				<Block title={ __( 'Customer', 'storewright' ) }>
 					<p className="sw-order__strong">{ customer }</p>

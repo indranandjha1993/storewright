@@ -78,6 +78,7 @@ final class Console {
 			'currency'  => get_woocommerce_currency(),
 			'locale'    => str_replace( '_', '-', get_user_locale() ),
 			'timezone'  => wp_timezone_string(),
+			'carriers'  => apply_filters( 'storewright_console_carriers', [] ),
 			'mapTiles'  => apply_filters(
 				'storewright_map_tiles',
 				[

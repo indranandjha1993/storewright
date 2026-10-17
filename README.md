@@ -68,6 +68,11 @@ change `WEB_PORT`, `MAIL_PORT` and `DB_PORT` in `.env` if you need others.
 Category, price and availability filters on the shop, and search suggestions as you type. See
 [docs/catalogue.md](docs/catalogue.md).
 
+## Shipping
+
+Ship an order in one parcel or several from the console, with carrier and tracking, and the
+customer gets an email and a card per parcel on their order. See [docs/fulfilment.md](docs/fulfilment.md).
+
 ## Delivery areas
 
 How areas, shapes and the PIN directory work is in [docs/delivery.md](docs/delivery.md).

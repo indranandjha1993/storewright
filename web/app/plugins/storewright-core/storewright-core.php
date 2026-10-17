@@ -48,6 +48,9 @@ add_action(
 		Checkout\FreeDelivery::register();
 		Account\AccountPages::register();
 		Emails\OrderButton::register();
+		Emails\ShipmentCopy::register();
+		Fulfilment\Carriers::register();
+		Fulfilment\CustomerView::register();
 		Checkout\ThankYou::register();
 		Payments\RazorpayWebhooks::register();
 		Delivery\PackageRouting::register();

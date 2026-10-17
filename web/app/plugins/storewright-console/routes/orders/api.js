@@ -15,3 +15,9 @@ export const loadNotes = ( id ) => apiFetch( { path: `/wc/v3/orders/${ id }/note
 export const addNote = ( id, note, customerNote ) => apiFetch( { path: `/wc/v3/orders/${ id }/notes`, method: 'POST', data: { note, customer_note: customerNote } } );
 
 export const setStatus = ( id, status ) => apiFetch( { path: `/wc/v3/orders/${ id }`, method: 'PUT', data: { status } } );
+
+export const loadFulfilments = ( id ) => apiFetch( { path: `/wc/v3/orders/${ id }/fulfillments` } );
+
+export const createFulfilment = ( id, data ) => apiFetch( { path: `/wc/v3/orders/${ id }/fulfillments`, method: 'POST', data } );
+
+export const deleteFulfilment = ( orderId, id ) => apiFetch( { path: `/wc/v3/orders/${ orderId }/fulfillments/${ id }?notify_customer=false`, method: 'DELETE' } );

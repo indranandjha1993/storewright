@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { account, logIn, type Account } from './support/accounts';
+import { mailFor } from './support/mail';
 import { wp } from './support/wp';
 
 let staff: Account;
@@ -76,6 +77,56 @@ test('staff work orders from the console', async ({ page }) => {
 	await panel.getByPlaceholder('Add a note').fill('Packed in the blue box.');
 	await panel.getByRole('button', { name: 'Add note' }).click();
 	await expect(panel.locator('.sw-order__notes')).toContainText('Packed in the blue box.');
+});
+
+test('staff ship an order in parts with carrier and tracking', async ({ page }) => {
+	const id = wp('eval', '$order = wc_create_order(); $order->add_product( wc_get_product( wc_get_product_id_by_sku( "SW-MUG" ) ), 2 ); $order->add_product( wc_get_product( wc_get_product_id_by_sku( "SW-NOTE" ) ), 1 ); $order->set_address( [ "first_name" => "Ship", "last_name" => "Check", "email" => "ship.check@example.com", "city" => "Bengaluru", "postcode" => "560001", "country" => "IN", "state" => "KA" ], "billing" ); $order->calculate_totals(); $order->set_status( "processing" ); $order->save(); echo $order->get_id();');
+	await logIn(page, staff);
+	await page.goto(`/wp/wp-admin/admin.php?page=storewright&p=%2Forders&order=${id}`);
+	const panel = page.getByRole('complementary', { name: /^Order #/ });
+	const shipments = panel.getByRole('region', { name: 'Shipments' });
+	await expect(shipments).toContainText('Nothing has been sent yet.');
+
+	await shipments.getByRole('button', { name: 'Ship items' }).click();
+	const form = shipments.getByRole('form', { name: 'Ship items' });
+	await form.getByLabel('Quantity of Stoneware Mug').fill('1');
+	await form.getByLabel('Quantity of Dot Grid Notebook').fill('0');
+	await form.getByLabel('Carrier').selectOption({ label: 'Delhivery' });
+	await form.getByLabel('Tracking number').fill('1490110012345');
+	await form.getByLabel('Tracking link').fill('https://track.example.com/1490110012345');
+	await form.getByRole('button', { name: 'Mark as shipped' }).click();
+
+	await expect(shipments).toContainText('Part of the order has been sent.');
+	const first = shipments.locator('.sw-shipment').first();
+	await expect(first).toContainText('Delhivery');
+	await expect(first.getByRole('link', { name: '1490110012345' })).toHaveAttribute('href', 'https://track.example.com/1490110012345');
+	await expect(first).toContainText('1 × Stoneware Mug');
+
+	const shipped = await mailFor(page, `to:"ship.check@example.com" subject:"order ${id} is on its way"`);
+	expect(shipped.html).toContain('Your parcel has left us.');
+	expect(shipped.html).toContain('Delhivery');
+	expect(shipped.html).toContain('https://track.example.com/1490110012345');
+	expect(shipped.html).not.toMatch(/Woo!|fulfill/i);
+
+	const received = wp('eval', `echo wc_get_order( ${id} )->get_checkout_order_received_url();`);
+	const shopper = await page.context().newPage();
+	await shopper.goto(received);
+	const card = shopper.getByRole('region', { name: 'Shipments' });
+	await expect(card).toContainText('Delhivery');
+	await expect(card.getByRole('link', { name: 'Track parcel' })).toHaveAttribute('href', 'https://track.example.com/1490110012345');
+	await expect(card).toContainText('Still to ship: 1 x Stoneware Mug, 1 x Dot Grid Notebook');
+	await shopper.close();
+
+	await shipments.getByRole('button', { name: 'Ship items' }).click();
+	await expect(form.getByLabel('Quantity of Stoneware Mug')).toHaveValue('1');
+	await form.getByLabel('Carrier').selectOption({ label: 'Our own delivery' });
+	await form.getByRole('checkbox', { name: 'Email the customer that it is on its way' }).uncheck();
+	await form.getByRole('button', { name: 'Mark as shipped' }).click();
+	await expect(shipments).toContainText('Everything has been sent.');
+	await expect(shipments.getByRole('button', { name: 'Ship items' })).toHaveCount(0);
+
+	await shipments.locator('.sw-shipment').nth(1).getByRole('button', { name: 'Remove' }).click();
+	await expect(shipments).toContainText('Part of the order has been sent.');
 });
 
 test('staff change a price without leaving the console', async ({ page }) => {

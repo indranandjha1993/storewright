@@ -26,8 +26,8 @@ so a deployment needs nothing extra.
   against the period before, a sales chart, the queues to fulfil, awaiting payment and on hold,
   recent orders, payment gateway health from the webhook log, low stock and best sellers.
 - **Orders** (`/orders`): every order with status filters, search, a detail panel with items,
-  customer, delivery address, payment and notes, and the next status one click away. Refunds and
-  line edits open the advanced order screen.
+  shipments (see [fulfilment.md](fulfilment.md)), customer, delivery address, payment and notes,
+  and the next status one click away. Refunds and line edits open the advanced order screen.
 - **Products** (`/products`): the catalogue with stock filters and search; price, sale price and
   stock are edited in the row. Variations and everything else open the full editor.
 - **Customers** (`/customers`): shoppers with a profile panel: contact, delivery address and

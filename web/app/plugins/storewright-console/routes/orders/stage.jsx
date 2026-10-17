@@ -5,7 +5,7 @@ import { count, money, timeAgo } from '../../lib/format';
 import { Empty, Screen } from '../../lib/screen';
 import { initials, personName } from '../../lib/wc';
 import { loadOrders, loadTotals, PER_PAGE } from './api';
-import { STATUSES, statusLabel, statusTone } from './labels';
+import { shippingLabel, STATUSES, statusLabel, statusTone } from './labels';
 import { OrderPanel } from './order-panel';
 import './style.scss';
 
@@ -62,6 +62,7 @@ function Rows( { orders, selected, onSelect } ) {
 							</td>
 							<td>
 								<span className={ `sw-pill ${ statusTone( order.status ) }` }>{ statusLabel( order.status ) }</span>
+								{ shippingLabel( order ) && <small>{ shippingLabel( order ) }</small> }
 							</td>
 							<td className="is-number">{ money( order.total, 2 ) }</td>
 						</tr>

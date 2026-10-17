@@ -26,6 +26,9 @@ final class StoreDefaults {
 		'woocommerce_custom_orders_table_data_sync_enabled' => 'no',
 		'timezone_string'                                 => 'Asia/Kolkata',
 		'show_avatars'                                    => '0',
+		'woocommerce_feature_fulfillments_enabled'        => 'yes',
+		'auto_fulfill_downloadable'                       => 'yes',
+		'auto_fulfill_virtual'                            => 'yes',
 		'blogdescription'                                 => '',
 	];
 
