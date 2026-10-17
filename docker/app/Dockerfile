@@ -35,6 +35,7 @@ FROM base AS app
 ARG STOREWRIGHT_VERSION=dev
 ARG GIT_SHA=unknown
 ENV STOREWRIGHT_VERSION=$STOREWRIGHT_VERSION GIT_SHA=$GIT_SHA
+LABEL org.opencontainers.image.source="https://github.com/indranandjha1993/storewright" org.opencontainers.image.version=$STOREWRIGHT_VERSION org.opencontainers.image.revision=$GIT_SHA
 COPY --from=vendor /build/vendor ./vendor
 COPY --from=vendor /build/web/wp ./web/wp
 COPY --from=vendor /build/web/app/plugins ./web/app/plugins
@@ -47,5 +48,10 @@ COPY --from=console /build/web/app/themes/storewright/assets/fonts ./web/app/the
 COPY config ./config
 COPY web/index.php web/wp-config.php ./web/
 COPY wp-cli.yml ./
+COPY bin/install ./bin/install
 RUN mkdir -p web/app/uploads && chown -R www-data:www-data web/app/uploads
 USER www-data
+
+FROM nginx:1.27-alpine AS web
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=app /var/www/html/web /var/www/html/web

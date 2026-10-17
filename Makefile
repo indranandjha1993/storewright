@@ -13,6 +13,13 @@ help:
 .env:
 	@echo ".env is missing; copy .env.example and fill it in" && exit 1
 
+IMAGE ?= ghcr.io/indranandjha1993/storewright
+VERSION ?= $(shell git describe --tags --always)
+
+images: ## build the release app and web images, e.g. make images VERSION=0.2.0
+	docker build -f docker/app/Dockerfile --target app --build-arg STOREWRIGHT_VERSION=$(VERSION) --build-arg GIT_SHA=$$(git rev-parse --short HEAD) -t $(IMAGE):$(VERSION) .
+	docker build -f docker/app/Dockerfile --target web --build-arg STOREWRIGHT_VERSION=$(VERSION) -t $(IMAGE)-web:$(VERSION) .
+
 build: .env ## build the application image
 	$(COMPOSE) build app
 
