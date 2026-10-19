@@ -329,7 +329,8 @@ test('order emails carry the store brand and point each reader to the right plac
 	expect(staff).not.toMatch(/WooCommerce|WordPress/);
 });
 
-test('an order gets a numbered gst invoice that only its buyer can open', async ({ page, browser }) => {
+test('an order gets a numbered gst invoice that only its buyer can open', async ({ page, browser }, testInfo) => {
+	test.skip(testInfo.project.name !== 'desktop', 'the store GSTIN is store-wide, so only one project may change it');
 	wp('eval', '$s = (array) get_option( "storewright_settings", [] ); $s["store_gstin"] = "29ABCDE1234F1ZW"; update_option( "storewright_settings", $s );');
 	try {
 		await addToBag(page, products.mug);
