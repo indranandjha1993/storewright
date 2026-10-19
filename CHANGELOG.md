@@ -20,7 +20,6 @@ Templates the Site Editor can open, a locked plugin set, and client stores that 
 - Dependabot opens weekly pull requests for Composer, npm and the workflow actions.
 - The browser tests start from the seeded store, set their users' passwords once per run, and run the console specs after the storefront specs, which removes the sign-in and cash-on-delivery flakes.
 
-
 ## 0.2.1 - 2026-10-17
 
 Running a store on its own server.
