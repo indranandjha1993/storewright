@@ -4,6 +4,7 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- A store can install and remove its own plugins from the advanced admin when its server sets `PLUGIN_MANAGEMENT=open`; the default stays managed, the plugins and theme Storewright needs stay locked either way, and client-added plugins live in a volume that backups include and updates keep.
 - The advanced admin follows the brand: menu, admin bar, tables, cards, buttons, inputs, notices and tabs use the store's colours and typefaces.
 - Every console input is 40px tall, matching the buttons beside it.
 - The sign-in page's remaining links and the show-password control use the brand colours.
