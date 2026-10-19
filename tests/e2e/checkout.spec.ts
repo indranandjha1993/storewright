@@ -113,6 +113,7 @@ test('the bag drawer stays out of reach until it is opened', async ({ page }) =>
 	await page.getByRole('button', { name: /Number of items in the cart/ }).click();
 	await expect(drawer).toBeVisible();
 	await expect(drawer.getByRole('link', { name: 'Stoneware Mug' }).last()).toBeVisible();
+	await expect(drawer.getByRole('button', { name: 'Close' })).toBeFocused();
 
 	await page.keyboard.press('Escape');
 	await expect(drawer).toBeHidden();
