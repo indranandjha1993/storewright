@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Storewright\Core\Checkout\Gstin;
 use Storewright\Core\Invoice\Gst;
 use Storewright\Core\Settings;
+use Storewright\Platform\PluginManagement;
 use WC_Email;
 use WP_Error;
 use WP_REST_Request;
@@ -66,6 +67,10 @@ final class SettingsEndpoint {
 				'gstin'    => (string) Settings::get( 'store_gstin' ),
 				'gstRate'  => (string) Settings::get( 'gst_rate' ),
 				'prefix'   => (string) Settings::get( 'invoice_prefix' ),
+			],
+			'plugins'  => [
+				'management' => PluginManagement::mode(),
+				'extras'     => PluginManagement::extras(),
 			],
 			'gstRates' => Gst::RATES,
 			'states'   => array_map(

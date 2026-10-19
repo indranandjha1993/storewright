@@ -51,7 +51,7 @@ Config::define('WP_CACHE_KEY_SALT', env('WP_HOME'));
 Config::define('AUTOMATIC_UPDATER_DISABLED', true);
 Config::define('STOREWRIGHT_LOGIN_PATH', env('LOGIN_PATH') ?: 'sign-in');
 Config::define('DISALLOW_FILE_EDIT', true);
-Config::define('DISALLOW_FILE_MODS', true);
+Config::define('DISALLOW_FILE_MODS', env('PLUGIN_MANAGEMENT') !== 'open');
 Config::define('DISABLE_WP_CRON', env('DISABLE_WP_CRON') ?? true);
 Config::define('WP_POST_REVISIONS', 10);
 Config::define('CONCATENATE_SCRIPTS', false);

@@ -122,6 +122,24 @@ export const stage = () => {
 						onChange={ ( value ) => set( 'checkout', 'returnDays' )( Number( value ) ) }
 					/>
 				</Card>
+				<Card title={ __( 'Plugins', 'storewright' ) }>
+					<p className="sw-settings__note">
+						{ data.plugins.management === 'open'
+							? __( 'This store installs and removes its own plugins from the advanced admin. The ones Storewright needs stay locked, and their updates arrive with each release.', 'storewright' )
+							: __( 'Plugins come with each release. The server setting PLUGIN_MANAGEMENT=open lets this store install its own from the advanced admin.', 'storewright' ) }
+					</p>
+					{ data.plugins.extras.length > 0 && (
+						<ul className="sw-settings__plugins">
+							{ data.plugins.extras.map( ( plugin ) => (
+								<li key={ plugin.plugin }>
+									<strong>{ plugin.name }</strong>
+									<span>{ plugin.version }</span>
+									<span className={ `sw-pill ${ plugin.active ? 'is-good' : 'is-quiet' }` }>{ plugin.active ? __( 'Active', 'storewright' ) : __( 'Inactive', 'storewright' ) }</span>
+								</li>
+							) ) }
+						</ul>
+					) }
+				</Card>
 				<footer className="sw-save">
 					{ notice && (
 						<Notice status={ notice.status } onRemove={ () => setNotice( null ) }>

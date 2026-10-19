@@ -22,6 +22,7 @@ final class HealthTest extends TestCase {
 		self::assertSame( 'abc123', $version['sha'] );
 		self::assertSame( '7.1.3', $version['wordpress'] );
 		self::assertSame( 'production', $version['environment'] );
+		self::assertSame( [ 'management' => 'managed', 'extras' => 0 ], $version['plugins'] );
 		self::assertSame(
 			[
 				'stripe'   => 'off',
