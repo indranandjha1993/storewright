@@ -4,6 +4,7 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- Today shows the payment mix, new against returning customers, where orders go, the delivery method split and days of stock left per product, with open returns one click away.
 - The plugin list describes the commerce engine and the Razorpay gateway in the store's words, hides filters, checkboxes and search while plugins are managed, and every plugin and theme header carries the release version.
 - The advanced admin and the console share one shell: the same sidebar with the store's name, the signed-in user and sign out, the same content surface, and no admin bar, dashboard or WooCommerce activity strip.
 
