@@ -22,7 +22,7 @@ final class Login {
 		wp_add_inline_style(
 			'login',
 			sprintf(
-				'body.login{background:var(--sw-base);font-family:var(--sw-font-body)}.login h1 a{%1$s}.login form{border-radius:var(--sw-radius);border-color:var(--sw-line);box-shadow:var(--sw-shadow)}.login input[type=text],.login input[type=password]{border-radius:var(--sw-radius-small)}.wp-core-ui .button-primary{background:%2$s;border-color:%2$s;color:%4$s;border-radius:var(--sw-radius-button)}.wp-core-ui .button-primary:hover,.wp-core-ui .button-primary:focus{background:%3$s;border-color:%3$s;color:%4$s}.login input:focus{border-color:%2$s;box-shadow:0 0 0 1px %2$s}.login #nav a:hover,.login #backtoblog a:hover{color:%2$s}',
+				'body.login{background:var(--sw-base);font-family:var(--sw-font-body)}.login h1 a{%1$s}.login form{border-radius:var(--sw-radius);border-color:var(--sw-line);box-shadow:var(--sw-shadow)}.login input[type=text],.login input[type=password]{border-radius:var(--sw-radius-small)}.wp-core-ui .button-primary{background:%2$s;border-color:%2$s;color:%4$s;border-radius:var(--sw-radius-button)}.wp-core-ui .button-primary:hover,.wp-core-ui .button-primary:focus{background:%3$s;border-color:%3$s;color:%4$s}.login input:focus{border-color:%2$s;box-shadow:0 0 0 1px %2$s}.login #nav a,.login #backtoblog a,.login .privacy-policy-page-link a{color:var(--sw-muted)}.login #nav a:hover,.login #backtoblog a:hover,.login .privacy-policy-page-link a:hover{color:%2$s}.login .button.wp-hide-pw{color:var(--sw-muted)}.login .button.wp-hide-pw:hover,.login .button.wp-hide-pw:focus{color:%2$s;box-shadow:none}',
 				$mark,
 				$palette['accent'],
 				$palette['accentHover'],
