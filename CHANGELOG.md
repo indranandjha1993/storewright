@@ -4,6 +4,14 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+The console looks like the store it runs.
+
+- The sidebar carries the store name or logo, the brand colours and typeface, and the link to the full admin sits at the bottom.
+- Orders, customers, brand and delivery areas share one split layout: the same header, column widths and sticky panel, and the orders table drops its wide columns while an order is open.
+- Filters and switches use one segmented control instead of chips on some screens and pressed buttons on others.
+- Row actions in the product, page, journal and delivery area lists are links; buttons are kept for actions that change data.
+- The webhook addresses on the payments screen show in full.
+
 ## 0.2.3 - 2026-10-19
 
 Place Order works on the first press.
