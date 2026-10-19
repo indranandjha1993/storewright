@@ -20,7 +20,6 @@ final class Required {
 		add_filter( 'pre_update_option_template', [ self::class, 'keepTemplate' ], 10, 2 );
 		add_filter( 'pre_update_option_stylesheet', [ self::class, 'keepStylesheet' ], 10, 2 );
 		add_filter( 'plugin_action_links', [ self::class, 'links' ], 99, 2 );
-		add_filter( 'bulk_actions-plugins', [ self::class, 'bulkActions' ] );
 		add_filter( 'wp_prepare_themes_for_js', [ self::class, 'themes' ] );
 	}
 
@@ -55,11 +54,6 @@ final class Required {
 		}
 		unset( $actions['deactivate'] );
 		$actions['storewright'] = '<span class="storewright-required">' . esc_html__( 'Required by Storewright', 'storewright' ) . '</span>';
-		return $actions;
-	}
-
-	public static function bulkActions( array $actions ): array {
-		unset( $actions['deactivate-selected'] );
 		return $actions;
 	}
 

@@ -17,7 +17,7 @@ spl_autoload_register(
 	}
 );
 
-const VERSION = '0.1.0';
+const VERSION = '0.4.0';
 
 Health::register();
 Hardening::register();
@@ -39,6 +39,7 @@ WhiteLabel\Wording::register();
 WhiteLabel\Login::register();
 WhiteLabel\AdminChrome::register();
 WhiteLabel\AdminSkin::register();
+WhiteLabel\PluginList::register();
 WhiteLabel\Promotions::register();
 WhiteLabel\OperatorMenus::register();
 WhiteLabel\Journal::register();

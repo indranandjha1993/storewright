@@ -961,3 +961,19 @@ html body.woocommerce_page_wc-settings .wrap h1.screen-reader-text {
 	clip-path: none;
 	font-size: 1.75rem;
 }
+
+.plugins tr[data-plugin^="storewright-"] .requires,
+.plugins tr[data-slug="woocommerce"] .required-by,
+.plugins tr[data-slug="woocommerce"] .requires {
+	display: none;
+}
+
+body.storewright-plugins-managed.plugins-php .search-box,
+body.storewright-plugins-managed.plugins-php .tablenav.top,
+body.storewright-plugins-managed.plugins-php .tablenav.bottom {
+	display: none;
+}
+
+body.storewright-plugins-managed .plugins .plugin-title {
+	padding-left: 1.25rem;
+}

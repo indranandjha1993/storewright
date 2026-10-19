@@ -53,7 +53,11 @@ test('the plugins and the theme a store needs cannot be switched off', async ({ 
 		await expect(row).toContainText('Required by Storewright');
 		await expect(row.getByRole('link', { name: /^Deactivate/ })).toHaveCount(0);
 	}
-	await expect(page.locator('#bulk-action-selector-top option[value="deactivate-selected"]')).toHaveCount(0);
+	await expect(page.locator('#bulk-action-selector-top')).toHaveCount(0);
+	await expect(page.locator('.plugins th.check-column')).toHaveCount(0);
+	await expect(page.locator('.subsubsub')).toHaveCount(0);
+	await expect(page.locator('#wpbody-content')).not.toContainText(/WooCommerce|WordPress/, { useInnerText: true });
+	await expect(page.locator('tr[data-slug="woocommerce"]')).toContainText('Commerce engine');
 	await expect(page.getByRole('link', { name: /Add New Plugin|Add New/ })).toHaveCount(0);
 
 	await page.goto('/wp/wp-admin/themes.php');
