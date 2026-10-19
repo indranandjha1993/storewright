@@ -45,7 +45,7 @@ jobs:
           for s in AUTH_KEY SECURE_AUTH_KEY LOGGED_IN_KEY NONCE_KEY AUTH_SALT SECURE_AUTH_SALT LOGGED_IN_SALT NONCE_SALT; do
             sed -i "s/^$s=.*/$s=$(openssl rand -hex 32)/" .env
           done
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: build image
         uses: docker/build-push-action@v7
         with:
