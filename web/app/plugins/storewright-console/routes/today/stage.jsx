@@ -344,7 +344,7 @@ export const stage = () => {
 						</Card>
 						<Card title={ __( 'Payment mix', 'storewright' ) }>
 							<Shares
-								rows={ data.insights.payments.map( ( row ) => ( { key: row.method || 'none', title: gatewayName[ row.method ] ?? ( row.title || __( 'Not recorded', 'storewright' ) ), orders: row.orders, total: row.total } ) ) }
+								rows={ data.insights.payments.map( ( row ) => ( { key: row.title, title: row.title, orders: row.orders, total: row.total } ) ) }
 								label={ ( row, share ) => sprintf( /* translators: 1: amount, 2: share */ __( '%1$s · %2$s%%', 'storewright' ), money( row.total ), share ) }
 								empty={ __( 'No paid orders in this period yet.', 'storewright' ) }
 							/>

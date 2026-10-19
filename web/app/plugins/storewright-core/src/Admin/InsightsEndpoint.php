@@ -58,24 +58,33 @@ final class InsightsEndpoint {
 		global $wpdb;
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT COALESCE(NULLIF(payment_method, ''), payment_method_title) AS method, MAX(payment_method_title) AS title, COUNT(*) AS orders, SUM(total_amount) AS total
+				"SELECT payment_method AS method, payment_method_title AS title, COUNT(*) AS orders, SUM(total_amount) AS total
 				FROM {$wpdb->prefix}wc_orders
 				WHERE type = 'shop_order' AND status IN (" . self::statuses() . ") AND date_created_gmt BETWEEN %s AND %s
-				GROUP BY COALESCE(NULLIF(payment_method, ''), payment_method_title) ORDER BY total DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				GROUP BY payment_method, payment_method_title", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$after,
 				$before
 			),
 			ARRAY_A
 		);
-		return array_map(
-			static fn( array $row ): array => [
-				'method' => (string) $row['method'],
-				'title'  => (string) $row['title'] ?: (string) $row['method'],
-				'orders' => (int) $row['orders'],
-				'total'  => (float) $row['total'],
-			],
-			$rows
-		);
+		$names = [
+			'razorpay' => 'Razorpay',
+			'stripe'   => 'Stripe',
+			'cod'      => __( 'Cash on delivery', 'storewright' ),
+		];
+		$mix   = [];
+		foreach ( $rows as $row ) {
+			$title = $names[ (string) $row['method'] ] ?? ( (string) $row['title'] ?: __( 'Not recorded', 'storewright' ) );
+			$mix[ $title ] ??= [
+				'title'  => $title,
+				'orders' => 0,
+				'total'  => 0.0,
+			];
+			$mix[ $title ]['orders'] += (int) $row['orders'];
+			$mix[ $title ]['total']  += (float) $row['total'];
+		}
+		usort( $mix, static fn( array $a, array $b ): int => $b['total'] <=> $a['total'] );
+		return $mix;
 	}
 
 	private static function customers( string $after, string $before ): array {
