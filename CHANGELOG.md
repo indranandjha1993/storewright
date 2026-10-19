@@ -4,7 +4,18 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
-- The browser tests set their users' passwords once per run. Before this every worker reset them, and a password change signs that user out of every other worker.
+## 0.2.2 - 2026-10-19
+
+Templates the Site Editor can open, a locked plugin set, and client stores that update themselves on each release.
+
+- Every template and template part is built from blocks the Site Editor understands, and the Storewright blocks preview there instead of showing up as unsupported.
+- The plugins and the theme a store needs cannot be deactivated from the admin, and no plugin can be added; what a store runs is decided by the image.
+- Weights default to kilograms and dimensions to centimetres.
+- Setup switches on WooCommerce's redesigned emails itself. A store installed from the command line sent the old plain emails until someone first opened the admin.
+- `wp storewright templates` reports when a WooCommerce update changed a template the theme overrides, and CI fails on it.
+- Client servers listed in the repository's deploy targets receive `deploy.sh update` when a release is published.
+- Dependabot opens weekly pull requests for Composer, npm and the workflow actions.
+- The browser tests start from the seeded store, set their users' passwords once per run, and run the console specs after the storefront specs, which removes the sign-in and cash-on-delivery flakes.
 
 
 ## 0.2.1 - 2026-10-17
