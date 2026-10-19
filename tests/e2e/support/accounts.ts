@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { wp } from './wp';
 
 export type Account = { email: string; password: string };
@@ -30,7 +30,10 @@ export function account(login: Login): Account {
 
 export async function logIn(page: Page, who: Account) {
 	await page.goto('/sign-in/');
-	await page.getByLabel('Username or Email Address').fill(who.email);
+	const username = page.getByLabel('Username or Email Address');
+	// The sign-in page focuses and selects this field 200 ms after load, which would catch the password typed next.
+	await expect(username).toBeFocused();
+	await username.fill(who.email);
 	await page.getByLabel('Password', { exact: true }).fill(who.password);
 	await page.getByRole('button', { name: 'Log In' }).click();
 	await page.waitForURL((url) => !url.pathname.includes('/sign-in'));
