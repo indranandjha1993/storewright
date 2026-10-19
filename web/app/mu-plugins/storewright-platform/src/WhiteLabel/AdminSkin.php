@@ -12,7 +12,21 @@ final class AdminSkin {
 
 	public static function enqueue(): void {
 		$plugin = dirname( __DIR__, 2 ) . '/plugin.php';
-		$file   = dirname( $plugin ) . '/assets/admin.css';
-		wp_enqueue_style( 'storewright-admin', plugins_url( 'assets/admin.css', $plugin ), [], (string) filemtime( $file ) );
+		$assets = dirname( $plugin ) . '/assets';
+		wp_enqueue_style( 'storewright-admin', plugins_url( 'assets/admin.css', $plugin ), [], (string) filemtime( $assets . '/admin.css' ) );
+		wp_enqueue_script( 'storewright-admin', plugins_url( 'assets/admin.js', $plugin ), [], (string) filemtime( $assets . '/admin.js' ), true );
+		wp_add_inline_script( 'storewright-admin', 'window.storewrightShell = ' . wp_json_encode( self::shell() ) . ';', 'before' );
+	}
+
+	public static function shell(): array {
+		return [
+			'name'    => Brand::name(),
+			'logo'    => Brand::logoUrl(),
+			'home'    => home_url( '/' ),
+			'label'   => __( 'Console', 'storewright' ),
+			'user'    => wp_get_current_user()->display_name,
+			'logout'  => wp_logout_url( home_url( '/' ) ),
+			'signOut' => __( 'Sign out', 'storewright' ),
+		];
 	}
 }

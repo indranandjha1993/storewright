@@ -31,7 +31,7 @@ test('an operator never reads WordPress or WooCommerce in the admin', async ({ p
 
 test('the operator menu shows the journal and leaves out comments, tools and the marketplace', async ({ page }) => {
 	await logIn(page, operator);
-	await page.goto('/wp/wp-admin/index.php');
+	await page.goto('/wp/wp-admin/edit.php?post_type=product');
 	const menu = page.locator('#adminmenu');
 
 	await expect(menu.getByRole('link', { name: 'Store', exact: true })).toBeVisible();

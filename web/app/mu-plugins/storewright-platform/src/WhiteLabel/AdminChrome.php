@@ -25,9 +25,9 @@ final class AdminChrome {
 		add_filter( 'admin_footer_text', static fn(): string => esc_html( Brand::name() ) );
 		add_filter( 'update_footer', '__return_empty_string', PHP_INT_MAX );
 		add_action( 'wp_dashboard_setup', [ self::class, 'dashboard' ], 99 );
-		add_action( 'admin_menu', [ self::class, 'menuIcons' ], 999 );
+		add_action( 'admin_menu', [ self::class, 'menu' ], 999 );
+		add_filter( 'woocommerce_admin_features', [ self::class, 'features' ] );
 		add_action( 'admin_head', [ self::class, 'help' ] );
-		remove_action( 'welcome_panel', 'wp_welcome_panel' );
 	}
 
 	public static function adminBar( WP_Admin_Bar $bar ): void {
@@ -56,13 +56,19 @@ final class AdminChrome {
 	}
 
 	public static function dashboard(): void {
+		remove_action( 'welcome_panel', 'wp_welcome_panel' );
 		foreach ( self::DASHBOARD_BOXES as [ $id, $context ] ) {
 			remove_meta_box( $id, 'dashboard', $context );
 		}
 	}
 
-	public static function menuIcons(): void {
+	public static function features( array $features ): array {
+		return array_values( array_diff( $features, [ 'activity-panels' ] ) );
+	}
+
+	public static function menu(): void {
 		global $menu;
+		remove_menu_page( 'index.php' );
 		foreach ( (array) $menu as $position => $item ) {
 			$slug = (string) ( $item[2] ?? '' );
 			$icon = match ( true ) {
