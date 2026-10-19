@@ -47,7 +47,7 @@ export function Setup() {
 						{ step.done ? (
 							<span className="sw-setup__state">{ __( 'Done', 'storewright' ) }</span>
 						) : (
-							<a className="components-button is-secondary is-compact" href={ consoleLink( step.path ) }>
+							<a className="sw-link" href={ consoleLink( step.path ) }>
 								{ __( 'Open', 'storewright' ) }
 							</a>
 						) }

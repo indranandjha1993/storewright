@@ -1,4 +1,3 @@
-import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { methodsText, pinsText, shapeText, whereText } from './describe';
 
@@ -25,18 +24,18 @@ function AreaItem( { area, colour, first, last, highlighted, busy, onEdit, onMov
 					<dt>{ __( 'Delivery', 'storewright' ) }</dt>
 					<dd>{ methodsText( area ) }</dd>
 				</dl>
-				<div className="sw-areas__buttons">
-					<Button variant="secondary" size="compact" onClick={ () => onEdit( area ) }>
+				<div className="sw-actions">
+					<button type="button" className="sw-link" onClick={ () => onEdit( area ) }>
 						{ __( 'Edit', 'storewright' ) }
-					</Button>
+					</button>
 					{ ! fixed && (
 						<>
-							<Button variant="tertiary" size="compact" disabled={ first || busy } accessibleWhenDisabled onClick={ () => onMove( area.id, -1 ) }>
+							<button type="button" className="sw-link is-quiet" disabled={ first || busy } onClick={ () => onMove( area.id, -1 ) }>
 								{ __( 'Move up', 'storewright' ) }
-							</Button>
-							<Button variant="tertiary" size="compact" disabled={ last || busy } accessibleWhenDisabled onClick={ () => onMove( area.id, 1 ) }>
+							</button>
+							<button type="button" className="sw-link is-quiet" disabled={ last || busy } onClick={ () => onMove( area.id, 1 ) }>
 								{ __( 'Move down', 'storewright' ) }
-							</Button>
+							</button>
 						</>
 					) }
 				</div>

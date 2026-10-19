@@ -200,10 +200,12 @@ export const stage = () => {
 												) }
 											</td>
 											<td className="is-number">{ count( product.total_sales ) }</td>
-											<td className="is-number">
-												<Button variant="secondary" size="compact" onClick={ () => setEditing( editing === product.id ? null : product.id ) }>
-													{ __( 'Edit', 'storewright' ) }
-												</Button>
+											<td>
+												<div className="sw-actions">
+													<button type="button" className="sw-link" aria-expanded={ editing === product.id } onClick={ () => setEditing( editing === product.id ? null : product.id ) }>
+														{ __( 'Edit', 'storewright' ) }
+													</button>
+												</div>
 											</td>
 										</tr>
 										{ editing === product.id && (

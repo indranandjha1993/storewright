@@ -41,13 +41,15 @@ function Rows( { items, kind } ) {
 							<span className={ `sw-pill ${ item.status === 'publish' ? 'is-good' : 'is-quiet' }` }>{ statusLabel[ item.status ] ?? item.status }</span>
 						</td>
 						<td>{ timeAgo( item.modified_gmt + 'Z' ) }</td>
-						<td className="is-number sw-content__actions">
-							<Button variant="secondary" size="compact" href={ adminLink( `post.php?post=${ item.id }&action=edit` ) }>
-								{ __( 'Edit', 'storewright' ) }
-							</Button>
-							<a className="sw-link" href={ item.link } target="_blank" rel="noreferrer">
-								{ __( 'View', 'storewright' ) }
-							</a>
+						<td>
+							<div className="sw-actions">
+								<a className="sw-link" href={ adminLink( `post.php?post=${ item.id }&action=edit` ) }>
+									{ __( 'Edit', 'storewright' ) }
+								</a>
+								<a className="sw-link is-quiet" href={ item.link } target="_blank" rel="noreferrer">
+									{ __( 'View', 'storewright' ) }
+								</a>
+							</div>
 						</td>
 					</tr>
 				) ) }

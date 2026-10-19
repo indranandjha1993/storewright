@@ -216,12 +216,43 @@
 }
 
 .sw-link {
+	padding: 0;
+	border: 0;
+	background: none;
 	color: var(--sw-accent);
+	font: inherit;
 	font-weight: 600;
 	text-decoration: none;
+	cursor: pointer;
 
 	&:hover {
 		text-decoration: underline;
+	}
+
+	&:disabled {
+		color: var(--sw-muted);
+		text-decoration: none;
+		cursor: default;
+	}
+
+	&.is-quiet {
+		color: var(--sw-muted);
+		font-weight: 500;
+
+		&:hover {
+			color: var(--sw-contrast);
+		}
+	}
+}
+
+.sw-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+
+	td > & {
+		justify-content: flex-end;
 	}
 }
 
