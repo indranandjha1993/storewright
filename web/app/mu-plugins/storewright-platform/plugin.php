@@ -37,6 +37,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 WhiteLabel\Wording::register();
 WhiteLabel\Login::register();
 WhiteLabel\AdminChrome::register();
+WhiteLabel\AdminSkin::register();
 WhiteLabel\Promotions::register();
 WhiteLabel\OperatorMenus::register();
 WhiteLabel\Journal::register();

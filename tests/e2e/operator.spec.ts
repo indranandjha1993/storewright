@@ -41,6 +41,7 @@ test('the operator menu shows the journal and leaves out comments, tools and the
 	}
 	await expect(menu.getByRole('link', { name: 'Marketing', exact: true })).toHaveAttribute('href', 'edit.php?post_type=shop_coupon');
 	await expect(page.locator('#wp-admin-bar-wp-logo')).toHaveCount(0);
+	await expect(page.locator('link#storewright-admin-css')).toHaveCount(1);
 	await expect(page.locator('#wp-admin-bar-my-account > a')).toHaveText(/^Store Operator/);
 });
 
