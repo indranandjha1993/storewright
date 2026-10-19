@@ -12,7 +12,6 @@ use WP_REST_Response;
 
 final class InsightsEndpoint {
 
-	private const PAID = [ 'wc-processing', 'wc-completed' ];
 
 	public static function register(): void {
 		register_rest_route(
@@ -23,8 +22,14 @@ final class InsightsEndpoint {
 				'callback'            => [ self::class, 'respond' ],
 				'permission_callback' => static fn(): bool => current_user_can( 'manage_woocommerce' ),
 				'args'                => [
-					'after'  => [ 'type' => 'string', 'required' => true ],
-					'before' => [ 'type' => 'string', 'required' => true ],
+					'after'  => [
+						'type'     => 'string',
+						'required' => true,
+					],
+					'before' => [
+						'type'     => 'string',
+						'required' => true,
+					],
 				],
 			]
 		);
@@ -50,18 +55,14 @@ final class InsightsEndpoint {
 		return $date->setTimezone( new DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' );
 	}
 
-	private static function statuses(): string {
-		return "'" . implode( "','", self::PAID ) . "'";
-	}
-
 	private static function payments( string $after, string $before ): array {
 		global $wpdb;
-		$rows = $wpdb->get_results(
+		$rows  = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT payment_method AS method, payment_method_title AS title, COUNT(*) AS orders, SUM(total_amount) AS total
 				FROM {$wpdb->prefix}wc_orders
-				WHERE type = 'shop_order' AND status IN (" . self::statuses() . ") AND date_created_gmt BETWEEN %s AND %s
-				GROUP BY payment_method, payment_method_title", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				WHERE type = 'shop_order' AND status IN ('wc-processing', 'wc-completed') AND date_created_gmt BETWEEN %s AND %s
+				GROUP BY payment_method, payment_method_title",
 				$after,
 				$before
 			),
@@ -74,8 +75,8 @@ final class InsightsEndpoint {
 		];
 		$mix   = [];
 		foreach ( $rows as $row ) {
-			$title = $names[ (string) $row['method'] ] ?? ( (string) $row['title'] ?: __( 'Not recorded', 'storewright' ) );
-			$mix[ $title ] ??= [
+			$title                    = $names[ (string) $row['method'] ] ?? ( (string) $row['title'] ?: __( 'Not recorded', 'storewright' ) );
+			$mix[ $title ]          ??= [
 				'title'  => $title,
 				'orders' => 0,
 				'total'  => 0.0,
@@ -94,14 +95,14 @@ final class InsightsEndpoint {
 				"SELECT COALESCE(NULLIF(customer_id, 0), billing_email) AS who, MIN(date_created_gmt) AS first_order,
 					SUM(date_created_gmt BETWEEN %s AND %s) AS in_period
 				FROM {$wpdb->prefix}wc_orders
-				WHERE type = 'shop_order' AND status IN (" . self::statuses() . ")
-				GROUP BY who HAVING in_period > 0", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				WHERE type = 'shop_order' AND status IN ('wc-processing', 'wc-completed')
+				GROUP BY who HAVING in_period > 0",
 				$after,
 				$before
 			),
 			ARRAY_A
 		);
-		$new = 0;
+		$new  = 0;
 		foreach ( $rows as $row ) {
 			if ( (string) $row['first_order'] >= $after ) {
 				++$new;
@@ -120,8 +121,8 @@ final class InsightsEndpoint {
 				"SELECT a.city AS city, a.state AS state, COUNT(*) AS orders, SUM(o.total_amount) AS total
 				FROM {$wpdb->prefix}wc_orders o
 				JOIN {$wpdb->prefix}wc_order_addresses a ON a.order_id = o.id AND a.address_type = 'shipping'
-				WHERE o.type = 'shop_order' AND o.status IN (" . self::statuses() . ") AND o.date_created_gmt BETWEEN %s AND %s AND a.city <> ''
-				GROUP BY a.city, a.state ORDER BY orders DESC LIMIT 5", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				WHERE o.type = 'shop_order' AND o.status IN ('wc-processing', 'wc-completed') AND o.date_created_gmt BETWEEN %s AND %s AND a.city <> ''
+				GROUP BY a.city, a.state ORDER BY orders DESC LIMIT 5",
 				$after,
 				$before
 			),
@@ -145,8 +146,8 @@ final class InsightsEndpoint {
 				"SELECT i.order_item_name AS title, COUNT(*) AS orders
 				FROM {$wpdb->prefix}woocommerce_order_items i
 				JOIN {$wpdb->prefix}wc_orders o ON o.id = i.order_id
-				WHERE i.order_item_type = 'shipping' AND o.type = 'shop_order' AND o.status IN (" . self::statuses() . ") AND o.date_created_gmt BETWEEN %s AND %s
-				GROUP BY i.order_item_name ORDER BY orders DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				WHERE i.order_item_type = 'shipping' AND o.type = 'shop_order' AND o.status IN ('wc-processing', 'wc-completed') AND o.date_created_gmt BETWEEN %s AND %s
+				GROUP BY i.order_item_name ORDER BY orders DESC",
 				$after,
 				$before
 			),
@@ -170,8 +171,8 @@ final class InsightsEndpoint {
 				"SELECT p.product_id AS product_id, SUM(p.product_qty) AS sold
 				FROM {$wpdb->prefix}wc_order_product_lookup p
 				JOIN {$wpdb->prefix}wc_orders o ON o.id = p.order_id
-				WHERE o.status IN (" . self::statuses() . ") AND p.date_created >= %s
-				GROUP BY p.product_id", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				WHERE o.status IN ('wc-processing', 'wc-completed') AND p.date_created >= %s
+				GROUP BY p.product_id",
 				$since
 			),
 			ARRAY_A
