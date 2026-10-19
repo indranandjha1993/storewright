@@ -10,7 +10,7 @@ deploy.
 
 ## Status
 
-Version 0.2.2. A store can take orders and payments, deliver to the areas it chooses, ship in
+Version 0.2.3. A store can take orders and payments, deliver to the areas it chooses, ship in
 parcels, issue GST invoices and handle returns, all run from the console, and it deploys to its
 own server with one script. Carrier integrations come next. Every release is listed in
 [CHANGELOG.md](CHANGELOG.md).
