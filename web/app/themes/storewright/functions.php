@@ -43,6 +43,7 @@ add_action(
 
 add_filter( 'woocommerce_product_single_add_to_cart_text', static fn(): string => __( 'Add to bag', 'storewright' ) );
 add_filter( 'woocommerce_product_description_heading', '__return_empty_string' );
+add_filter( 'the_title', static fn( string $title, int $id = 0 ): string => $id > 0 && $id === wc_get_page_id( 'cart' ) ? __( 'Your bag', 'storewright' ) : $title, 10, 2 );
 add_filter( 'woocommerce_product_additional_information_heading', '__return_empty_string' );
 add_filter( 'woocommerce_product_additional_information_tab_title', static fn(): string => __( 'Details', 'storewright' ) );
 add_filter( 'woocommerce_product_add_to_cart_text', static fn( string $text, WC_Product $product ): string => $product->is_type( 'variable' ) ? __( 'Choose options', 'storewright' ) : __( 'Add to bag', 'storewright' ), 10, 2 );
