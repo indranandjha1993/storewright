@@ -35,7 +35,10 @@ test('the dashboard shows sales, recent orders, payments and stock', async ({ pa
 	await expect(payments).toContainText('Razorpay');
 	await expect(payments).toContainText('Stripe');
 	await expect(payments).toContainText('Cash on delivery');
-	await expect(page.getByRole('region', { name: 'Stock' })).toContainText(/running low/);
+	await expect(page.getByRole('region', { name: 'Stock', exact: true })).toContainText(/running low/);
+	for (const name of ['Payment mix', 'Customers', 'Where orders go', 'Delivery methods', 'Days of stock']) {
+		await expect(page.getByRole('region', { name })).toBeVisible();
+	}
 
 	await page.getByRole('button', { name: '7 days' }).click();
 	await expect(page.getByRole('img', { name: 'Sales by day' })).toBeVisible();

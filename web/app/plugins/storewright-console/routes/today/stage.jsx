@@ -1,6 +1,6 @@
 import { Notice, Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { adminLink, consoleLink } from '../../lib/data';
 import { Card, Empty, Screen, Segmented } from '../../lib/screen';
 import { count, localDate, money, shortDate, timeAgo } from '../../lib/format';
@@ -180,6 +180,67 @@ function Stock( { stock, lowStock } ) {
 	);
 }
 
+function Shares( { rows, label, empty } ) {
+	if ( rows.length === 0 ) {
+		return <Empty>{ empty }</Empty>;
+	}
+	const sum = rows.reduce( ( total, row ) => total + row.orders, 0 );
+	return (
+		<ul className="sw-dash__shares">
+			{ rows.map( ( row ) => {
+				const share = sum ? Math.round( ( row.orders / sum ) * 100 ) : 0;
+				return (
+					<li key={ row.key }>
+						<span className="sw-dash__share-name">{ row.title }</span>
+						<span className="sw-dash__share-value">{ label( row, share ) }</span>
+						<span className="sw-dash__share-bar" aria-hidden="true">
+							<span style={ { width: `${ share }%` } } />
+						</span>
+					</li>
+				);
+			} ) }
+		</ul>
+	);
+}
+
+function Customers( { customers } ) {
+	const total = customers.new + customers.returning;
+	if ( total === 0 ) {
+		return <Empty>{ __( 'No paid orders in this period yet.', 'storewright' ) }</Empty>;
+	}
+	const share = Math.round( ( customers.returning / total ) * 100 );
+	return (
+		<div className="sw-dash__customers">
+			<div className="sw-dash__split" aria-hidden="true">
+				<span style={ { width: `${ share }%` } } />
+			</div>
+			<dl className="sw-dash__facts">
+				<dt>{ __( 'Returning', 'storewright' ) }</dt>
+				<dd>{ sprintf( /* translators: 1: customers, 2: share */ __( '%1$s (%2$s%%)', 'storewright' ), count( customers.returning ), share ) }</dd>
+				<dt>{ __( 'New', 'storewright' ) }</dt>
+				<dd>{ count( customers.new ) }</dd>
+			</dl>
+		</div>
+	);
+}
+
+function DaysOfStock( { items } ) {
+	if ( items.length === 0 ) {
+		return <Empty>{ __( 'Nothing with tracked stock has sold in the last 30 days.', 'storewright' ) }</Empty>;
+	}
+	return (
+		<ul className="sw-dash__list">
+			{ items.map( ( item ) => (
+				<li key={ item.id } className={ item.daysLeft <= 7 ? 'is-trouble' : undefined }>
+					<a href={ adminLink( `post.php?post=${ item.id }&action=edit` ) }>{ item.name }</a>
+					<span>{ sprintf( /* translators: %s: days */ _n( '%s day left', '%s days left', item.daysLeft, 'storewright' ), count( item.daysLeft ) ) }</span>
+					<small>{ sprintf( /* translators: 1: units in stock, 2: units sold per day */ __( '%1$s in stock, about %2$s a day', 'storewright' ), count( item.quantity ), item.perDay ) }</small>
+				</li>
+			) ) }
+		</ul>
+	);
+}
+
 function Products( { products } ) {
 	if ( products.length === 0 ) {
 		return <Empty>{ __( 'Nothing sold in this period yet.', 'storewright' ) }</Empty>;
@@ -280,6 +341,42 @@ export const stage = () => {
 						</Card>
 						<Card title={ __( 'Best sellers', 'storewright' ) }>
 							<Products products={ data.products } />
+						</Card>
+						<Card title={ __( 'Payment mix', 'storewright' ) }>
+							<Shares
+								rows={ data.insights.payments.map( ( row ) => ( { key: row.method || 'none', title: gatewayName[ row.method ] ?? ( row.title || __( 'Not recorded', 'storewright' ) ), orders: row.orders, total: row.total } ) ) }
+								label={ ( row, share ) => sprintf( /* translators: 1: amount, 2: share */ __( '%1$s · %2$s%%', 'storewright' ), money( row.total ), share ) }
+								empty={ __( 'No paid orders in this period yet.', 'storewright' ) }
+							/>
+						</Card>
+						<Card title={ __( 'Customers', 'storewright' ) }>
+							<Customers customers={ data.insights.customers } />
+						</Card>
+						<Card title={ __( 'Where orders go', 'storewright' ) }>
+							<Shares
+								rows={ data.insights.cities.map( ( row ) => ( { key: `${ row.city }-${ row.state }`, title: [ row.city, row.state ].filter( Boolean ).join( ', ' ), orders: row.orders, total: row.total } ) ) }
+								label={ ( row ) => sprintf( /* translators: %s: orders */ __( '%s orders', 'storewright' ), count( row.orders ) ) }
+								empty={ __( 'No deliveries in this period yet.', 'storewright' ) }
+							/>
+						</Card>
+						<Card title={ __( 'Delivery methods', 'storewright' ) }>
+							<Shares
+								rows={ data.insights.delivery.map( ( row ) => ( { key: row.title, title: row.title, orders: row.orders } ) ) }
+								label={ ( row, share ) => sprintf( /* translators: 1: orders, 2: share */ __( '%1$s · %2$s%%', 'storewright' ), count( row.orders ), share ) }
+								empty={ __( 'No deliveries in this period yet.', 'storewright' ) }
+							/>
+						</Card>
+						<Card
+							title={ __( 'Days of stock', 'storewright' ) }
+							action={
+								data.insights.returns > 0 && (
+									<a className="sw-link" href={ consoleLink( '/returns' ) }>
+										{ sprintf( /* translators: %s: open returns */ __( '%s returns open', 'storewright' ), count( data.insights.returns ) ) }
+									</a>
+								)
+							}
+						>
+							<DaysOfStock items={ data.insights.stock } />
 						</Card>
 					</div>
 				</>

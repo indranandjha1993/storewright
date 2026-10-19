@@ -37,7 +37,8 @@ export function loadDashboard( period ) {
 		apiFetch( { path: '/wc-analytics/reports/stock/stats' } ),
 		apiFetch( { path: addQueryArgs( '/wc-analytics/reports/stock', { type: 'lowstock', per_page: 5 } ) } ),
 		apiFetch( { path: '/storewright/v1/payments/health' } ),
-	] ).then( ( [ now, before, totals, orders, products, stock, lowStock, payments ] ) => ( {
+		apiFetch( { path: addQueryArgs( '/storewright/v1/insights', { after: current.after, before: current.before } ) } ),
+	] ).then( ( [ now, before, totals, orders, products, stock, lowStock, payments, insights ] ) => ( {
 		range: current,
 		now,
 		before,
@@ -47,5 +48,6 @@ export function loadDashboard( period ) {
 		stock: stock.totals,
 		lowStock,
 		payments,
+		insights,
 	} ) );
 }
