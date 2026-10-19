@@ -1008,3 +1008,14 @@ html .woocommerce-stats-overview__install-jetpack-promo,
 html .woocommerce-homescreen .woocommerce-store-alerts {
 	display: none;
 }
+
+body.wp-admin [data-wpds-corner-radius],
+body.wp-admin [data-wpds-root-provider] {
+	--wp-admin-theme-color: var(--sw-accent) !important;
+	--wp-admin-theme-color-darker-10: var(--sw-accent-hover) !important;
+	--wp-admin-theme-color-darker-20: var(--sw-accent-hover) !important;
+	--wp-components-color-accent: var(--sw-accent) !important;
+	--wp-components-color-accent-darker-10: var(--sw-accent-hover) !important;
+	--wp-components-color-accent-darker-20: var(--sw-accent-hover) !important;
+	--wp-components-color-accent-inverted: var(--sw-on-accent) !important;
+}
