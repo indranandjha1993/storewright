@@ -17,13 +17,27 @@ body.wp-admin {
 	padding-bottom: 3rem;
 }
 
-#wpwrap a {
+#wpwrap a:not(.button):not(.components-button):not(.page-title-action) {
 	color: var(--sw-accent);
 }
 
-#wpwrap a:hover,
-#wpwrap a:focus {
+#wpwrap a:not(.button):not(.components-button):not(.page-title-action):hover,
+#wpwrap a:not(.button):not(.components-button):not(.page-title-action):focus {
 	color: var(--sw-accent-hover);
+}
+
+html #wpwrap .components-button.is-primary,
+html #wpwrap .components-button.is-primary:hover,
+html #wpwrap .components-button.is-primary:focus,
+html #wpwrap .wp-core-ui .button-primary,
+html #wpwrap a.button-primary {
+	color: var(--sw-on-accent);
+}
+
+html #wpwrap .components-button.is-secondary,
+html #wpwrap .components-button.is-tertiary,
+html #wpwrap .components-button.is-link {
+	color: var(--sw-accent);
 }
 
 .wrap h1,
@@ -976,4 +990,21 @@ body.storewright-plugins-managed.plugins-php .tablenav.bottom {
 
 body.storewright-plugins-managed .plugins .plugin-title {
 	padding-left: 1.25rem;
+}
+
+html .woocommerce-layout__header {
+	border-bottom: 1px solid var(--sw-line);
+	background: var(--sw-surface);
+	box-shadow: none;
+}
+
+html .woocommerce-layout__header .woocommerce-layout__header-heading {
+	color: var(--sw-contrast);
+	font-family: var(--sw-font-heading);
+	font-weight: 600;
+}
+
+html .woocommerce-stats-overview__install-jetpack-promo,
+html .woocommerce-homescreen .woocommerce-store-alerts {
+	display: none;
 }
