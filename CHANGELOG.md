@@ -4,6 +4,8 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+## 0.3.0 - 2026-10-20
+
 The console looks like the store it runs.
 
 - The sidebar carries the store name or logo, the brand colours and typeface, and the link to the full admin sits at the bottom.
