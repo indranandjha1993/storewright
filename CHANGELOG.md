@@ -4,6 +4,8 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- The advanced admin and the console share one shell: the same sidebar with the store's name, the signed-in user and sign out, the same content surface, and no admin bar, dashboard or WooCommerce activity strip.
+
 ## 0.4.0 - 2026-10-20
 
 The admin wears the brand, and a store can bring its own plugins.
