@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Storewright Console
  * Description: The full-screen console store staff work in.
- * Version: 0.1.0
+ * Version: 0.4.0
  * Requires at least: 7.0
  * Requires PHP: 8.3
  * Requires Plugins: woocommerce

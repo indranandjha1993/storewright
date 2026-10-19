@@ -15,6 +15,9 @@ A release is two images with the same tag:
 `make images VERSION=0.2.0` builds both locally; `IMAGE=` changes the name. Uploads live in a
 volume shared by both, so nothing in the images changes at run time.
 
+Before tagging, `bin/version x.y.z` writes the version into the plugin and theme headers, the
+console package and the README so every screen that shows a version agrees with the tag.
+
 Pushing a `v*` tag runs the release workflow (`.github/workflows/release.yml`): it builds both
 images, scans them with Trivy and stops on any critical issue that has a fix, pushes them to GHCR
 and creates the GitHub release from that version's section of `CHANGELOG.md` if it does not exist
