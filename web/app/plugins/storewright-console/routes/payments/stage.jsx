@@ -3,7 +3,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { consoleLink } from '../../lib/data';
 import { count, money, timeAgo } from '../../lib/format';
-import { Card, Empty, Screen } from '../../lib/screen';
+import { Card, Empty, Screen, Segmented } from '../../lib/screen';
 import { checkOrder, loadEvents, loadHealth, loadUnsettled } from './api';
 import './style.scss';
 
@@ -149,9 +149,9 @@ function Events() {
 	}, [ filter, page ] );
 
 	const filters = [
-		[ '', __( 'All', 'storewright' ) ],
-		[ 'failed', __( 'Failed', 'storewright' ) ],
-		[ 'received', __( 'Waiting', 'storewright' ) ],
+		{ key: '', label: __( 'All', 'storewright' ) },
+		{ key: 'failed', label: __( 'Failed', 'storewright' ) },
+		{ key: 'received', label: __( 'Waiting', 'storewright' ) },
 	];
 
 	return (
@@ -159,22 +159,15 @@ function Events() {
 			title={ __( 'Webhook log', 'storewright' ) }
 			padded={ false }
 			action={
-				<nav className="sw-payments__filters" aria-label={ __( 'Webhook status', 'storewright' ) }>
-					{ filters.map( ( [ key, label ] ) => (
-						<button
-							key={ key }
-							type="button"
-							className={ `sw-chip ${ key === filter ? 'is-active' : '' }` }
-							aria-pressed={ key === filter }
-							onClick={ () => {
-								setFilter( key );
-								setPage( 1 );
-							} }
-						>
-							{ label }
-						</button>
-					) ) }
-				</nav>
+				<Segmented
+					label={ __( 'Webhook status', 'storewright' ) }
+					value={ filter }
+					options={ filters }
+					onChange={ ( next ) => {
+						setFilter( next );
+						setPage( 1 );
+					} }
+				/>
 			}
 		>
 			{ ! result && <Spinner /> }

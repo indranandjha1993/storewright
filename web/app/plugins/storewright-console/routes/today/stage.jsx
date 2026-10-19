@@ -1,8 +1,8 @@
-import { Button, Notice, Spinner } from '@wordpress/components';
+import { Notice, Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { adminLink, consoleLink } from '../../lib/data';
-import { Card, Empty, Screen } from '../../lib/screen';
+import { Card, Empty, Screen, Segmented } from '../../lib/screen';
 import { count, localDate, money, shortDate, timeAgo } from '../../lib/format';
 import { loadDashboard } from './api';
 import { Setup } from './setup';
@@ -217,15 +217,7 @@ export const stage = () => {
 		};
 	}, [ period ] );
 
-	const switcher = (
-		<div className="sw-dash__periods" role="group" aria-label={ __( 'Period', 'storewright' ) }>
-			{ periods.map( ( item ) => (
-				<Button key={ item.key } variant={ item.key === period ? 'primary' : 'secondary' } size="compact" aria-pressed={ item.key === period } onClick={ () => setPeriod( item.key ) }>
-					{ item.label }
-				</Button>
-			) ) }
-		</div>
-	);
+	const switcher = <Segmented label={ __( 'Period', 'storewright' ) } value={ period } options={ periods } onChange={ setPeriod } />;
 
 	return (
 		<Screen title={ __( 'Today', 'storewright' ) } actions={ switcher } className="sw-dash">

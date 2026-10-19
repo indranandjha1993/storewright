@@ -1,11 +1,5 @@
 @use '../../lib/screen';
 
-.sw-products__filters {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-}
-
 .sw-products__list {
 	overflow: hidden;
 	border: 1px solid var(--sw-line);

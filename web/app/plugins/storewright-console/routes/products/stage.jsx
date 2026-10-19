@@ -3,7 +3,7 @@ import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { adminLink } from '../../lib/data';
 import { count, money } from '../../lib/format';
-import { Empty, Screen } from '../../lib/screen';
+import { Empty, Screen, Segmented } from '../../lib/screen';
 import { loadProducts, PER_PAGE, saveProduct } from './api';
 import './style.scss';
 
@@ -139,22 +139,15 @@ export const stage = () => {
 				</>
 			}
 		>
-			<nav className="sw-products__filters" aria-label={ __( 'Stock', 'storewright' ) }>
-				{ FILTERS.map( ( item ) => (
-					<button
-						key={ item.key }
-						type="button"
-						className={ `sw-chip ${ item.key === stock ? 'is-active' : '' }` }
-						aria-pressed={ item.key === stock }
-						onClick={ () => {
-							setStock( item.key );
-							setPageNumber( 1 );
-						} }
-					>
-						{ item.label }
-					</button>
-				) ) }
-			</nav>
+			<Segmented
+				label={ __( 'Stock', 'storewright' ) }
+				value={ stock }
+				options={ FILTERS }
+				onChange={ ( next ) => {
+					setStock( next );
+					setPageNumber( 1 );
+				} }
+			/>
 			{ error && (
 				<Notice status="error" isDismissible={ false }>
 					{ error }

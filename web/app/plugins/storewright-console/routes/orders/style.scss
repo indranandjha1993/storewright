@@ -1,23 +1,5 @@
 @use '../../lib/screen';
 
-.sw-orders__filters {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-}
-
-.sw-orders__count {
-	padding: 0 0.4rem;
-	border-radius: 999px;
-	background: rgb(0 0 0 / 8%);
-	font-size: 0.6875rem;
-	font-variant-numeric: tabular-nums;
-
-	.is-active & {
-		background: rgb(255 255 255 / 18%);
-	}
-}
-
 .sw-orders__table {
 	tr.is-selected td {
 		background: var(--sw-accent-soft);

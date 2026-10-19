@@ -37,6 +37,19 @@ export function Card( { title, action, children, className = '', padded = true }
 	);
 }
 
+export function Segmented( { label, value, options, onChange } ) {
+	return (
+		<div className="sw-segmented" role="group" aria-label={ label }>
+			{ options.map( ( option ) => (
+				<button key={ option.key } type="button" className={ option.key === value ? 'is-active' : '' } aria-pressed={ option.key === value } onClick={ () => onChange( option.key ) }>
+					{ option.label }
+					{ option.count !== undefined && <span className="sw-segmented__count">{ option.count }</span> }
+				</button>
+			) ) }
+		</div>
+	);
+}
+
 export function Empty( { children } ) {
 	return <p className="sw-empty">{ children ?? __( 'Nothing here yet.', 'storewright' ) }</p>;
 }

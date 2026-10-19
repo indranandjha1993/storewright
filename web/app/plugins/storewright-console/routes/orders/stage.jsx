@@ -2,7 +2,7 @@ import { Button, Notice, SearchControl, Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { count, money, timeAgo } from '../../lib/format';
-import { Empty, Screen } from '../../lib/screen';
+import { Empty, Screen, Segmented } from '../../lib/screen';
 import { initials, personName } from '../../lib/wc';
 import { loadOrders, loadTotals, PER_PAGE } from './api';
 import { shippingLabel, STATUSES, statusLabel, statusTone } from './labels';
@@ -10,16 +10,8 @@ import { OrderPanel } from './order-panel';
 import './style.scss';
 
 function Filters( { status, totals, onChange } ) {
-	return (
-		<nav className="sw-orders__filters" aria-label={ __( 'Order status', 'storewright' ) }>
-			{ STATUSES.map( ( item ) => (
-				<button key={ item.key } type="button" className={ `sw-chip ${ item.key === status ? 'is-active' : '' }` } aria-pressed={ item.key === status } onClick={ () => onChange( item.key ) }>
-					{ item.label }
-					{ item.key !== '' && totals && <span className="sw-orders__count">{ count( totals[ item.key ] ?? 0 ) }</span> }
-				</button>
-			) ) }
-		</nav>
-	);
+	const options = STATUSES.map( ( item ) => ( { key: item.key, label: item.label, count: item.key !== '' && totals ? count( totals[ item.key ] ?? 0 ) : undefined } ) );
+	return <Segmented label={ __( 'Order status', 'storewright' ) } value={ status } options={ options } onChange={ onChange } />;
 }
 
 function Rows( { orders, selected, onSelect } ) {

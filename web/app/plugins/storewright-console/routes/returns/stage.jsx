@@ -5,7 +5,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { consoleLink } from '../../lib/data';
 import { money, timeAgo } from '../../lib/format';
-import { Card, Empty, Screen } from '../../lib/screen';
+import { Card, Empty, Screen, Segmented } from '../../lib/screen';
 import './style.scss';
 
 const STATES = {
@@ -108,14 +108,15 @@ export const stage = () => {
 			title={ __( 'Returns', 'storewright' ) }
 			lead={ __( 'Customers ask from their order page within the return window. Approve, collect, then refund: online payments go back automatically, cash on delivery is refunded by you.', 'storewright' ) }
 			actions={
-				<div className="sw-returns__switch" role="group" aria-label={ __( 'Which returns', 'storewright' ) }>
-					<Button variant={ all ? 'secondary' : 'primary' } size="compact" aria-pressed={ ! all } onClick={ () => setAll( false ) }>
-						{ __( 'Open', 'storewright' ) }
-					</Button>
-					<Button variant={ all ? 'primary' : 'secondary' } size="compact" aria-pressed={ all } onClick={ () => setAll( true ) }>
-						{ __( 'All', 'storewright' ) }
-					</Button>
-				</div>
+				<Segmented
+					label={ __( 'Which returns', 'storewright' ) }
+					value={ all ? 'all' : 'open' }
+					options={ [
+						{ key: 'open', label: __( 'Open', 'storewright' ) },
+						{ key: 'all', label: __( 'All', 'storewright' ) },
+					] }
+					onChange={ ( next ) => setAll( next === 'all' ) }
+				/>
 			}
 		>
 			<Card padded={ false }>

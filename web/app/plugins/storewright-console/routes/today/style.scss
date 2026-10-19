@@ -1,10 +1,5 @@
 @use '../../lib/screen';
 
-.sw-dash__periods {
-	display: flex;
-	gap: 0.25rem;
-}
-
 .sw-dash__kpis {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
