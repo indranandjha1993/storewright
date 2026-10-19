@@ -35,7 +35,7 @@ export function AreaTest( { answer, onCheck } ) {
 			<h2 id="sw-areas-test-title" className="sw-areas__subtitle">{ __( 'Test an address', 'storewright' ) }</h2>
 			<p className="sw-areas__hint">{ __( 'Enter a PIN code, or click the map to test a spot. The answer is what a shopper would see.', 'storewright' ) }</p>
 			<div className="sw-areas__row">
-				<TextControl label={ __( 'PIN code to test', 'storewright' ) } value={ pin } onChange={ setPin } inputMode="numeric" maxLength={ 6 } />
+				<TextControl __next40pxDefaultSize label={ __( 'PIN code to test', 'storewright' ) } value={ pin } onChange={ setPin } inputMode="numeric" maxLength={ 6 } />
 				<Button variant="secondary" type="submit" isBusy={ busy } disabled={ busy }>
 					{ __( 'Check', 'storewright' ) }
 				</Button>

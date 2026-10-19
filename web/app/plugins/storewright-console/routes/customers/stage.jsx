@@ -113,7 +113,7 @@ export const stage = () => {
 			className="sw-customers"
 			split="detail"
 			aside={ selected && <Detail customer={ selected } onClose={ () => setSelected( null ) } /> }
-			actions={ <SearchControl label={ __( 'Search customers', 'storewright' ) } placeholder={ __( 'Name, email or phone', 'storewright' ) } value={ search } onChange={ setSearch } size="compact" /> }
+			actions={ <SearchControl __next40pxDefaultSize label={ __( 'Search customers', 'storewright' ) } placeholder={ __( 'Name, email or phone', 'storewright' ) } value={ search } onChange={ setSearch } /> }
 		>
 			{ error && (
 				<Notice status="error" isDismissible={ false }>

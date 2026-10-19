@@ -9,7 +9,7 @@ function FindPin( { onFind } ) {
 	const find = () => onFind( pin ).then( setMessage );
 	return (
 		<div className="sw-areas__row">
-			<TextControl
+			<TextControl __next40pxDefaultSize
 				label={ __( 'Show a PIN code on the map', 'storewright' ) }
 				value={ pin }
 				onChange={ setPin }
@@ -50,7 +50,7 @@ export function ShapeFields( { draft, onChange, onFind } ) {
 			) }
 			{ draft.shapeKind === 'radius' && (
 				<>
-					<TextControl type="number" min="0.1" step="0.1" label={ __( 'Radius in km', 'storewright' ) } value={ draft.radiusKm } onChange={ ( radiusKm ) => set( { radiusKm } ) } />
+					<TextControl __next40pxDefaultSize type="number" min="0.1" step="0.1" label={ __( 'Radius in km', 'storewright' ) } value={ draft.radiusKm } onChange={ ( radiusKm ) => set( { radiusKm } ) } />
 					<p className="sw-areas__hint">
 						{ draft.centre
 							? sprintf( /* translators: 1: latitude, 2: longitude */ __( 'Centre at %1$s, %2$s. Click the map to move it.', 'storewright' ), draft.centre[ 0 ].toFixed( 4 ), draft.centre[ 1 ].toFixed( 4 ) )

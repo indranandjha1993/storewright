@@ -11,9 +11,9 @@ function MethodRow( { method, number, onChange, onRemove } ) {
 			<ToggleControl label={ __( 'Offered', 'storewright' ) } checked={ method.enabled } onChange={ ( enabled ) => onChange( { enabled } ) } />
 			{ method.editable ? (
 				<>
-					<TextControl label={ __( 'Name shoppers see', 'storewright' ) } value={ method.title } onChange={ ( title ) => onChange( { title } ) } />
+					<TextControl __next40pxDefaultSize label={ __( 'Name shoppers see', 'storewright' ) } value={ method.title } onChange={ ( title ) => onChange( { title } ) } />
 					{ method.type === 'flat_rate' ? (
-						<TextControl
+						<TextControl __next40pxDefaultSize
 							type="number"
 							min="0"
 							step="any"
@@ -23,7 +23,7 @@ function MethodRow( { method, number, onChange, onRemove } ) {
 							onChange={ ( cost ) => onChange( { cost } ) }
 						/>
 					) : (
-						<TextControl
+						<TextControl __next40pxDefaultSize
 							type="number"
 							min="0"
 							step="any"

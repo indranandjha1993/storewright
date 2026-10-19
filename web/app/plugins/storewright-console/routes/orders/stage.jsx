@@ -111,7 +111,7 @@ export const stage = () => {
 			className="sw-orders"
 			split="detail"
 			aside={ selected && <OrderPanel id={ selected } onClose={ () => setSelected( null ) } onChanged={ changed } /> }
-			actions={ <SearchControl label={ __( 'Search orders', 'storewright' ) } placeholder={ __( 'Order number, name, email or phone', 'storewright' ) } value={ search } onChange={ setSearch } size="compact" /> }
+			actions={ <SearchControl __next40pxDefaultSize label={ __( 'Search orders', 'storewright' ) } placeholder={ __( 'Order number, name, email or phone', 'storewright' ) } value={ search } onChange={ setSearch } /> }
 		>
 			<Filters
 				status={ status }

@@ -139,7 +139,7 @@ export function OrderPanel( { id, onClose, onChanged } ) {
 					</Button>
 				) }
 				{ steps.length > 1 && (
-					<SelectControl
+					<SelectControl __next40pxDefaultSize
 						label={ __( 'Move to', 'storewright' ) }
 						hideLabelFromVision
 						value={ next }

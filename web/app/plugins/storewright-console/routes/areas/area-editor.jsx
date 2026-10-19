@@ -7,7 +7,7 @@ import { ShapeFields } from './shape-fields';
 function RegionField( { value, places, onChange } ) {
 	const byLabel = new Map( [ ...places, ...value ].map( ( place ) => [ place.label, place ] ) );
 	return (
-		<FormTokenField
+		<FormTokenField __next40pxDefaultSize
 			label={ __( 'Regions', 'storewright' ) }
 			value={ value.map( ( region ) => region.label ) }
 			suggestions={ places.map( ( place ) => place.label ) }
@@ -60,7 +60,7 @@ export function AreaEditor( { draft, places, savedName, error, busy, onChange, o
 				<p className="sw-areas__hint">{ __( 'Everywhere else covers every address no other area covers. Only its delivery methods can change.', 'storewright' ) }</p>
 			) : (
 				<>
-					<TextControl label={ __( 'Name', 'storewright' ) } help={ __( 'Only staff see this name.', 'storewright' ) } value={ draft.name } onChange={ set( 'name' ) } />
+					<TextControl __next40pxDefaultSize label={ __( 'Name', 'storewright' ) } help={ __( 'Only staff see this name.', 'storewright' ) } value={ draft.name } onChange={ set( 'name' ) } />
 					<RegionField value={ draft.regions } places={ places } onChange={ set( 'regions' ) } />
 					<TextareaControl
 						label={ __( 'PIN codes', 'storewright' ) }

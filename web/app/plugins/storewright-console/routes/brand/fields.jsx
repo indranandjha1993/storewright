@@ -14,7 +14,7 @@ export function ColourField( { label, value, help, onChange } ) {
 				value={ valid && value.length === 7 ? value.toLowerCase() : '#000000' }
 				onChange={ ( event ) => onChange( event.target.value ) }
 			/>
-			<TextControl label={ label } value={ value } help={ help } onChange={ ( next ) => onChange( next.trim() ) } className={ valid ? undefined : 'is-invalid' } />
+			<TextControl __next40pxDefaultSize label={ label } value={ value } help={ help } onChange={ ( next ) => onChange( next.trim() ) } className={ valid ? undefined : 'is-invalid' } />
 		</div>
 	);
 }
@@ -23,7 +23,7 @@ export function FontField( { label, value, fonts, onChange } ) {
 	const chosen = fonts.find( ( font ) => font.slug === value );
 	return (
 		<div className="sw-brand__font">
-			<SelectControl
+			<SelectControl __next40pxDefaultSize
 				label={ label }
 				value={ value }
 				options={ fonts.map( ( font ) => ( { label: font.name, value: font.slug } ) ) }

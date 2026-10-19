@@ -122,7 +122,7 @@ export const stage = () => {
 					</Notice>
 				) }
 				<Card title={ __( 'Identity', 'storewright' ) }>
-					<TextControl label={ __( 'Store name', 'storewright' ) } value={ draft.name } onChange={ set( 'name' ) } />
+					<TextControl __next40pxDefaultSize label={ __( 'Store name', 'storewright' ) } value={ draft.name } onChange={ set( 'name' ) } />
 					<ImageField
 						label={ __( 'Logo', 'storewright' ) }
 						image={ logo }
@@ -140,7 +140,7 @@ export const stage = () => {
 						maxLength={ 160 }
 						onChange={ set( 'description' ) }
 					/>
-					<TextControl
+					<TextControl __next40pxDefaultSize
 						label={ __( 'Announcement', 'storewright' ) }
 						help={ __( 'One line above the header, for an offer or a delivery promise. Leave empty to hide it.', 'storewright' ) }
 						value={ draft.announcement }

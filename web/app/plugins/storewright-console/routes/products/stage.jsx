@@ -60,11 +60,11 @@ function Editor( { product, onSaved, onClose } ) {
 			) }
 			{ simple ? (
 				<div className="sw-products__fields">
-					<TextControl label={ __( 'Price', 'storewright' ) } type="number" min="0" step="any" value={ draft.regular_price } onChange={ set( 'regular_price' ) } />
-					<TextControl label={ __( 'Sale price', 'storewright' ) } type="number" min="0" step="any" value={ draft.sale_price } onChange={ set( 'sale_price' ) } help={ __( 'Leave empty for no sale.', 'storewright' ) } />
+					<TextControl __next40pxDefaultSize label={ __( 'Price', 'storewright' ) } type="number" min="0" step="any" value={ draft.regular_price } onChange={ set( 'regular_price' ) } />
+					<TextControl __next40pxDefaultSize label={ __( 'Sale price', 'storewright' ) } type="number" min="0" step="any" value={ draft.sale_price } onChange={ set( 'sale_price' ) } help={ __( 'Leave empty for no sale.', 'storewright' ) } />
 					<ToggleControl label={ __( 'Track stock', 'storewright' ) } checked={ draft.manage_stock } onChange={ set( 'manage_stock' ) } />
 					{ draft.manage_stock ? (
-						<TextControl label={ __( 'Units in stock', 'storewright' ) } type="number" min="0" step="1" value={ String( draft.stock_quantity ) } onChange={ set( 'stock_quantity' ) } />
+						<TextControl __next40pxDefaultSize label={ __( 'Units in stock', 'storewright' ) } type="number" min="0" step="1" value={ String( draft.stock_quantity ) } onChange={ set( 'stock_quantity' ) } />
 					) : (
 						<ToggleControl label={ __( 'Available to buy', 'storewright' ) } checked={ draft.stock_status === 'instock' } onChange={ ( on ) => set( 'stock_status' )( on ? 'instock' : 'outofstock' ) } />
 					) }
@@ -132,7 +132,7 @@ export const stage = () => {
 			wide
 			actions={
 				<>
-					<SearchControl label={ __( 'Search products', 'storewright' ) } placeholder={ __( 'Name or SKU', 'storewright' ) } value={ search } onChange={ setSearch } size="compact" />
+					<SearchControl __next40pxDefaultSize label={ __( 'Search products', 'storewright' ) } placeholder={ __( 'Name or SKU', 'storewright' ) } value={ search } onChange={ setSearch } />
 					<Button variant="primary" href={ adminLink( 'post-new.php?post_type=product' ) }>
 						{ __( 'Add a product', 'storewright' ) }
 					</Button>
