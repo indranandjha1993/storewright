@@ -58,8 +58,8 @@ final class Console {
 	public static function page(): void {
 		add_action( 'admin_head', [ self::class, 'hideNoScriptNotice' ] );
 		$labels = [
-			'Dashboard'           => __( 'Advanced', 'storewright' ),
-			'Go to the Dashboard' => __( 'Open the advanced settings', 'storewright' ),
+			'Dashboard'           => __( 'Advanced admin', 'storewright' ),
+			'Go to the Dashboard' => __( 'Open the advanced admin', 'storewright' ),
 		];
 		wp_add_inline_script(
 			'wp-i18n',
@@ -81,6 +81,8 @@ final class Console {
 			'homeUrl'   => home_url( '/' ),
 			'storeName' => get_bloginfo( 'name' ),
 			'logo'      => Brand::logoUrl(),
+			'user'      => wp_get_current_user()->display_name,
+			'logoutUrl' => wp_logout_url( home_url( '/' ) ),
 			'currency'  => get_woocommerce_currency(),
 			'locale'    => str_replace( '_', '-', get_user_locale() ),
 			'timezone'  => wp_timezone_string(),

@@ -21,7 +21,11 @@ body.storewright {
 	}
 
 	.boot-sidebar__scrollable {
-		padding: 1rem 0 0.75rem;
+		padding: 1rem 0;
+	}
+
+	.boot-sidebar__content {
+		flex-grow: 0;
 	}
 
 	.sw-shell__brand {
@@ -31,6 +35,33 @@ body.storewright {
 		margin: 0.5rem 1.25rem 1.5rem;
 		color: var(--sw-contrast);
 		text-decoration: none;
+	}
+
+	.sw-shell__foot {
+		order: 2;
+		display: grid;
+		gap: 0.35rem;
+		margin: 0.5rem 1.25rem 0;
+		padding-top: 1rem;
+		border-top: 1px solid var(--sw-line);
+		color: var(--sw-muted);
+		font-size: 0.8125rem;
+
+		a {
+			color: var(--sw-muted);
+			font-weight: 500;
+			text-decoration: none;
+
+			&:hover,
+			&:focus {
+				color: var(--sw-contrast);
+			}
+		}
+	}
+
+	.sw-shell__user {
+		color: var(--sw-contrast);
+		font-weight: 600;
 	}
 
 	.sw-shell__name {
@@ -99,7 +130,7 @@ body.storewright {
 
 	.boot-sidebar__back-button.components-button {
 		order: 1;
-		margin: 1rem 0.75rem 0;
+		margin: 0.5rem 0.75rem 0;
 		color: var(--sw-muted);
 		font-family: inherit;
 		font-size: 0.8125rem;

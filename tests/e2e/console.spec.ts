@@ -45,8 +45,8 @@ test('the dashboard shows sales, recent orders, payments and stock', async ({ pa
 test('the advanced link opens the full admin and the admin leads back', async ({ page }) => {
 	await logIn(page, staff);
 
-	await page.getByText('Advanced', { exact: true }).click();
-	await expect(page).toHaveURL(/\/wp\/wp-admin\/$/);
+	await page.getByText('Advanced admin', { exact: true }).click();
+	await expect(page).toHaveURL(/\/wp\/wp-admin\/edit\.php\?post_type=product$/);
 	await page.locator('#adminmenu').getByRole('link', { name: 'Console', exact: true }).click();
 	await expect(page.getByRole('heading', { name: 'Today' })).toBeVisible();
 });

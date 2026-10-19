@@ -20,10 +20,16 @@ export function Shell() {
 	}
 
 	return createPortal(
-		<a className="sw-shell__brand" href={ consoleData.homeUrl }>
-			{ consoleData.logo ? <img className="sw-shell__logo" src={ consoleData.logo } alt={ consoleData.storeName } /> : <span className="sw-shell__name">{ consoleData.storeName }</span> }
-			<span className="sw-shell__role">{ __( 'Console', 'storewright' ) }</span>
-		</a>,
+		<>
+			<a className="sw-shell__brand" href={ consoleData.homeUrl }>
+				{ consoleData.logo ? <img className="sw-shell__logo" src={ consoleData.logo } alt={ consoleData.storeName } /> : <span className="sw-shell__name">{ consoleData.storeName }</span> }
+				<span className="sw-shell__role">{ __( 'Console', 'storewright' ) }</span>
+			</a>
+			<div className="sw-shell__foot">
+				<span className="sw-shell__user">{ consoleData.user }</span>
+				<a href={ consoleData.logoutUrl }>{ __( 'Sign out', 'storewright' ) }</a>
+			</div>
+		</>,
 		host
 	);
 }
