@@ -825,3 +825,139 @@ html #adminmenuwrap #adminmenu {
 		padding-top: 46px !important;
 	}
 }
+
+html #adminmenu li.menu-top:hover,
+html #adminmenu li.opensub,
+html #adminmenu li.opensub > a.menu-top,
+html #adminmenu li > a.menu-top:focus {
+	background: color-mix(in srgb, var(--sw-contrast) 6%, transparent);
+	color: var(--sw-contrast);
+}
+
+html #adminmenu li.wp-has-current-submenu.opensub,
+html #adminmenu li.wp-has-current-submenu.opensub > a.menu-top,
+html #adminmenu li.wp-has-current-submenu > a.menu-top:focus {
+	background: var(--sw-accent-soft);
+	color: var(--sw-accent);
+}
+
+html #adminmenu li.opensub div.wp-menu-image::before,
+html #adminmenu li > a.menu-top:focus div.wp-menu-image::before {
+	color: var(--sw-contrast);
+}
+
+html #adminmenu li.wp-has-current-submenu.opensub div.wp-menu-image::before,
+html #adminmenu li.wp-has-current-submenu > a.menu-top:focus div.wp-menu-image::before {
+	color: var(--sw-accent);
+}
+
+html #adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover::after,
+html #adminmenu li.wp-has-submenu.wp-not-current-submenu:focus-within::after {
+	display: none;
+}
+
+html #adminmenu .wp-submenu a:focus,
+html #adminmenu .wp-submenu a:hover,
+html #adminmenu .opensub .wp-submenu a:focus,
+html #adminmenu .opensub .wp-submenu a:hover,
+html #adminmenu .wp-has-current-submenu .wp-submenu a:focus,
+html #adminmenu a.wp-has-current-submenu:focus + .wp-submenu a:focus {
+	color: var(--sw-contrast);
+	box-shadow: inset 3px 0 0 0 var(--sw-accent);
+}
+
+html #adminmenu .wp-submenu li.current a:focus,
+html #adminmenu .opensub .wp-submenu li.current a:focus,
+html #adminmenu .wp-has-current-submenu .wp-submenu li.current a:focus {
+	color: var(--sw-accent);
+}
+
+html #adminmenu a:focus,
+html #adminmenu a.menu-top:focus,
+html #adminmenu .wp-submenu a:focus {
+	outline: 2px solid transparent;
+	box-shadow: 0 0 0 2px var(--sw-accent);
+}
+
+html #adminmenu .wp-submenu a:focus {
+	box-shadow: inset 3px 0 0 0 var(--sw-accent);
+}
+
+html #wpbody-content .wp-list-table thead th a,
+html #wpbody-content .widefat thead th a,
+html #wpbody-content .wp-list-table thead th a:hover {
+	color: inherit;
+}
+
+.wp-list-table thead th,
+.widefat thead th {
+	overflow-wrap: normal;
+	word-break: normal;
+	hyphens: manual;
+}
+
+table.wp-list-table mark.instock,
+table.wp-list-table mark.onbackorder {
+	color: var(--sw-accent);
+}
+
+table.wp-list-table mark.outofstock {
+	color: var(--sw-sale);
+}
+
+html .user-admin-color-wrap {
+	display: none;
+}
+
+html body.woocommerce_page_wc-settings #wpcontent,
+html body.woocommerce_page_wc-settings #wpbody-content {
+	background: var(--sw-surface);
+}
+
+html body.woocommerce_page_wc-settings .nav-tab-wrapper {
+	margin: 0 0 1.25rem;
+	padding: 0;
+	gap: 1.25rem;
+	border-bottom-color: var(--sw-line);
+}
+
+html body.woocommerce_page_wc-settings .nav-tab-wrapper a {
+	padding: 0.5rem 0;
+	color: var(--sw-muted);
+	font-family: var(--sw-font-body);
+	font-size: 0.875rem;
+}
+
+html body.woocommerce_page_wc-settings .nav-tab-wrapper a.nav-tab-active,
+html body.woocommerce_page_wc-settings .nav-tab-wrapper a:hover {
+	color: var(--sw-contrast);
+}
+
+html body.woocommerce_page_wc-settings .nav-tab-wrapper a.nav-tab-active {
+	border-bottom: 2px solid var(--sw-accent);
+}
+
+html body.woocommerce_page_wc-settings #wpcontent {
+	padding: 1.5rem 2.5rem 3rem;
+}
+
+html body.woocommerce_page_wc-settings #mainform {
+	padding: 0;
+	background: transparent;
+}
+
+html body.woocommerce_page_wc-settings nav.woo-nav-tab-wrapper,
+html body.woocommerce_page_wc-settings h2.woo-nav-tab-wrapper {
+	margin: 0 0 1.25rem;
+}
+
+html body.woocommerce_page_wc-settings .wrap h1.screen-reader-text {
+	position: static;
+	width: auto;
+	height: auto;
+	margin: 0 0 1rem;
+	overflow: visible;
+	clip: auto;
+	clip-path: none;
+	font-size: 1.75rem;
+}

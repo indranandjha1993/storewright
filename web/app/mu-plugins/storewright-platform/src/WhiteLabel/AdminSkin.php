@@ -8,6 +8,12 @@ final class AdminSkin {
 
 	public static function register(): void {
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue' ] );
+		add_filter( 'get_user_option_admin_color', static fn(): string => 'fresh' );
+		add_action( 'admin_init', [ self::class, 'oneScheme' ] );
+	}
+
+	public static function oneScheme(): void {
+		remove_action( 'admin_color_scheme_picker', 'admin_color_scheme_picker' );
 	}
 
 	public static function enqueue(): void {
