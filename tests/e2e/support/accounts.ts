@@ -4,15 +4,28 @@ import { wp } from './wp';
 
 export type Account = { email: string; password: string };
 
-export function account(login: string, role: string, name: string): Account {
-	const email = `${login}@example.com`;
+const roster = {
+	'account.e2e': ['customer', 'Meera Rao'],
+	'areas.e2e': ['shop_manager', 'Areas Staff'],
+	'brand.e2e': ['shop_manager', 'Brand Staff'],
+	'console.e2e': ['shop_manager', 'Console Staff'],
+	'operator.e2e': ['shop_manager', 'Store Operator'],
+	'owner.e2e': ['administrator', 'Store Owner'],
+	'returns.e2e': ['shop_manager', 'Returns Staff'],
+	'shopper.e2e': ['customer', 'Shopper'],
+};
+
+export type Login = keyof typeof roster;
+
+// Changing a password signs that user out everywhere, so the roster is set once per run, never per worker.
+export function createAccounts(): string {
 	const password = randomBytes(18).toString('base64url');
-	try {
-		wp('user', 'update', email, `--user_pass=${password}`, `--role=${role}`, '--skip-email');
-	} catch {
-		wp('user', 'create', login, email, `--role=${role}`, `--display_name=${name}`, `--user_pass=${password}`);
-	}
-	return { email, password };
+	wp('eval', `add_filter( "send_password_change_email", "__return_false" ); foreach ( json_decode( '${JSON.stringify(roster)}', true ) as $login => [ $role, $name ] ) { $data = [ "user_pass" => "${password}", "role" => $role, "display_name" => $name ]; $user = get_user_by( "email", "$login@example.com" ); if ( $user ) { wp_update_user( $data + [ "ID" => $user->ID ] ); } else { wp_insert_user( $data + [ "user_login" => $login, "user_email" => "$login@example.com" ] ); } }`);
+	return password;
+}
+
+export function account(login: Login): Account {
+	return { email: `${login}@example.com`, password: process.env.E2E_PASSWORD ?? '' };
 }
 
 export async function logIn(page: Page, who: Account) {

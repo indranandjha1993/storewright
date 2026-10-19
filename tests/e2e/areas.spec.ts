@@ -9,7 +9,7 @@ function removeTestAreas() {
 }
 
 test.beforeAll(() => {
-	staff = account('areas.e2e', 'shop_manager', 'Areas Staff');
+	staff = account('areas.e2e');
 	removeTestAreas();
 });
 

@@ -5,6 +5,7 @@ const local = ci ? {} : { channel: 'chrome', headless: false, launchOptions: { s
 
 export default defineConfig({
 	testDir: 'tests/e2e',
+	globalSetup: './tests/e2e/support/global-setup.ts',
 	outputDir: 'tests/e2e/results',
 	fullyParallel: false,
 	workers: ci ? undefined : 1,

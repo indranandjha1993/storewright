@@ -4,6 +4,9 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- The browser tests set their users' passwords once per run. Before this every worker reset them, and a password change signs that user out of every other worker.
+
+
 ## 0.2.1 - 2026-10-17
 
 Running a store on its own server.

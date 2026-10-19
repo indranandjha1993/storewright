@@ -7,7 +7,7 @@ let shopper: Account;
 
 test.beforeEach(({}, testInfo) => {
 	test.skip(testInfo.project.name !== 'desktop', 'the account is checked at desktop width');
-	shopper = account('account.e2e', 'customer', 'Meera Rao');
+	shopper = account('account.e2e');
 	wp('eval', '$id = get_user_by( "login", "account.e2e" )->ID; delete_user_meta( $id, "storewright_addresses" ); delete_user_meta( $id, "storewright_saved" ); $c = new WC_Customer( $id ); $c->set_first_name( "Meera" ); $c->set_shipping_first_name( "Meera" ); $c->set_shipping_last_name( "Rao" ); $c->set_shipping_address_1( "4 Lavelle Road" ); $c->set_shipping_address_2( "" ); $c->set_shipping_city( "Bengaluru" ); $c->set_shipping_state( "KA" ); $c->set_shipping_postcode( "560001" ); $c->set_shipping_country( "IN" ); $c->save(); WC()->cart?->empty_cart();');
 });
 
@@ -126,7 +126,7 @@ test('a delivered order can be returned and refunded', async ({ page, browser })
 
 	const staffContext = await browser.newContext();
 	const staffPage = await staffContext.newPage();
-	await logIn(staffPage, account('returns.e2e', 'shop_manager', 'Returns Staff'));
+	await logIn(staffPage, account('returns.e2e'));
 	await staffPage.goto('/wp/wp-admin/admin.php?page=storewright&p=%2Freturns');
 	const row = staffPage.locator('.sw-return-row').filter({ hasText: `#${id}` });
 	await row.getByRole('button', { name: 'Approve and arrange pickup' }).click();

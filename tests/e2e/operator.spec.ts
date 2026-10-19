@@ -5,7 +5,7 @@ const productNames = /WooCommerce|WordPress/;
 let operator: Account;
 
 test.beforeAll(() => {
-	operator = account('operator.e2e', 'shop_manager', 'Store Operator');
+	operator = account('operator.e2e');
 });
 
 test.beforeEach(({}, testInfo) => {
@@ -49,7 +49,7 @@ test('the operator menu shows the journal and leaves out comments, tools and the
 });
 
 test('the plugins and the theme a store needs cannot be switched off', async ({ page }) => {
-	await logIn(page, account('owner.e2e', 'administrator', 'Store Owner'));
+	await logIn(page, account('owner.e2e'));
 	await page.goto('/wp/wp-admin/plugins.php');
 	for (const slug of ['woocommerce', 'woo-razorpay', 'storewright-core', 'storewright-console']) {
 		const row = page.locator(`tr[data-slug="${slug}"]`);
@@ -72,7 +72,7 @@ test('every template opens in the site editor without broken blocks', async ({ p
 			problems.push(message.text().slice(0, 120));
 		}
 	});
-	await logIn(page, account('owner.e2e', 'administrator', 'Store Owner'));
+	await logIn(page, account('owner.e2e'));
 	for (const [type, slug] of [['wp_template', 'front-page'], ['wp_template', 'archive-product'], ['wp_template', 'product-search-results'], ['wp_template', 'single-product'], ['wp_template', 'order-confirmation'], ['wp_template_part', 'header'], ['wp_template_part', 'footer']]) {
 		await page.goto(`/wp/wp-admin/site-editor.php?p=%2F${type}%2Fstorewright%2F%2F${slug}&canvas=edit`);
 		const canvas = page.frameLocator('iframe[name="editor-canvas"]');

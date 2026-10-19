@@ -12,7 +12,7 @@ function resetBrand() {
 }
 
 test.beforeAll(() => {
-	staff = account('brand.e2e', 'shop_manager', 'Brand Staff');
+	staff = account('brand.e2e');
 	resetBrand();
 });
 
