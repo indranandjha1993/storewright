@@ -43,13 +43,12 @@
 	}
 
 	code {
-		overflow: hidden;
 		padding: 0.35rem 0.5rem;
 		border-radius: var(--sw-radius-small);
 		background: var(--sw-accent-soft);
 		font-size: 0.75rem;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		line-height: 1.5;
+		overflow-wrap: anywhere;
 	}
 }
 

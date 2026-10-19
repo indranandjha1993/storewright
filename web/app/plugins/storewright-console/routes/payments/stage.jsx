@@ -119,11 +119,13 @@ function Unsettled() {
 								<td>{ order.customer }</td>
 								<td>{ NAMES[ order.gateway ] ?? order.title }</td>
 								<td className="is-number">{ money( order.total, 2 ) }</td>
-								<td className="sw-payments__check">
-									<Button variant="secondary" size="compact" isBusy={ busy === order.id } disabled={ busy !== null } accessibleWhenDisabled onClick={ () => check( order ) }>
-										{ /* translators: %s: gateway name */ sprintf( __( 'Check with %s', 'storewright' ), NAMES[ order.gateway ] ?? order.title ) }
-									</Button>
-									{ answers[ order.id ] && <small role="status">{ answers[ order.id ].message }</small> }
+								<td>
+									<div className="sw-payments__check">
+										<Button variant="secondary" size="compact" isBusy={ busy === order.id } disabled={ busy !== null } accessibleWhenDisabled onClick={ () => check( order ) }>
+											{ /* translators: %s: gateway name */ sprintf( __( 'Check with %s', 'storewright' ), NAMES[ order.gateway ] ?? order.title ) }
+										</Button>
+										{ answers[ order.id ] && <small role="status">{ answers[ order.id ].message }</small> }
+									</div>
 								</td>
 							</tr>
 						) ) }
