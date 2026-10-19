@@ -15,10 +15,6 @@ test.beforeAll(() => {
 
 test.afterAll(() => removeTestAreas());
 
-test.beforeEach(({}, testInfo) => {
-	test.skip(testInfo.project.name !== 'desktop', 'the console is checked at desktop width');
-});
-
 async function openAreas(page: Page) {
 	await logIn(page, staff);
 	await page.getByRole('link', { name: 'Delivery areas' }).click();

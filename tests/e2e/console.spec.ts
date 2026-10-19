@@ -12,10 +12,6 @@ test.beforeAll(() => {
 	wp('eval', '$order = wc_create_order(); $order->add_product( wc_get_product( wc_get_product_id_by_sku( "SW-MUG" ) ), 1 ); $order->set_address( [ "first_name" => "Console", "last_name" => "Check", "email" => "console.check@example.com", "city" => "Bengaluru", "postcode" => "560001", "country" => "IN", "state" => "KA" ], "billing" ); $order->set_payment_method_title( "Cash on delivery" ); $order->calculate_totals(); $order->set_status( "processing" ); $order->save();');
 });
 
-test.beforeEach(({}, testInfo) => {
-	test.skip(testInfo.project.name !== 'desktop', 'the console is checked at desktop width');
-});
-
 test('staff land on the console and see what needs doing today', async ({ page }) => {
 	await logIn(page, staff);
 

@@ -18,10 +18,6 @@ test.beforeAll(() => {
 
 test.afterAll(() => resetBrand());
 
-test.beforeEach(({}, testInfo) => {
-	test.skip(testInfo.project.name !== 'desktop', 'the console is checked at desktop width');
-});
-
 async function openBrand(page: Page) {
 	await logIn(page, staff);
 	await page.getByRole('link', { name: 'Brand' }).click();

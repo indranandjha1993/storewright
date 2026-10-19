@@ -8,10 +8,6 @@ test.beforeAll(() => {
 	operator = account('operator.e2e');
 });
 
-test.beforeEach(({}, testInfo) => {
-	test.skip(testInfo.project.name !== 'desktop', 'the admin is checked at desktop width');
-});
-
 test('the login page carries the store brand only', async ({ page }) => {
 	await page.goto('/sign-in/');
 
