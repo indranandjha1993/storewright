@@ -4,6 +4,10 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- The advanced admin follows the brand: menu, admin bar, tables, cards, buttons, inputs, notices and tabs use the store's colours and typefaces.
+- Every console input is 40px tall, matching the buttons beside it.
+- The sign-in page's remaining links and the show-password control use the brand colours.
+
 ## 0.3.0 - 2026-10-20
 
 The console looks like the store it runs.
