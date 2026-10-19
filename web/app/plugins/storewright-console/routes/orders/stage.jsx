@@ -29,8 +29,8 @@ function Rows( { orders, selected, onSelect } ) {
 				<tr>
 					<th scope="col">{ __( 'Order', 'storewright' ) }</th>
 					<th scope="col">{ __( 'Customer', 'storewright' ) }</th>
-					<th scope="col">{ __( 'Items', 'storewright' ) }</th>
-					<th scope="col">{ __( 'Payment', 'storewright' ) }</th>
+					<th scope="col" className="is-extra">{ __( 'Items', 'storewright' ) }</th>
+					<th scope="col" className="is-extra">{ __( 'Payment', 'storewright' ) }</th>
 					<th scope="col">{ __( 'Status', 'storewright' ) }</th>
 					<th scope="col" className="is-number">{ __( 'Total', 'storewright' ) }</th>
 				</tr>
@@ -55,8 +55,8 @@ function Rows( { orders, selected, onSelect } ) {
 									</span>
 								</span>
 							</td>
-							<td>{ order.line_items.map( ( item ) => ( item.quantity > 1 ? `${ item.quantity } × ${ item.name }` : item.name ) ).join( ', ' ) }</td>
-							<td>
+							<td className="is-extra">{ order.line_items.map( ( item ) => ( item.quantity > 1 ? `${ item.quantity } × ${ item.name }` : item.name ) ).join( ', ' ) }</td>
+							<td className="is-extra">
 								{ order.payment_method_title || __( 'Unpaid', 'storewright' ) }
 								<small>{ order.shipping_lines[ 0 ]?.method_title }</small>
 							</td>
@@ -116,8 +116,9 @@ export const stage = () => {
 	return (
 		<Screen
 			title={ __( 'Orders', 'storewright' ) }
-			className={ selected ? 'sw-orders has-panel' : 'sw-orders' }
-			wide
+			className="sw-orders"
+			split="detail"
+			aside={ selected && <OrderPanel id={ selected } onClose={ () => setSelected( null ) } onChanged={ changed } /> }
 			actions={ <SearchControl label={ __( 'Search orders', 'storewright' ) } placeholder={ __( 'Order number, name, email or phone', 'storewright' ) } value={ search } onChange={ setSearch } size="compact" /> }
 		>
 			<Filters
@@ -133,14 +134,13 @@ export const stage = () => {
 					{ error }
 				</Notice>
 			) }
-			<div className="sw-orders__body">
-				<div className="sw-orders__list">
+			<div className="sw-list">
 					{ ! result && ! error && <Spinner /> }
 					{ result && result.items.length === 0 && <Empty>{ query ? __( 'No orders match that search.', 'storewright' ) : __( 'No orders here yet.', 'storewright' ) }</Empty> }
 					{ result && result.items.length > 0 && (
 						<>
 							<Rows orders={ result.items } selected={ selected } onSelect={ setSelected } />
-							<footer className="sw-orders__pager">
+							<footer className="sw-pager">
 								<span>{ /* translators: 1: first row, 2: last row, 3: total */ sprintf( __( '%1$s to %2$s of %3$s', 'storewright' ), from, to, count( result.total ) ) }</span>
 								<Button variant="tertiary" size="compact" disabled={ pageNumber <= 1 } accessibleWhenDisabled onClick={ () => setPageNumber( pageNumber - 1 ) }>
 									{ __( 'Previous', 'storewright' ) }
@@ -151,8 +151,6 @@ export const stage = () => {
 							</footer>
 						</>
 					) }
-				</div>
-				{ selected && <OrderPanel id={ selected } onClose={ () => setSelected( null ) } onChanged={ changed } /> }
 			</div>
 		</Screen>
 	);

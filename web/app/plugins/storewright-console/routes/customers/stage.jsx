@@ -21,7 +21,7 @@ function Detail( { customer, onClose } ) {
 	const name = personName( customer, customer.username );
 	const spent = orders ? orders.items.reduce( ( sum, order ) => sum + ( [ 'completed', 'processing' ].includes( order.status ) ? Number( order.total ) : 0 ), 0 ) : 0;
 	return (
-		<aside className="sw-customer" aria-label={ name }>
+		<aside className="sw-panel sw-customer" aria-label={ name }>
 			<header className="sw-customer__head">
 				<span className="sw-avatar is-large" aria-hidden="true">{ initials( name ) }</span>
 				<div>
@@ -44,20 +44,20 @@ function Detail( { customer, onClose } ) {
 					<strong className="sw-stat__value">{ orders ? money( spent ) : '–' }</strong>
 				</div>
 			</div>
-			<section className="sw-customer__block" aria-label={ __( 'Contact', 'storewright' ) }>
-				<h3 className="sw-customer__block-title">{ __( 'Contact', 'storewright' ) }</h3>
+			<section className="sw-panel__block" aria-label={ __( 'Contact', 'storewright' ) }>
+				<h3 className="sw-panel__block-title">{ __( 'Contact', 'storewright' ) }</h3>
 				<p><a className="sw-link" href={ `mailto:${ customer.email }` }>{ customer.email }</a></p>
 				{ customer.billing?.phone && <p><a className="sw-link" href={ `tel:${ customer.billing.phone }` }>{ customer.billing.phone }</a></p> }
 			</section>
-			<section className="sw-customer__block" aria-label={ __( 'Delivery address', 'storewright' ) }>
-				<h3 className="sw-customer__block-title">{ __( 'Delivery address', 'storewright' ) }</h3>
+			<section className="sw-panel__block" aria-label={ __( 'Delivery address', 'storewright' ) }>
+				<h3 className="sw-panel__block-title">{ __( 'Delivery address', 'storewright' ) }</h3>
 				{ addressLines( customer.shipping?.address_1 ? customer.shipping : customer.billing ).map( ( line ) => (
 					<p key={ line }>{ line }</p>
 				) ) }
 				{ ! customer.shipping?.address_1 && ! customer.billing?.address_1 && <p className="sw-customer__muted">{ __( 'No address saved yet.', 'storewright' ) }</p> }
 			</section>
-			<section className="sw-customer__block" aria-label={ __( 'Recent orders', 'storewright' ) }>
-				<h3 className="sw-customer__block-title">{ __( 'Recent orders', 'storewright' ) }</h3>
+			<section className="sw-panel__block" aria-label={ __( 'Recent orders', 'storewright' ) }>
+				<h3 className="sw-panel__block-title">{ __( 'Recent orders', 'storewright' ) }</h3>
 				{ orders === null && <Spinner /> }
 				{ orders && orders.items.length === 0 && <p className="sw-customer__muted">{ __( 'No orders yet.', 'storewright' ) }</p> }
 				<ul className="sw-customer__orders">
@@ -110,8 +110,9 @@ export const stage = () => {
 	return (
 		<Screen
 			title={ __( 'Customers', 'storewright' ) }
-			className={ selected ? 'sw-customers has-panel' : 'sw-customers' }
-			wide
+			className="sw-customers"
+			split="detail"
+			aside={ selected && <Detail customer={ selected } onClose={ () => setSelected( null ) } /> }
 			actions={ <SearchControl label={ __( 'Search customers', 'storewright' ) } placeholder={ __( 'Name, email or phone', 'storewright' ) } value={ search } onChange={ setSearch } size="compact" /> }
 		>
 			{ error && (
@@ -119,8 +120,7 @@ export const stage = () => {
 					{ error }
 				</Notice>
 			) }
-			<div className="sw-customers__body">
-				<div className="sw-customers__list">
+			<div className="sw-list">
 					{ ! result && ! error && <Spinner /> }
 					{ result && result.items.length === 0 && <Empty>{ __( 'No customers match.', 'storewright' ) }</Empty> }
 					{ result && result.items.length > 0 && (
@@ -158,7 +158,7 @@ export const stage = () => {
 									} ) }
 								</tbody>
 							</table>
-							<footer className="sw-customers__pager">
+							<footer className="sw-pager">
 								<span>{ /* translators: 1: first row, 2: last row, 3: total */ sprintf( __( '%1$s to %2$s of %3$s', 'storewright' ), from, to, count( result.total ) ) }</span>
 								<Button variant="tertiary" size="compact" disabled={ pageNumber <= 1 } accessibleWhenDisabled onClick={ () => setPageNumber( pageNumber - 1 ) }>
 									{ __( 'Previous', 'storewright' ) }
@@ -169,8 +169,6 @@ export const stage = () => {
 							</footer>
 						</>
 					) }
-				</div>
-				{ selected && <Detail customer={ selected } onClose={ () => setSelected( null ) } /> }
 			</div>
 		</Screen>
 	);

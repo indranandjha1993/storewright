@@ -14,12 +14,6 @@
 }
 
 .sw-products__table {
-	td small {
-		display: block;
-		color: var(--sw-muted);
-		font-size: 0.75rem;
-	}
-
 	tr.is-selected td {
 		background: var(--sw-accent-soft);
 		border-bottom-color: transparent;

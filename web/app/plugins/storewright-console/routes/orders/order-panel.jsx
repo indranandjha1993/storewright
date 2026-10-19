@@ -100,7 +100,7 @@ export function OrderPanel( { id, onClose, onChanged } ) {
 
 	if ( ! order ) {
 		return (
-			<aside className="sw-order" aria-label={ __( 'Order', 'storewright' ) }>
+			<aside className="sw-panel sw-order" aria-label={ __( 'Order', 'storewright' ) }>
 				{ error ? <Notice status="error" isDismissible={ false }>{ error }</Notice> : <Spinner /> }
 			</aside>
 		);
@@ -114,11 +114,11 @@ export function OrderPanel( { id, onClose, onChanged } ) {
 	const primary = steps[ 0 ];
 
 	return (
-		<aside className="sw-order" aria-label={ /* translators: %s: order number */ sprintf( __( 'Order #%s', 'storewright' ), order.number ) }>
-			<header className="sw-order__head">
+		<aside className="sw-panel sw-order" aria-label={ /* translators: %s: order number */ sprintf( __( 'Order #%s', 'storewright' ), order.number ) }>
+			<header className="sw-panel__head">
 				<div>
-					<p className="sw-order__eyebrow">{ timeAgo( order.date_created_gmt + 'Z' ) }</p>
-					<h2 className="sw-order__title">
+					<p className="sw-panel__eyebrow">{ timeAgo( order.date_created_gmt + 'Z' ) }</p>
+					<h2 className="sw-panel__title">
 						{ /* translators: %s: order number */ sprintf( __( 'Order #%s', 'storewright' ), order.number ) }
 						<span className={ `sw-pill ${ statusTone( order.status ) }` }>{ statusLabel( order.status ) }</span>
 					</h2>

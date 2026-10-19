@@ -1,18 +1,24 @@
 import { __ } from '@wordpress/i18n';
-import { consoleData } from './data';
 
-export function Screen( { title, eyebrow, lead, actions, children, className = '', wide = false } ) {
+export function Screen( { title, lead, actions, children, className = '', wide = false, split = null, aside = null } ) {
+	const classes = [ 'sw-screen', ( wide || split ) && 'is-wide', split && `is-split is-split-${ split }`, split && aside && 'has-aside', className ].filter( Boolean ).join( ' ' );
 	return (
-		<div className={ `sw-screen ${ wide ? 'is-wide' : '' } ${ className }`.trim() }>
+		<div className={ classes }>
 			<header className="sw-screen__head">
 				<div className="sw-screen__heading">
-					<p className="sw-screen__eyebrow">{ eyebrow ?? consoleData.storeName }</p>
 					<h1 className="sw-screen__title">{ title }</h1>
 					{ lead && <p className="sw-screen__lead">{ lead }</p> }
 				</div>
 				{ actions && <div className="sw-screen__actions">{ actions }</div> }
 			</header>
-			{ children }
+			{ split ? (
+				<div className="sw-screen__body">
+					<div className="sw-screen__main">{ children }</div>
+					{ aside && <div className="sw-screen__aside">{ aside }</div> }
+				</div>
+			) : (
+				children
+			) }
 		</div>
 	);
 }
