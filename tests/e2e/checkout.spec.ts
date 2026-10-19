@@ -12,8 +12,7 @@ test.beforeEach(({ page }) => {
 	storeApiInFlight.set(page, open);
 });
 
-// A background address update still running at Place Order can overwrite the order's billing address.
-async function placeOrder(page: Page) {
+async function storeApiQuiet(page: Page) {
 	const open = storeApiInFlight.get(page) ?? new Set();
 	let quietSince = Date.now();
 	await expect
@@ -24,6 +23,13 @@ async function placeOrder(page: Page) {
 			return Date.now() - quietSince;
 		}, { timeout: 15_000, intervals: [100] })
 		.toBeGreaterThan(1500);
+}
+
+// WooCommerce sends an unsent address change when focus leaves a field, and a delivery-affecting one disables Place Order mid-click.
+async function placeOrder(page: Page) {
+	await storeApiQuiet(page);
+	await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+	await storeApiQuiet(page);
 	const button = page.getByRole('button', { name: 'Place order' });
 	await button.scrollIntoViewIfNeeded();
 	await button.click();
