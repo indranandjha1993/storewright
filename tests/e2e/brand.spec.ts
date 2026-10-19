@@ -25,6 +25,10 @@ test.beforeEach(({}, testInfo) => {
 async function openBrand(page: Page) {
 	await logIn(page, staff);
 	await page.getByRole('link', { name: 'Brand' }).click();
+	return brandForm(page);
+}
+
+async function brandForm(page: Page) {
 	await expect(page.getByRole('heading', { name: 'Brand' })).toBeVisible();
 	return page.getByRole('form', { name: 'Brand' });
 }
@@ -73,7 +77,8 @@ test('a logo replaces the store name in the header', async ({ page }) => {
 	await expect(header.locator('.wp-block-site-logo img')).toBeVisible();
 	await expect(header.locator('.wp-block-site-title')).not.toBeInViewport();
 
-	await openBrand(page);
+	await page.goto('/wp/wp-admin/admin.php?page=storewright&p=%2Fbrand');
+	await brandForm(page);
 	await page.locator('.sw-brand__logo').filter({ has: page.getByRole('img', { name: 'Current logo' }) }).getByRole('button', { name: 'Remove', exact: true }).click();
 	await page.getByRole('button', { name: 'Save brand' }).click();
 	await expect(savedNotice(page)).toContainText('Saved. The store is wearing the new brand.');

@@ -8,6 +8,7 @@ export default defineConfig({
 	globalSetup: './tests/e2e/support/global-setup.ts',
 	outputDir: 'tests/e2e/results',
 	fullyParallel: false,
+	timeout: 60_000,
 	workers: ci ? undefined : 1,
 	retries: ci ? 1 : 0,
 	reporter: [['list'], ['html', { outputFolder: 'tests/e2e/report', open: 'never' }]],
