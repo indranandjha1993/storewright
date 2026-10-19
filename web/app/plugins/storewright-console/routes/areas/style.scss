@@ -145,23 +145,6 @@
 	padding-left: 1.25rem;
 }
 
-.sw-areas__fieldset {
-	display: grid;
-	gap: 0.75rem;
-	margin: 0;
-	padding: 1.25rem;
-	border: 1px solid var(--sw-line);
-	border-radius: var(--sw-radius);
-	background: var(--sw-surface);
-}
-
-.sw-areas__legend {
-	padding: 0 0.35rem;
-	font-family: var(--sw-font-heading);
-	font-size: 1.0625rem;
-	font-weight: 600;
-}
-
 .sw-areas__method {
 	display: grid;
 	gap: 0.5rem;

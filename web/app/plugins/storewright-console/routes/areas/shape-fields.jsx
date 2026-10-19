@@ -1,6 +1,7 @@
 import { Button, RadioControl, TextControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { Card } from '../../lib/screen';
 
 function FindPin( { onFind } ) {
 	const [ pin, setPin ] = useState( '' );
@@ -32,8 +33,7 @@ function FindPin( { onFind } ) {
 export function ShapeFields( { draft, onChange, onFind } ) {
 	const set = ( changes ) => onChange( { ...draft, ...changes } );
 	return (
-		<fieldset className="sw-areas__fieldset">
-			<legend className="sw-areas__legend">{ __( 'Map shape', 'storewright' ) }</legend>
+		<Card title={ __( 'Map shape', 'storewright' ) }>
 			<RadioControl
 				label={ __( 'Limit the area on the map', 'storewright' ) }
 				hideLabelFromVision
@@ -74,6 +74,6 @@ export function ShapeFields( { draft, onChange, onFind } ) {
 				</>
 			) }
 			{ draft.shapeKind !== 'none' && <FindPin onFind={ onFind } /> }
-		</fieldset>
+		</Card>
 	);
 }

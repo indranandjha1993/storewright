@@ -1,5 +1,6 @@
 import { Button, TextControl, ToggleControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { Card } from '../../lib/screen';
 import { newMethod } from './draft';
 
 function MethodRow( { method, number, onChange, onRemove } ) {
@@ -48,8 +49,7 @@ function MethodRow( { method, number, onChange, onRemove } ) {
 export function MethodFields( { methods, onChange } ) {
 	const change = ( key, changes ) => onChange( methods.map( ( method ) => ( method.key === key ? { ...method, ...changes } : method ) ) );
 	return (
-		<fieldset className="sw-areas__fieldset">
-			<legend className="sw-areas__legend">{ __( 'Delivery methods', 'storewright' ) }</legend>
+		<Card title={ __( 'Delivery methods', 'storewright' ) }>
 			{ methods.length === 0 && <p className="sw-areas__hint">{ __( 'Without a method, addresses in this area are refused at checkout.', 'storewright' ) }</p> }
 			{ methods.map( ( method, index ) => (
 				<MethodRow
@@ -68,6 +68,6 @@ export function MethodFields( { methods, onChange } ) {
 					{ __( 'Add free delivery', 'storewright' ) }
 				</Button>
 			</div>
-		</fieldset>
+		</Card>
 	);
 }
