@@ -30,6 +30,7 @@ final class StoreDefaults {
 		'timezone_string'                                 => 'Asia/Kolkata',
 		'show_avatars'                                    => '0',
 		'woocommerce_feature_fulfillments_enabled'        => 'yes',
+		'woocommerce_feature_email_improvements_enabled'  => 'yes',
 		'auto_fulfill_downloadable'                       => 'yes',
 		'auto_fulfill_virtual'                            => 'yes',
 	];
