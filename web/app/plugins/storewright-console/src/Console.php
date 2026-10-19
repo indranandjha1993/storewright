@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Storewright\Console;
 
+use Storewright\Platform\WhiteLabel\Brand;
 use WP_User;
 
 final class Console {
@@ -77,7 +78,9 @@ final class Console {
 		return [
 			...$data,
 			'adminUrl'  => admin_url(),
+			'homeUrl'   => home_url( '/' ),
 			'storeName' => get_bloginfo( 'name' ),
+			'logo'      => Brand::logoUrl(),
 			'currency'  => get_woocommerce_currency(),
 			'locale'    => str_replace( '_', '-', get_user_locale() ),
 			'timezone'  => wp_timezone_string(),
