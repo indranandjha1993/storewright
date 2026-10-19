@@ -45,19 +45,10 @@ function AreaItem( { area, colour, first, last, highlighted, busy, onEdit, onMov
 	);
 }
 
-export function AreaList( { areas, colours, highlight, busy, tester, onAdd, onEdit, onMove } ) {
+export function AreaList( { areas, colours, highlight, busy, tester, onEdit, onMove } ) {
 	const movable = areas.filter( ( area ) => area.id !== 0 );
 	return (
 		<div className="sw-areas__list">
-			<div className="sw-areas__head">
-				<h1 className="sw-areas__title">{ __( 'Delivery areas', 'storewright' ) }</h1>
-				<Button variant="primary" onClick={ onAdd }>
-					{ __( 'Add an area', 'storewright' ) }
-				</Button>
-			</div>
-			<p className="sw-areas__hint">
-				{ __( 'Addresses are checked against the areas from the top. The first area that covers an address and offers a delivery method decides what the shopper can choose.', 'storewright' ) }
-			</p>
 			{ tester }
 			<ol className="sw-areas__items">
 				{ areas.map( ( area, index ) => (

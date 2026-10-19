@@ -48,9 +48,9 @@ export function AreaEditor( { draft, places, savedName, error, busy, onChange, o
 	};
 	return (
 		<form className="sw-areas__editor" onSubmit={ submit } aria-labelledby="sw-areas-editor-title">
-			<h1 id="sw-areas-editor-title" className="sw-areas__title">
+			<h2 id="sw-areas-editor-title" className="sw-areas__title">
 				{ draft.id === null ? __( 'New delivery area', 'storewright' ) : savedName }
-			</h1>
+			</h2>
 			{ error && (
 				<Notice status="error" isDismissible={ false }>
 					{ error }

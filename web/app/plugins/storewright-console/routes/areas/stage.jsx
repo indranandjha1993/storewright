@@ -1,4 +1,4 @@
-import { Notice, Spinner } from '@wordpress/components';
+import { Button, Notice, Spinner } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { createArea, deleteArea, loadAreas, reorderAreas, testAddress, updateArea } from './api';
@@ -8,6 +8,7 @@ import { AreaMap } from './area-map';
 import { AreaTest } from './area-test';
 import { draftOf, newDraft, payloadOf, problemWith } from './draft';
 import { boundsOf, viewOf } from './geo';
+import { Screen } from '../../lib/screen';
 import './style.scss';
 
 const COLOURS = [ '#0f5c4d', '#b4541a', '#3858e9', '#8a2c8a', '#5b6b00', '#a0352c' ];
@@ -125,15 +126,34 @@ export const stage = () => {
 
 	const moveCorner = ( index, point ) => setDraft( { ...draft, corners: draft.corners.map( ( corner, at ) => ( at === index ? point : corner ) ) } );
 
+	const title = __( 'Delivery areas', 'storewright' );
+	const lead = __( 'Addresses are checked against the areas from the top. The first area that covers an address and offers a delivery method decides what the shopper can choose.', 'storewright' );
+
 	if ( areas === null ) {
-		return <div className="sw-areas__loading">{ error ? <Notice status="error" isDismissible={ false }>{ error }</Notice> : <Spinner /> }</div>;
+		return (
+			<Screen title={ title } lead={ lead } className="sw-areas">
+				{ error ? <Notice status="error" isDismissible={ false }>{ error }</Notice> : <Spinner /> }
+			</Screen>
+		);
 	}
 
 	const saved = areas.find( ( area ) => area.id === draft?.id );
+	const add = (
+		<Button variant="primary" onClick={ () => open( newDraft( places ) ) }>
+			{ __( 'Add an area', 'storewright' ) }
+		</Button>
+	);
 
 	return (
-		<div className="sw-areas">
-			<div className="sw-areas__panel">
+		<Screen
+			title={ title }
+			lead={ draft ? null : lead }
+			className="sw-areas"
+			split="canvas"
+			actions={ draft ? null : add }
+			aside={ <AreaMap shapes={ shapes } draft={ draft } marker={ marker } view={ view } onClick={ clickMap } onMoveCorner={ moveCorner } /> }
+		>
+			<>
 				{ draft ? (
 					<AreaEditor
 						draft={ draft }
@@ -160,14 +180,12 @@ export const stage = () => {
 							highlight={ answer?.areaId }
 							busy={ busy }
 							tester={ <AreaTest answer={ answer } onCheck={ ( data ) => check( data ) } /> }
-							onAdd={ () => open( newDraft( places ) ) }
 							onEdit={ ( area ) => open( draftOf( area ), area.shape ) }
 							onMove={ move }
 						/>
 					</>
 				) }
-			</div>
-			<AreaMap shapes={ shapes } draft={ draft } marker={ marker } view={ view } onClick={ clickMap } onMoveCorner={ moveCorner } />
-		</div>
+			</>
+		</Screen>
 	);
 };

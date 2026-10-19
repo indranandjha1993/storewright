@@ -122,7 +122,7 @@ export const stage = () => {
 						onChange={ ( value ) => set( 'checkout', 'returnDays' )( Number( value ) ) }
 					/>
 				</Card>
-				<footer className="sw-settings__save">
+				<footer className="sw-save">
 					{ notice && (
 						<Notice status={ notice.status } onRemove={ () => setNotice( null ) }>
 							{ notice.text }

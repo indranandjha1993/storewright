@@ -53,19 +53,3 @@
 	max-width: 16rem;
 	margin: 0 0 1rem 3rem;
 }
-
-.sw-settings__save {
-	position: sticky;
-	bottom: 0;
-	display: flex;
-	gap: 1rem;
-	align-items: center;
-	justify-content: flex-end;
-	padding: 0.75rem 0;
-	background: var(--sw-surface);
-
-	.components-notice {
-		flex: 1;
-		margin: 0;
-	}
-}

@@ -134,6 +134,22 @@
 	text-transform: uppercase;
 }
 
+.sw-save {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1rem;
+	align-items: center;
+	padding: 0.75rem 0;
+	background: var(--sw-surface);
+
+	.components-notice {
+		flex: 1 1 100%;
+		margin: 0;
+	}
+}
+
 .sw-list {
 	overflow: hidden;
 	border: 1px solid var(--sw-line);

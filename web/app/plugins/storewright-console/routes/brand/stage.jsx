@@ -3,6 +3,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { loadBrand, saveBrand, uploadImage } from './api';
 import { contrast, isHex } from './colour';
+import { Card, Screen } from '../../lib/screen';
 import { ColourField, FontField, ImageField, RadiusField } from './fields';
 import { Preview } from './preview';
 import './style.scss';
@@ -93,19 +94,23 @@ export const stage = () => {
 
 	const image = ( key ) => ( pending[ key ] && draft[ key ] === pending[ key ].id ? pending[ key ] : brand[ key ] );
 
+	const title = __( 'Brand', 'storewright' );
+	const lead = __( 'One set of choices styles the store, the checkout, emails, the sign-in page and this console.', 'storewright' );
 	if ( ! draft ) {
-		return <div className="sw-brand__loading">{ error ? <Notice status="error" isDismissible={ false }>{ error }</Notice> : <Spinner /> }</div>;
+		return (
+			<Screen title={ title } lead={ lead } className="sw-brand">
+				{ error ? <Notice status="error" isDismissible={ false }>{ error }</Notice> : <Spinner /> }
+			</Screen>
+		);
 	}
 
 	const dirty = JSON.stringify( draft ) !== JSON.stringify( { ...brand.settings, name: brand.name, description: brand.description, announcement: brand.announcement, logo: brand.logo.id, heroImage: brand.heroImage.id } );
 	const logo = image( 'logo' );
 
 	return (
-		<div className="sw-brand">
+		<Screen title={ title } lead={ lead } className="sw-brand" split="canvas" aside={ <Preview settings={ draft } fonts={ brand.fonts } name={ draft.name } logo={ logo.url } /> }>
 			<style>{ brand.fontCss }</style>
-			<form className="sw-brand__form" onSubmit={ save } aria-labelledby="sw-brand-title">
-				<h1 id="sw-brand-title" className="sw-brand__title">{ __( 'Brand', 'storewright' ) }</h1>
-				<p className="sw-brand__hint">{ __( 'One set of choices styles the store, the checkout, emails, the sign-in page and this console.', 'storewright' ) }</p>
+			<form className="sw-brand__form" onSubmit={ save } aria-label={ title }>
 				{ error && (
 					<Notice status="error" onRemove={ () => setError( null ) }>
 						{ error }
@@ -116,8 +121,7 @@ export const stage = () => {
 						{ __( 'Saved. The store is wearing the new brand.', 'storewright' ) }
 					</Notice>
 				) }
-				<fieldset className="sw-brand__fieldset">
-					<legend className="sw-brand__legend">{ __( 'Identity', 'storewright' ) }</legend>
+				<Card title={ __( 'Identity', 'storewright' ) }>
 					<TextControl label={ __( 'Store name', 'storewright' ) } value={ draft.name } onChange={ set( 'name' ) } />
 					<ImageField
 						label={ __( 'Logo', 'storewright' ) }
@@ -152,21 +156,19 @@ export const stage = () => {
 						onUpload={ upload( 'heroImage' ) }
 						onRemove={ remove( 'heroImage' ) }
 					/>
-				</fieldset>
-				<fieldset className="sw-brand__fieldset">
-					<legend className="sw-brand__legend">{ __( 'Colours', 'storewright' ) }</legend>
+				</Card>
+				<Card title={ __( 'Colours', 'storewright' ) }>
 					<ColourField label={ __( 'Accent', 'storewright' ) } value={ draft.accent } help={ __( 'Buttons, links and highlights.', 'storewright' ) } onChange={ set( 'accent' ) } />
 					<ColourField label={ __( 'Background', 'storewright' ) } value={ draft.background } help={ __( 'The page behind everything. Cards sit on white, or a lighter shade of a dark background.', 'storewright' ) } onChange={ set( 'background' ) } />
 					<ColourField label={ __( 'Text', 'storewright' ) } value={ draft.text } onChange={ set( 'text' ) } />
 					<ColourField label={ __( 'Sale', 'storewright' ) } value={ draft.sale } help={ __( 'Sale badges and warnings.', 'storewright' ) } onChange={ set( 'sale' ) } />
-				</fieldset>
-				<fieldset className="sw-brand__fieldset">
-					<legend className="sw-brand__legend">{ __( 'Typography and shape', 'storewright' ) }</legend>
+				</Card>
+				<Card title={ __( 'Typography and shape', 'storewright' ) }>
 					<FontField label={ __( 'Headings', 'storewright' ) } value={ draft.headingFont } fonts={ brand.fonts } onChange={ set( 'headingFont' ) } />
 					<FontField label={ __( 'Body text', 'storewright' ) } value={ draft.bodyFont } fonts={ brand.fonts } onChange={ set( 'bodyFont' ) } />
 					<RadiusField value={ draft.radius } onChange={ set( 'radius' ) } />
-				</fieldset>
-				<div className="sw-brand__buttons">
+				</Card>
+				<div className="sw-save">
 					<Button variant="primary" type="submit" isBusy={ busy } disabled={ busy || ! dirty } accessibleWhenDisabled>
 						{ __( 'Save brand', 'storewright' ) }
 					</Button>
@@ -175,7 +177,6 @@ export const stage = () => {
 					</Button>
 				</div>
 			</form>
-			<Preview settings={ draft } fonts={ brand.fonts } name={ draft.name } logo={ logo.url } />
-		</div>
+		</Screen>
 	);
 };
