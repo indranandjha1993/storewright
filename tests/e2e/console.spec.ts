@@ -154,7 +154,7 @@ test('staff keep store details, order emails and checkout options in settings', 
 	await form.getByLabel('Address', { exact: true }).fill('22 Residency Road');
 	await form.getByLabel('GSTIN').fill('29ABCDE1234F1Z5');
 	await form.getByRole('button', { name: 'Save settings' }).click();
-	const notice = form.locator('.sw-settings__save .components-notice');
+	const notice = form.locator('.sw-save .components-notice');
 	await expect(notice).toContainText('That GSTIN does not look right.');
 
 	await form.getByLabel('GSTIN').fill('29ABCDE1234F1ZW');
