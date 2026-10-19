@@ -4,6 +4,11 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+## 0.5.0 - 2026-10-20
+
+One shell for console and admin, a storefront that answers back, and insights on Today.
+
+- The storefront's forms, buttons, option cards, quantity steppers, filters and notices share one brand control system with hover, focus, loading and added states, and the cart page is called Your bag.
 - Today shows the payment mix, new against returning customers, where orders go, the delivery method split and days of stock left per product, with open returns one click away.
 - The plugin list describes the commerce engine and the Razorpay gateway in the store's words, hides filters, checkboxes and search while plugins are managed, and every plugin and theme header carries the release version.
 - The advanced admin and the console share one shell: the same sidebar with the store's name, the signed-in user and sign out, the same content surface, and no admin bar, dashboard or WooCommerce activity strip.
