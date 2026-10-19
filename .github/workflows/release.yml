@@ -23,6 +23,7 @@ env:
 jobs:
   images:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     outputs:
       tag: ${{ steps.version.outputs.tag }}
       version: ${{ steps.version.outputs.version }}
@@ -55,7 +56,6 @@ jobs:
             GIT_SHA=${{ steps.version.outputs.sha }}
           tags: ${{ env.IMAGE }}:${{ steps.version.outputs.version }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
       - name: build web
         uses: docker/build-push-action@v7
         with:
