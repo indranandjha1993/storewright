@@ -68,6 +68,8 @@ jobs:
             GIT_SHA=${{ steps.version.outputs.sha }}
           tags: ${{ env.IMAGE }}-web:${{ steps.version.outputs.version }}
           cache-from: type=gha
+      - name: start app once
+        run: docker run --rm "$IMAGE:${{ steps.version.outputs.version }}" sh -c 'sync-plugins && test -f web/app/plugins/woocommerce/.storewright-image && php-fpm -t'
       - name: scan app
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:

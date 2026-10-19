@@ -49,8 +49,15 @@ COPY config ./config
 COPY web/index.php web/wp-config.php ./web/
 COPY wp-cli.yml ./
 COPY bin/install ./bin/install
-RUN mkdir -p web/app/uploads && chown -R www-data:www-data web/app/uploads
+COPY docker/app/sync-plugins.sh /usr/local/bin/sync-plugins
+COPY docker/app/entrypoint.sh /usr/local/bin/storewright-entrypoint
+RUN chmod +x /usr/local/bin/sync-plugins /usr/local/bin/storewright-entrypoint \
+    && cp -a web/app/plugins /opt/storewright-plugins \
+    && mkdir -p web/app/uploads web/app/languages \
+    && chown -R www-data:www-data web/app/uploads web/app/languages web/app/plugins
 USER www-data
+ENTRYPOINT ["storewright-entrypoint"]
+CMD ["php-fpm"]
 
 FROM nginx:1.27-alpine AS web
 RUN apk upgrade --no-cache

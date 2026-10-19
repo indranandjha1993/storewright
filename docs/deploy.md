@@ -53,6 +53,26 @@ Production sends through SMTP when `MAIL_HOST` is set (`MAIL_SMTP_PORT`, `MAIL_E
 ssl, `MAIL_USER`, `MAIL_PASSWORD`, and `MAIL_FROM` for the sender). Any transactional mail service
 works. Without it, order emails are not delivered.
 
+### Plugins
+
+The plugins a store runs come with each release, and the admin cannot install others. Set
+`PLUGIN_MANAGEMENT=open` in `.env` and restart to let the store install, update and remove its own
+plugins from the advanced admin. The plugins and the theme Storewright needs stay locked either
+way, their updates arrive only with a release, and themes and core cannot be installed from the
+admin. Installed plugins live in the `plugins` volume, go into every backup as `plugins.tar.gz`,
+and survive updates: on start the app copies the release's own plugins into the volume and leaves
+the rest alone. Installed language packs live in the `languages` volume the same way. `/version`
+reports the mode and how many extra plugins are installed.
+
+### What an update keeps
+
+An update replaces the code that ships in the image and nothing else. The database (settings,
+products, orders, the brand, Site Editor changes to templates and styles, custom CSS, the settings
+of any plugin), the `uploads`, `plugins` and `languages` volumes and `.env` are never written by
+`deploy.sh update`; the release's own plugins and theme are refreshed in place and everything a
+client added stays as it was. The update takes a backup first and rolls back on its own if the new
+version does not come up healthy.
+
 ## Day to day
 
 ```

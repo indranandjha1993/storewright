@@ -6,6 +6,8 @@ x-app: &app
   restart: unless-stopped
   volumes:
     - uploads:/var/www/html/web/app/uploads
+    - plugins:/var/www/html/web/app/plugins
+    - languages:/var/www/html/web/app/languages
   depends_on:
     db:
       condition: service_healthy
@@ -28,6 +30,7 @@ services:
       - "${WEB_BIND:-127.0.0.1:8080}:80"
     volumes:
       - uploads:/var/www/html/web/app/uploads:ro
+      - plugins:/var/www/html/web/app/plugins:ro
     depends_on:
       - app
 
@@ -70,4 +73,6 @@ services:
 volumes:
   db_data:
   uploads:
+  plugins:
+  languages:
   caddy_data:

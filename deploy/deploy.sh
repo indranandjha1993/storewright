@@ -128,6 +128,7 @@ cmd_backup() {
   mkdir -p "$target"
   compose exec -T db sh -c 'mariadb-dump -uroot -p"$MARIADB_ROOT_PASSWORD" --single-transaction --routines --triggers "$MARIADB_DATABASE"' | gzip >"$target/db.sql.gz"
   compose exec -T app tar -C /var/www/html/web/app -czf - uploads >"$target/uploads.tar.gz"
+  compose exec -T app tar -C /var/www/html/web/app -czf - plugins languages >"$target/plugins.tar.gz"
   echo "$STOREWRIGHT_VERSION" >"$target/version"
   local keep
   keep="$(env_value BACKUP_KEEP || true)"
@@ -146,6 +147,10 @@ cmd_restore() {
   use_version "$(current)"
   gunzip -c "$source/db.sql.gz" | compose exec -T db sh -c 'mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" "$MARIADB_DATABASE"'
   compose exec -T app sh -c 'find /var/www/html/web/app/uploads -mindepth 1 -delete && tar -C /var/www/html/web/app -xzf -' <"$source/uploads.tar.gz"
+  if [ -f "$source/plugins.tar.gz" ]; then
+    compose exec -T app sh -c 'find /var/www/html/web/app/plugins /var/www/html/web/app/languages -mindepth 1 -delete && tar -C /var/www/html/web/app -xzf -' <"$source/plugins.tar.gz"
+    compose exec -T app sync-plugins
+  fi
   compose exec -T app wp cache flush --quiet
   healthy || { echo "the store did not answer /health after the restore" >&2; exit 1; }
   echo "restored $(basename "$source")"
