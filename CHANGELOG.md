@@ -4,6 +4,9 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- Place Order works on the first press after a shopper edits the address. WooCommerce disabled the button mid-click to recalculate delivery and the press was lost; checkout now presses it again once the recalculation ends, unless the total or delivery method changed, in which case the shopper sees the new amount first.
+- Release builds no longer write the build cache, which no later release could read, and the image job stops after 30 minutes.
+
 ## 0.2.2 - 2026-10-19
 
 Templates the Site Editor can open, a locked plugin set, and client stores that update themselves on each release.

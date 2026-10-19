@@ -80,6 +80,27 @@ async function fillDeliveryAddress(page: Page, place = places.mgRoad) {
 	await shipping.getByLabel('Phone').blur();
 }
 
+async function typeAddressThenPayCash(page: Page, place: (typeof places)[keyof typeof places]) {
+	await page.getByRole('radio', { name: /Cash on delivery/ }).check();
+	await page.getByLabel('Email address').fill('asha.e2e@example.com');
+	const shipping = page.getByRole('group', { name: 'Shipping address' });
+	await shipping.getByLabel('First name').fill('Asha');
+	await shipping.getByLabel('Last name').fill('Menon');
+	await shipping.getByLabel('Address', { exact: true }).fill('12 Market Street');
+	await shipping.getByLabel('City').fill(place.city);
+	await shipping.getByLabel('State').selectOption({ label: place.state });
+	await shipping.getByLabel(/PIN Code/).fill(place.pin);
+	await shipping.getByLabel('Phone').click();
+	await page.keyboard.type('9123456780', { delay: 50 });
+}
+
+async function pressPlaceOrderLikeAShopper(page: Page) {
+	await page.getByRole('button', { name: 'Place order' }).hover();
+	await page.mouse.down();
+	await page.waitForTimeout(110);
+	await page.mouse.up();
+}
+
 test.beforeEach(async ({ context }) => {
 	await context.clearCookies();
 });
@@ -211,6 +232,37 @@ test('cash on delivery is not offered when the bag holds a download', async ({ p
 
 	await expect(page.getByRole('group', { name: 'Payment options' })).toBeVisible();
 	await expect(page.getByRole('radio', { name: /Cash on delivery/ })).toHaveCount(0);
+});
+
+test('place order pressed straight after typing the address still places the order', async ({ page }) => {
+	await addToBag(page, products.mug);
+	await page.goto('/checkout/');
+	await typeAddressThenPayCash(page, places.yelahanka);
+
+	await pressPlaceOrderLikeAShopper(page);
+
+	await expect(page).toHaveURL(/order-received/, { timeout: 15_000 });
+});
+
+test('a place order press is not repeated once the delivery it was made for changes', async ({ page }) => {
+	let resent = false;
+	await page.exposeFunction('storewrightResent', () => {
+		resent = true;
+	});
+	await page.addInitScript(() => document.addEventListener('storewright:place-order-resent', () => (window as unknown as { storewrightResent: () => void }).storewrightResent()));
+	await addToBag(page, products.mug);
+	await page.goto('/checkout/');
+	await typeAddressThenPayCash(page, places.mgRoad);
+
+	await pressPlaceOrderLikeAShopper(page);
+
+	await expect(page.getByText('Same-day delivery').first()).toBeVisible();
+	await storeApiQuiet(page);
+	expect(resent).toBe(false);
+	if (!page.url().includes('order-received')) {
+		await placeOrder(page);
+	}
+	await expect(page).toHaveURL(/order-received/, { timeout: 30_000 });
 });
 
 test('a guest pays on razorpay by netbanking', async ({ page }) => {

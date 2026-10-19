@@ -45,6 +45,7 @@ add_action(
 		Checkout\PhoneSync::register();
 		Checkout\BusinessFields::register();
 		Checkout\PinAutofill::register();
+		Checkout\PlaceOrderPress::register();
 		Checkout\FreeDelivery::register();
 		Account\AccountPages::register();
 		Emails\OrderButton::register();
