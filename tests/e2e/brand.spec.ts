@@ -8,7 +8,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
 
 function resetBrand() {
 	wp('storewright', 'brand', 'reset');
-	wp('eval', 'update_option( "site_logo", 0 ); remove_theme_mod( "custom_logo" );');
+	wp('eval', 'update_option( "site_logo", 0 ); remove_theme_mod( "custom_logo" ); foreach ( get_posts( [ "post_type" => "attachment", "title" => "logo", "post_status" => "any", "posts_per_page" => -1, "fields" => "ids" ] ) as $id ) { wp_delete_attachment( $id, true ); }');
 }
 
 test.beforeAll(() => {
