@@ -83,7 +83,7 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8600/wp/xmlrpc.php)" = "403"
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
-      - if: failure()
+      - if: always()
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
