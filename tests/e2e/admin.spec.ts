@@ -130,29 +130,30 @@ test('gst details are kept on the taxes and charges tab', async ({ page }) => {
 });
 
 test('staff see the job runner and can run a failed job again or dismiss it', async ({ page }) => {
+	// The cron container runs every minute and a job without a callback fails again, so each run uses its own job numbers and accepts any outcome of the re-run.
+	const tag = Date.now() % 1_000_000;
 	const schedule = (order: number) => wp('eval', `$id = as_schedule_single_action( time() - 300, "storewright_e2e_job", [ "order" => ${order} ], "storewright" ); ActionScheduler_Store::instance()->mark_failure( $id ); ActionScheduler_Logger::instance()->log( $id, "action failed: the courier did not answer" ); echo $id;`);
 	const status = (id: string) => wp('eval', `echo ActionScheduler_Store::instance()->get_status( ${id} );`);
-	const retry = schedule(4101);
-	const dismiss = schedule(4102);
+	const retry = schedule(tag + 1);
+	const dismiss = schedule(tag + 2);
 	await logIn(page, staff);
 	const jobs = page.locator('#storewright_jobs');
 
 	await expect(jobs).toContainText(/Last run|has not run yet/);
 	await expect(jobs).toContainText('waiting to run');
-	const retryRow = jobs.locator('li').filter({ hasText: '"order":4101' });
+	const retryRow = jobs.locator('li').filter({ hasText: `"order":${tag + 1}` });
 	await expect(retryRow).toContainText('storewright_e2e_job');
 	await expect(retryRow).toContainText('the courier did not answer');
 
 	await retryRow.getByRole('link', { name: 'Run again' }).click();
 	await expect(page.locator('.notice')).toContainText('queued to run again');
-	await expect(jobs.locator('li').filter({ hasText: '"order":4101' })).toHaveCount(0);
 	expect(status(retry)).toBe('canceled');
-	expect(Number(wp('eval', 'echo count( as_get_scheduled_actions( [ "hook" => "storewright_e2e_job", "args" => [ "order" => 4101 ], "status" => [ "pending", "in-progress", "complete" ] ], "ids" ) );'))).toBeGreaterThan(0);
+	expect(Number(wp('eval', `echo count( as_get_scheduled_actions( [ "hook" => "storewright_e2e_job", "args" => [ "order" => ${tag + 1} ], "status" => [ "pending", "in-progress", "complete", "failed" ] ], "ids" ) );`))).toBeGreaterThan(0);
 
-	await jobs.locator('li').filter({ hasText: '"order":4102' }).getByRole('link', { name: 'Dismiss' }).click();
+	await jobs.locator('li').filter({ hasText: `"order":${tag + 2}` }).getByRole('link', { name: 'Dismiss' }).click();
 	await expect(page.locator('.notice')).toContainText('dismissed');
 	expect(status(dismiss)).toBe('canceled');
-	wp('eval', 'as_unschedule_all_actions( "storewright_e2e_job" );');
+	wp('eval', '$store = ActionScheduler_Store::instance(); foreach ( $store->query_actions( [ "hook" => "storewright_e2e_job", "per_page" => 200, "status" => [ "pending", "in-progress", "complete", "failed", "canceled" ] ] ) as $id ) { $store->delete_action( (string) $id ); }');
 });
 
 test('settings only show fields that take effect', async ({ page }) => {
