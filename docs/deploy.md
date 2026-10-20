@@ -34,7 +34,7 @@ the tested images are scanned with Trivy (any critical issue with a fix stops th
 promoted to the version tag by retagging, so the image a server pulls is the one the suite
 passed, and the GitHub release is created from that version's section of `CHANGELOG.md`; then
 the deploy job (below). The pipeline can also be started by hand for an existing tag, to
-rebuild or redeploy it. The images are public, so a server pulls them without logging in. The
+rebuild or redeploy it, for tags cut after 0.7.0. The images are public, so a server pulls them without logging in. The
 running container reports the deployed tag on `/version` because the compose file passes
 `STOREWRIGHT_VERSION` in.
 
