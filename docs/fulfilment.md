@@ -21,6 +21,44 @@ Each shipment can be removed again, for example after a wrong tracking number; r
 not email the customer. The orders list shows "Shipped" or "Part shipped" under the status.
 Marking the order as completed stays a separate step.
 
+## Shipping with Shiprocket
+
+With a Shiprocket API user in the server settings, the order screen gets a Shipping with
+Shiprocket box under the items. It lists every courier that serves the delivery PIN for the parcel
+(weight and size from the products, or the defaults under Store, Settings, Carriers), with the
+charge and the expected arrival and Shiprocket's recommendation preselected. Press Ship with
+Shiprocket and the store:
+
+1. Creates a WooCommerce fulfilment for everything still to ship, marked as a draft.
+2. Books the order with Shiprocket and asks for a waybill from the chosen courier in a background
+   job, since Shiprocket takes about half a minute to allot one. The box says "Booking with
+   Shiprocket" meanwhile.
+3. Marks the fulfilment as shipped with the waybill as the tracking number and the public tracking
+   page as the link, and sends the shipment email.
+4. Asks the courier for a pickup and fetches the label, each retried every ten minutes for an hour
+   if Shiprocket is not ready; the box shows Print label once it is, and Fetch label to try sooner.
+5. Follows the parcel: every half hour the store asks Shiprocket where each open shipment is, and
+   a webhook can make that immediate. New scans become an order note and the latest one shows on
+   the customer's order page and the tracking page ("Out for delivery, Bengaluru, 22 Oct 09:10").
+
+Cancel this shipment cancels it with Shiprocket and removes the fulfilment, so the items can be
+shipped again. Removing the fulfilment from WooCommerce's own panel cancels it the same way. A
+booking that fails shows why in the box, with Try again; it also appears under Background work on
+the dashboard like any failed job.
+
+Server settings: `SHIPROCKET_EMAIL` and `SHIPROCKET_PASSWORD` of an API user (made in the
+Shiprocket panel under Settings, API Users), `SHIPROCKET_API_URL=https://api-sandbox.shiprocket.in`
+to use Shiprocket's sandbox (its own test servers, enabled from Settings, Additional Settings,
+Sandbox; nothing is really shipped), and `SHIPROCKET_WEBHOOK_TOKEN` for the webhook. Live
+credentials work only when `WP_ENV` is production, like the payment keys. `/version` reports the
+mode under `carriers`. The pickup address is the one named under Carriers, else the first one in
+the account, else one named Store is made from the store address.
+
+For the webhook, add one in the Shiprocket panel under Settings, API, Webhooks with the address
+`/wp-json/storewright/v1/webhooks/shiprocket` and the token as its security key; the store checks
+the `x-api-key` header and then asks Shiprocket for that waybill's scans, so a forged call can only
+cause a lookup.
+
 ## What the customer sees
 
 The shipment email ("Your Storewright order 1234 is on its way") names the carrier and tracking

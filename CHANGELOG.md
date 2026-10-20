@@ -4,6 +4,7 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- Shipping with Shiprocket: the order screen quotes every courier for the parcel and books the chosen one in the background, allots the waybill to the fulfilment, emails the customer, asks for the pickup and the label with retries, follows the parcel every half hour or on a webhook, and shows the latest scan to the customer; cancel puts the items back. Credentials come from SHIPROCKET_EMAIL, SHIPROCKET_PASSWORD and SHIPROCKET_API_URL (sandbox or live, live only in production), the pickup address and parcel defaults sit under Store, Settings, Carriers.
 ## 0.8.1 - 2026-10-20
 
 - On a fresh server the cron container now starts after the app, so only the app fills the plugins volume on first boot; two containers filling it at once could leave the store without its plugins.
