@@ -105,7 +105,13 @@ test('the order screen offers shiprocket couriers, or says why it cannot', async
 	const courier = box.getByLabel('Courier');
 	await expect(courier).toBeVisible();
 	expect(await courier.locator('option').count()).toBeGreaterThan(1);
-	await expect(box.getByRole('button', { name: /Ship 1 item with Shiprocket/ })).toBeVisible();
+	await box.getByRole('button', { name: /Ship 1 item with Shiprocket/ }).click();
+
+	await expect(page.getByText('Booking the shipment with Shiprocket')).toBeVisible();
+	const after = page.locator('#storewright-shipping');
+	await expect(after).toContainText('Booking with Shiprocket');
+	await expect(after.getByRole('button', { name: /Ship .* with Shiprocket/ })).toHaveCount(0);
+	await expect(after).toContainText('Everything in this order that travels has a shipment');
 });
 
 test('the payments page shows gateway health and orders still waiting for money', async ({ page }) => {

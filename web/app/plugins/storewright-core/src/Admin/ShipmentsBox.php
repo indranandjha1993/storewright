@@ -182,7 +182,8 @@ final class ShipmentsBox {
 			return;
 		}
 		$count = array_sum( array_column( $items, 'qty' ) );
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="sw-shipping__offer">';
+		// The order screen is one form already, so the button sends that form to our handler instead of nesting another.
+		echo '<p class="sw-shipping__offer">';
 		Action::fields( 'shipment_book' );
 		echo '<input type="hidden" name="order" value="' . esc_attr( (string) $order->get_id() ) . '">';
 		echo '<label for="sw-shipping-service">' . esc_html__( 'Courier', 'storewright' ) . '</label> ';
@@ -192,11 +193,11 @@ final class ShipmentsBox {
 		}
 		echo '</select> ';
 		/* translators: %d: number of items */
-		echo '<button type="submit" class="button button-primary">' . esc_html( sprintf( _n( 'Ship %d item with Shiprocket', 'Ship %d items with Shiprocket', $count, 'storewright' ), $count ) ) . '</button>';
+		echo '<button type="submit" class="button button-primary" formmethod="post" formaction="' . esc_url( admin_url( 'admin-post.php' ) ) . '">' . esc_html( sprintf( _n( 'Ship %d item with Shiprocket', 'Ship %d items with Shiprocket', $count, 'storewright' ), $count ) ) . '</button>';
 		if ( $mode === CarrierCredentials::SANDBOX ) {
 			echo ' <span class="description">' . esc_html__( 'Sandbox: nothing is really shipped.', 'storewright' ) . '</span>';
 		}
-		echo '</form>';
+		echo '</p>';
 	}
 
 	/** @return list<Quote> */

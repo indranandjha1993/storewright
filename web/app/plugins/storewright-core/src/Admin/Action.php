@@ -10,7 +10,8 @@ final class Action {
 		add_action(
 			'admin_post_storewright_' . $name,
 			static function () use ( $name, $handler, $capability ): void {
-				check_admin_referer( 'storewright_' . $name );
+				// Boxes on WooCommerce's order screen post through its form, so their nonce has its own name.
+				check_admin_referer( 'storewright_' . $name, isset( $_REQUEST['storewright_nonce'] ) ? 'storewright_nonce' : '_wpnonce' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				if ( ! current_user_can( $capability ) ) {
 					wp_die( esc_html__( 'Sorry, you are not allowed to do that.', 'storewright' ), 403 );
 				}
@@ -34,7 +35,7 @@ final class Action {
 
 	public static function fields( string $name ): void {
 		printf( '<input type="hidden" name="action" value="storewright_%s">', esc_attr( $name ) );
-		wp_nonce_field( 'storewright_' . $name );
+		wp_nonce_field( 'storewright_' . $name, 'storewright_nonce' );
 	}
 
 	public static function back( string $url ): never {
