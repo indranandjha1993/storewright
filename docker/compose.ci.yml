@@ -1,0 +1,23 @@
+services:
+  web:
+    ports: !override
+      - "${WEB_PORT:-8600}:80"
+
+  mail:
+    image: axllent/mailpit:latest
+    ports:
+      - "${MAIL_PORT:-8601}:8025"
+
+  cli:
+    image: ${STOREWRIGHT_IMAGE:-ghcr.io/indranandjha1993/storewright}:${STOREWRIGHT_VERSION:?set by the pipeline}
+    profiles: ["tools"]
+    env_file: .env
+    volumes:
+      - uploads:/var/www/html/web/app/uploads
+      - plugins:/var/www/html/web/app/plugins
+      - languages:/var/www/html/web/app/languages
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: []
+    command: ["bash"]

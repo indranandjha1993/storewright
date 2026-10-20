@@ -3,6 +3,8 @@ name: ${STORE_NAME:-storewright-store}
 x-app: &app
   image: ${STOREWRIGHT_IMAGE:-ghcr.io/indranandjha1993/storewright}:${STOREWRIGHT_VERSION:?set by deploy.sh}
   env_file: .env
+  environment:
+    STOREWRIGHT_VERSION: ${STOREWRIGHT_VERSION}
   restart: unless-stopped
   volumes:
     - uploads:/var/www/html/web/app/uploads
