@@ -69,6 +69,8 @@ jobs:
       packages: write
     outputs:
       build: ${{ steps.version.outputs.build }}
+    env:
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
     steps:
       - name: checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
