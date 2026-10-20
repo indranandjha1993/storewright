@@ -52,7 +52,9 @@ can be moved or removed there like any block; the theme registers them from
 
 ## Emails
 
-Order and account emails use WooCommerce's own templates with the brand applied on top. The logo
+Order and account emails use WooCommerce's own templates with the brand applied on top; the
+colour, typeface and header image fields are not shown on the Emails settings tab because the
+brand decides them. The logo
 heads each email, or the store name as a wordmark when there is no logo. Titles take the heading
 typeface and text the body typeface, each as its closest email-safe family (Georgia for serif
 faces, Helvetica for sans faces), because most mail apps ignore web fonts. Colours come from the

@@ -31,7 +31,9 @@ minute per address on the sign-in path, with a burst of 60. Login errors never s
 
 - Plugins, themes and WordPress itself cannot be installed, updated or deleted
   (`DISALLOW_FILE_MODS`); new versions arrive only as a release.
-- WooCommerce, the Razorpay plugin and Storewright Core stay active. The
+- WooCommerce, the Razorpay plugin and Storewright Core stay active.
+- `tests/e2e/permissions.spec.ts` opens every admin screen and the main API routes as a guest, a
+  shopper, a shop manager and an administrator on every CI run and checks who is let in. The
   Plugins screen marks them "Required by Storewright" without a Deactivate link, bulk deactivation
   is gone, and a deactivation through REST or WP-CLI is undone.
 - The theme stays Storewright, or a child theme built on it; switching to anything else is refused

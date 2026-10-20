@@ -63,7 +63,8 @@ off for the zone the tunnel uses; on the free plan it cannot be skipped for a si
 
 ## Payments screen
 
-The Payments page under Store shows, for Razorpay and Stripe, the mode the keys put
+The Razorpay settings under Store, Settings, Payments show no key fields: the keys come from the
+server and the page says which mode they put the gateway in. The Payments page under Store shows, for Razorpay and Stripe, the mode the keys put
 the gateway in, when the last webhook arrived, how many came in the last 24 hours, and how many
 failed or are still waiting to be processed. Each card has the webhook address to paste into the
 gateway dashboard.

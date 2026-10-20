@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const ci = !!process.env.CI;
 // The admin specs change store settings that the storefront specs read, so they run after them.
-const adminSpecs = /\/(account|admin|areas|brand|operator)\.spec\.ts$/;
+const adminSpecs = /\/(account|admin|areas|brand|operator|permissions)\.spec\.ts$/;
 const local = ci ? {} : { channel: 'chrome', headless: false, launchOptions: { slowMo: Number(process.env.E2E_SLOWMO ?? 150) } };
 
 export default defineConfig({

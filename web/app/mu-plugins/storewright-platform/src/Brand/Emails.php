@@ -24,6 +24,25 @@ final class Emails {
 		add_filter( 'pre_option_woocommerce_email_auto_sync_with_theme', static fn(): string => 'no' );
 		add_filter( 'pre_option_woocommerce_email_header_image', static fn( mixed $pre ): mixed => Brand::logoUrl() ?: $pre );
 		add_filter( 'woocommerce_email_styles', [ self::class, 'styles' ], 20 );
+		add_filter( 'woocommerce_email_settings', [ self::class, 'fields' ] );
+	}
+
+	public static function fields( array $settings ): array {
+		$decided = [ ...array_keys( self::COLOURS ), 'woocommerce_email_font_family', 'woocommerce_email_auto_sync_with_theme', 'woocommerce_email_header_image' ];
+		$kept    = [];
+		foreach ( $settings as $field ) {
+			if ( in_array( $field['id'] ?? '', $decided, true ) ) {
+				continue;
+			}
+			if ( ( $field['id'] ?? '' ) === 'email_template_options' && ( $field['type'] ?? '' ) === 'title' ) {
+				$field['desc'] = __( 'The logo, colours and typeface come from Store, Brand.', 'storewright' );
+			}
+			if ( ( $field['id'] ?? '' ) === 'email_notification_settings' && ( $field['type'] ?? '' ) === 'title' ) {
+				$field['desc'] = __( 'The emails the store sends. Open one to change its subject, heading and whether it is sent.', 'storewright' );
+			}
+			$kept[] = $field;
+		}
+		return $kept;
 	}
 
 	public static function styles( string $css ): string {

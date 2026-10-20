@@ -28,7 +28,9 @@ Change any of them in the site editor and the login page and admin follow.
 - The new order email to staff no longer advertises the WooCommerce mobile app.
 
 Staff without the `manage_options` capability, such as shop managers, also do not see Comments,
-Tools or the system status page. Administrators keep everything. Posts appear as the Journal, the
+Tools, Appearance or the system status page, and the system status API refuses them too; the
+brand page is their design door. Administrators keep everything. A shopper who opens any admin
+address is sent to their account page. Posts appear as the Journal, the
 store's own notes and guides, with entries instead of posts throughout.
 
 `wp storewright setup` hides WooCommerce's setup checklists and removes the sample post, page

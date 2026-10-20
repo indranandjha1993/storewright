@@ -110,9 +110,11 @@ test('the payments page shows gateway health and orders still waiting for money'
 	await expect(page.getByRole('region', { name: 'Webhook log' })).toBeVisible();
 });
 
-test('store details are kept on the general settings tab', async ({ page }) => {
+test('gst details are kept on the taxes and charges tab', async ({ page }) => {
 	await logIn(page, staff);
-	await page.goto('/wp/wp-admin/admin.php?page=wc-settings');
+	await page.goto('/wp/wp-admin/admin.php?page=wc-settings&tab=charges');
+	await expect(page.locator('.nav-tab-active')).toHaveText('Taxes and charges');
+	await expect(page.getByLabel('Enable taxes')).toHaveCount(0);
 
 	await page.getByLabel('GSTIN').fill('29ABCDE1234F1Z5');
 	await page.getByRole('button', { name: 'Save changes' }).click();
@@ -151,4 +153,28 @@ test('staff see the job runner and can run a failed job again or dismiss it', as
 	await expect(page.locator('.notice')).toContainText('dismissed');
 	expect(status(dismiss)).toBe('canceled');
 	wp('eval', 'as_unschedule_all_actions( "storewright_e2e_job" );');
+});
+
+test('settings only show fields that take effect', async ({ page }) => {
+	await logIn(page, staff);
+
+	await page.goto('/wp/wp-admin/admin.php?page=wc-settings&tab=email');
+	await expect(page.locator('#woocommerce_email_base_color, #woocommerce_email_font_family, #woocommerce_email_header_image')).toHaveCount(0);
+	await expect(page.locator('#wpbody-content')).toContainText('The logo, colours and typeface come from Store, Brand.');
+	await expect(page.locator('#woocommerce_email_from_address')).toBeVisible();
+
+	await page.goto('/wp/wp-admin/admin.php?page=wc-settings&tab=checkout&section=razorpay');
+	await expect(page.locator('#woocommerce_razorpay_key_id, #woocommerce_razorpay_key_secret, #woocommerce_razorpay_webhook_secret, #woocommerce_razorpay_enabled')).toHaveCount(0);
+	await expect(page.locator('#wpbody-content')).toContainText(/come from the server settings and are not stored here\. This store runs in (sandbox|live) mode/);
+
+	await page.goto('/wp/wp-admin/admin.php?page=wc-settings');
+	await expect(page.getByLabel('Enable taxes')).toHaveCount(0);
+
+	await page.goto('/wp/wp-admin/admin.php?page=wc-settings&tab=charges');
+	await page.getByLabel('Cash on delivery PIN codes').fill('560*\n411001-411099');
+	await page.getByRole('button', { name: 'Save changes' }).click();
+	await expect(page.locator('#message')).toContainText('Your settings have been saved.');
+	expect(wp('option', 'get', 'storewright_settings', '--format=json')).toContain('"cod_postcodes":["560*","411001-411099"]');
+	await expect(page.getByLabel('Cash on delivery PIN codes')).toHaveValue('560*\n411001-411099');
+	wp('eval', '$s = get_option( "storewright_settings" ); $s["cod_postcodes"] = []; update_option( "storewright_settings", $s );');
 });

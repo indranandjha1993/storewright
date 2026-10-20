@@ -18,6 +18,25 @@ final class GatewayCredentials {
 			add_filter( $hook . '_woocommerce_razorpay_settings', static fn( mixed $saved ): array => self::razorpay( $saved, wp_get_environment_type() ) );
 		}
 		add_filter( 'pre_update_option_woocommerce_razorpay_settings', static fn( mixed $value ): mixed => self::keepOutOfDatabase( $value, self::razorpayMode(), self::RAZORPAY_FIELDS ) );
+		add_filter( 'woocommerce_settings_api_form_fields_razorpay', [ self::class, 'razorpayForm' ] );
+	}
+
+	public static function razorpayForm( array $fields ): array {
+		$mode = self::razorpayMode();
+		if ( $mode === null ) {
+			return $fields;
+		}
+		$fields = array_diff_key( $fields, array_flip( [ ...self::RAZORPAY_FIELDS, 'enabled' ] ) );
+		$note   = [
+			'title'       => __( 'Keys', 'storewright' ),
+			'type'        => 'title',
+			'description' => sprintf(
+				/* translators: %s: sandbox or live */
+				__( 'The Razorpay keys and the webhook secret come from the server settings and are not stored here. This store runs in %s mode; the gateway is on while keys are present.', 'storewright' ),
+				self::status( $mode, wp_get_environment_type() )
+			),
+		];
+		return [ 'storewright_keys' => $note ] + $fields;
 	}
 
 	public static function keepOutOfDatabase( mixed $value, ?string $mode, array $fields ): mixed {

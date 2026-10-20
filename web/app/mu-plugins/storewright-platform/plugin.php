@@ -43,4 +43,5 @@ WhiteLabel\PluginList::register();
 WhiteLabel\Promotions::register();
 WhiteLabel\OperatorMenus::register();
 WhiteLabel\StoreMenu::register();
+WhiteLabel\StaffRoles::register();
 WhiteLabel\Journal::register();
