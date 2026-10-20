@@ -63,7 +63,7 @@ off for the zone the tunnel uses; on the free plan it cannot be skipped for a si
 
 ## Payments screen
 
-The console's Payments screen (`/payments`) shows, for Razorpay and Stripe, the mode the keys put
+The Payments page under Store shows, for Razorpay and Stripe, the mode the keys put
 the gateway in, when the last webhook arrived, how many came in the last 24 hours, and how many
 failed or are still waiting to be processed. Each card has the webhook address to paste into the
 gateway dashboard.

@@ -17,7 +17,7 @@ final class RequiredTest extends TestCase {
 	}
 
 	public function test_plugins_can_still_be_switched_on_and_others_switched_off(): void {
-		self::assertSame( [ 'storewright-console/storewright-console.php' ], Required::protect( [ 'storewright-console/storewright-console.php' ], [] ) );
+		self::assertSame( [ 'storewright-core/storewright-core.php' ], Required::protect( [ 'storewright-core/storewright-core.php' ], [] ) );
 		self::assertSame( [ 'woocommerce/woocommerce.php' ], Required::protect( [ 'woocommerce/woocommerce.php' ], [ 'woocommerce/woocommerce.php', 'hello/hello.php' ] ) );
 	}
 

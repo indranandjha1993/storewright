@@ -9,7 +9,7 @@ Two optional fields sit under the email address: **Business name** and **GSTIN**
 normalised to capitals without spaces and checked against the 15-character format and its check
 digit before the order is placed; a wrong one is refused with an example of the right shape. Both
 values are stored on the order (`_wc_other/storewright/business`, `_wc_other/storewright/gstin`),
-appear on the order confirmation page and in emails, and show in the console's order panel.
+appear on the order confirmation page, in emails and on the order screen.
 
 ## PIN code autofill
 

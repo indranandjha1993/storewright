@@ -61,8 +61,7 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npm run fonts
-      - run: npm run console
+      - run: npm run assets
       - name: deploy files
         run: |
           bash -n deploy/deploy.sh bin/install

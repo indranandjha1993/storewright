@@ -15,8 +15,8 @@ A release is two images with the same tag:
 `make images VERSION=0.2.0` builds both locally; `IMAGE=` changes the name. Uploads live in a
 volume shared by both, so nothing in the images changes at run time.
 
-Before tagging, `bin/version x.y.z` writes the version into the plugin and theme headers, the
-console package and the README so every screen that shows a version agrees with the tag.
+Before tagging, `bin/version x.y.z` writes the version into the plugin and theme headers and
+the README so every screen that shows a version agrees with the tag.
 
 Pushing a `v*` tag runs the release workflow (`.github/workflows/release.yml`): it builds both
 images, scans them with Trivy and stops on any critical issue that has a fix, pushes them to GHCR
@@ -96,8 +96,8 @@ store settings. Storewright's own tables upgrade themselves on the first request
 version; migrations only add, so rolling back is safe.
 
 `/health` also answers 503 when the `cron` container has not run the job queue for 15 minutes,
-so a monitor on that address notices a stopped runner. The console's Background work screen
-shows the same heartbeat, with the failed jobs to run again.
+so a monitor on that address notices a stopped runner. The dashboard's Background work box
+shows the same heartbeat, with the failed jobs to run again or dismiss.
 
 Backups keep the last `BACKUP_KEEP` (14 by default). Copy `backups/` off the server, for example
 with a nightly cron entry on the host:

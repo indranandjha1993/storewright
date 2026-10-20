@@ -20,7 +20,7 @@ test.afterAll(() => resetBrand());
 
 async function openBrand(page: Page) {
 	await logIn(page, staff);
-	await page.getByRole('link', { name: 'Brand' }).click();
+	await page.goto('/wp/wp-admin/admin.php?page=storewright-brand');
 	return brandForm(page);
 }
 
@@ -29,11 +29,11 @@ async function brandForm(page: Page) {
 	return page.getByRole('form', { name: 'Brand' });
 }
 
-const savedNotice = (page: Page) => page.locator('.sw-brand__form .components-notice.is-success');
+const savedNotice = (page: Page) => page.locator('.notice-success');
 
 const cssVariable = (page: Page, name: string) => page.evaluate((v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim(), name);
 
-test('one save restyles the storefront, sign-in page, console and emails', async ({ page }) => {
+test('one save restyles the storefront, sign-in page, admin and emails', async ({ page }) => {
 	const form = await openBrand(page);
 
 	await form.getByLabel('Accent', { exact: true }).fill('#7A1F5C');
@@ -63,20 +63,20 @@ test('one save restyles the storefront, sign-in page, console and emails', async
 test('a logo replaces the store name in the header', async ({ page }) => {
 	const form = await openBrand(page);
 
-	await page.getByLabel('Logo file').setInputFiles({ name: 'logo.png', mimeType: 'image/png', buffer: PNG });
-	await expect(form.getByRole('img', { name: 'Current logo' })).toBeVisible();
+	await form.getByLabel('Logo file').setInputFiles({ name: 'logo.png', mimeType: 'image/png', buffer: PNG });
 	await form.getByRole('button', { name: 'Save brand' }).click();
 	await expect(savedNotice(page)).toContainText('Saved. The store is wearing the new brand.');
+	await expect(page.getByRole('img', { name: 'Current logo' })).toBeVisible();
 
 	await page.goto('/');
 	const header = page.locator('header .sw-header__brand');
 	await expect(header.locator('.wp-block-site-logo img')).toBeVisible();
 	await expect(header.locator('.wp-block-site-title')).not.toBeInViewport();
 
-	await page.goto('/wp/wp-admin/admin.php?page=storewright&p=%2Fbrand');
-	await brandForm(page);
-	await page.locator('.sw-brand__logo').filter({ has: page.getByRole('img', { name: 'Current logo' }) }).getByRole('button', { name: 'Remove', exact: true }).click();
-	await page.getByRole('button', { name: 'Save brand' }).click();
+	await page.goto('/wp/wp-admin/admin.php?page=storewright-brand');
+	const again = await brandForm(page);
+	await again.locator('.sw-brand__image').filter({ has: page.getByRole('img', { name: 'Current logo' }) }).getByLabel('Remove').check();
+	await again.getByRole('button', { name: 'Save brand' }).click();
 	await expect(savedNotice(page)).toContainText('Saved. The store is wearing the new brand.');
 	await page.goto('/');
 	await expect(page.locator('header .wp-block-site-logo')).toHaveCount(0);
@@ -102,11 +102,14 @@ test('unreadable text is refused and nothing changes', async ({ page }) => {
 	await form.getByLabel('Text', { exact: true }).fill('#cccccc');
 	await form.getByRole('button', { name: 'Save brand' }).click();
 
-	await expect(form.getByText('The text colour needs more contrast against the background so the store stays readable.')).toBeVisible();
+	await expect(page.locator('.notice-error')).toContainText('The text colour needs more contrast against the background so the store stays readable.');
+	await expect(page.getByRole('form', { name: 'Brand' }).getByLabel('Text', { exact: true })).toHaveValue('#cccccc');
 	expect(wp('storewright', 'brand', 'show', '--format=json')).not.toContain('#cccccc');
 });
 
-test('the brand api is closed to anyone who is not staff', async ({ request }) => {
-	expect((await request.get('/wp-json/storewright/v1/brand')).status()).toBe(401);
-	expect((await request.put('/wp-json/storewright/v1/brand', { data: { accent: '#000000' } })).status()).toBe(401);
+test('the brand page is closed to anyone who is not staff', async ({ page, request }) => {
+	expect((await request.get('/wp-json/storewright/v1/brand')).status()).toBe(404);
+	await logIn(page, account('shopper.e2e'));
+	await page.goto('/wp/wp-admin/admin.php?page=storewright-brand');
+	await expect(page.getByRole('form', { name: 'Brand' })).toHaveCount(0);
 });

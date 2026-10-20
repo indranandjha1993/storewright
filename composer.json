@@ -47,7 +47,6 @@
     "psr-4": {
       "Storewright\\Platform\\": "web/app/mu-plugins/storewright-platform/src/",
       "Storewright\\Core\\": "web/app/plugins/storewright-core/src/",
-      "Storewright\\Console\\": "web/app/plugins/storewright-console/src/",
       "Storewright\\Tests\\": "tests/"
     }
   },

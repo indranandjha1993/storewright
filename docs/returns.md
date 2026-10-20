@@ -13,7 +13,7 @@ decline carries the store's message, and the refund arrives with WooCommerce's r
 
 ## For staff
 
-Returns has its own screen in the console. Open returns come first; All shows the history. Each
+Returns has its own page under Store, Returns. Open returns come first; All shows the history. Each
 return moves through:
 
 1. **New**: approve and arrange the pickup, or decline with a message.

@@ -126,14 +126,16 @@ test('a delivered order can be returned and refunded', async ({ page, browser })
 	const staffContext = await browser.newContext();
 	const staffPage = await staffContext.newPage();
 	await logIn(staffPage, account('returns.e2e'));
-	await staffPage.goto('/wp/wp-admin/admin.php?page=storewright&p=%2Freturns');
-	const row = staffPage.locator('.sw-return-row').filter({ hasText: `#${id}` });
-	await row.getByRole('button', { name: 'Approve and arrange pickup' }).click();
-	await expect(row).toContainText('Pickup arranged');
-	await row.getByRole('button', { name: 'Mark as received' }).click();
-	await expect(row).toContainText('Back with us');
-	await row.getByRole('button', { name: 'Refund' }).click();
-	await expect(row).toContainText('Refunded');
+	await staffPage.goto('/wp/wp-admin/admin.php?page=storewright-returns');
+	const row = () => staffPage.getByRole('row').filter({ hasText: `#${id}` });
+	await row().getByRole('button', { name: 'Approve and arrange pickup' }).click();
+	await expect(row()).toContainText('Pickup arranged');
+	await row().getByRole('button', { name: 'Mark as received' }).click();
+	await expect(row()).toContainText('Back with us');
+	await row().getByRole('button', { name: 'Refund' }).click();
+	await expect(staffPage.locator('.notice')).toContainText('is now Refunded');
+	await staffPage.goto('/wp/wp-admin/admin.php?page=storewright-returns&view=all');
+	await expect(row()).toContainText('Refunded');
 	await staffContext.close();
 
 	expect(wp('eval', `echo wc_get_order( ${id} )->get_total_refunded();`)).toBe('449');

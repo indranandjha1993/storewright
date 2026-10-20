@@ -17,7 +17,7 @@ test.afterAll(() => removeTestAreas());
 
 async function openAreas(page: Page) {
 	await logIn(page, staff);
-	await page.getByRole('link', { name: 'Delivery areas' }).click();
+	await page.goto('/wp/wp-admin/admin.php?page=storewright-areas');
 	await expect(page.getByRole('heading', { name: 'Delivery areas' })).toBeVisible();
 	await expect(page).toHaveTitle('Delivery areas ‹ Storewright');
 }
@@ -28,7 +28,7 @@ async function testPin(page: Page, pin: string): Promise<Locator> {
 	const tester = page.getByRole('form', { name: 'Test an address' });
 	await tester.getByLabel('PIN code to test').fill(pin);
 	await tester.getByRole('button', { name: 'Check' }).click();
-	const answer = tester.getByRole('status');
+	const answer = page.getByRole('form', { name: 'Test an address' }).getByRole('status');
 	await expect(answer).toContainText(pin);
 	return answer;
 }
@@ -37,6 +37,11 @@ async function showPin(editor: Locator, pin: string) {
 	await editor.getByLabel('Show a PIN code on the map').fill(pin);
 	await editor.getByRole('button', { name: 'Show', exact: true }).click();
 	await expect(editor.getByText(new RegExp(`^Showing ${pin}, `))).toBeVisible();
+}
+
+async function newArea(page: Page): Promise<Locator> {
+	await page.getByRole('link', { name: 'Add an area' }).click();
+	return page.getByRole('form', { name: 'New delivery area' });
 }
 
 test('the list shows areas in the order addresses are checked', async ({ page }) => {
@@ -67,8 +72,7 @@ test('testing a pin code answers the way the storefront does', async ({ page }) 
 
 test('staff add a radius area, move it and delete it', async ({ page }) => {
 	await openAreas(page);
-	await page.getByRole('button', { name: 'Add an area' }).click();
-	const editor = page.getByRole('form', { name: 'New delivery area' });
+	const editor = await newArea(page);
 
 	await editor.getByLabel('Name', { exact: true }).fill('E2E Jaipur centre');
 	await editor.getByLabel('PIN codes', { exact: true }).fill('302001-302039');
@@ -82,6 +86,7 @@ test('staff add a radius area, move it and delete it', async ({ page }) => {
 	await method.getByLabel('Charge').fill('59');
 	await editor.getByRole('button', { name: 'Save' }).click();
 
+	await expect(page.locator('.notice-success')).toContainText('E2E Jaipur centre saved.');
 	const jaipur = page.getByRole('listitem', { name: 'E2E Jaipur centre' });
 	await expect(names(page)).toHaveText(['E2E Jaipur centre', 'Bengaluru same-day', 'India', 'Everywhere else']);
 	await expect(jaipur).toContainText('302001...302039');
@@ -91,20 +96,19 @@ test('staff add a radius area, move it and delete it', async ({ page }) => {
 	await expect(answer).toContainText('Decided by E2E Jaipur centre.');
 	await expect(answer).toContainText('Jaipur same-day: ₹59.00');
 
-	await jaipur.getByRole('button', { name: 'Move down' }).click();
+	await page.getByRole('listitem', { name: 'E2E Jaipur centre' }).getByRole('link', { name: 'Move down' }).click();
 	await expect(names(page)).toHaveText(['Bengaluru same-day', 'E2E Jaipur centre', 'India', 'Everywhere else']);
 
-	await jaipur.getByRole('button', { name: 'Edit' }).click();
-	const edit = page.getByRole('form', { name: 'E2E Jaipur centre' });
-	await edit.getByRole('button', { name: 'Delete area' }).click();
-	await edit.getByRole('button', { name: 'Delete', exact: true }).click();
+	await page.getByRole('listitem', { name: 'E2E Jaipur centre' }).getByRole('link', { name: 'Edit' }).click();
+	await expect(page.getByRole('form', { name: 'E2E Jaipur centre' })).toBeVisible();
+	await page.getByText('Delete area').click();
+	await page.getByRole('button', { name: 'Delete', exact: true }).click();
 	await expect(names(page)).toHaveText(['Bengaluru same-day', 'India', 'Everywhere else']);
 });
 
 test('staff draw an area on the map and it decides delivery', async ({ page }) => {
 	await openAreas(page);
-	await page.getByRole('button', { name: 'Add an area' }).click();
-	const editor = page.getByRole('form', { name: 'New delivery area' });
+	let editor = await newArea(page);
 
 	await editor.getByLabel('Name', { exact: true }).fill('E2E Kothrud');
 	await editor.getByLabel('PIN codes', { exact: true }).fill('411038');
@@ -118,7 +122,12 @@ test('staff draw an area on the map and it decides delivery', async ({ page }) =
 	await expect(editor.getByText(/^3 corners so far\./)).toBeVisible();
 	await editor.getByRole('button', { name: 'Undo last corner' }).click();
 	await editor.getByRole('button', { name: 'Save' }).click();
-	await expect(editor.getByText('Click the map at least three times to draw the area.')).toBeVisible();
+	await expect(page.locator('.notice-error')).toContainText('Click the map at least three times to draw the area.');
+
+	editor = page.getByRole('form', { name: 'New delivery area' });
+	await expect(editor.getByLabel('Name', { exact: true })).toHaveValue('E2E Kothrud');
+	await expect(editor.getByText(/^2 corners so far\./)).toBeVisible();
+	await showPin(editor, '411038');
 	await map.click({ position: { x: box.width / 2, y: box.height / 2 + 90 } });
 	await editor.getByRole('group', { name: 'Delivery method 1' }).getByLabel('Charge').fill('39');
 	await editor.getByRole('button', { name: 'Save' }).click();
@@ -133,19 +142,18 @@ test('staff draw an area on the map and it decides delivery', async ({ page }) =
 
 test('a typo in the pin codes is explained and nothing is saved', async ({ page }) => {
 	await openAreas(page);
-	await page.getByRole('button', { name: 'Add an area' }).click();
-	const editor = page.getByRole('form', { name: 'New delivery area' });
+	const editor = await newArea(page);
 
 	await editor.getByLabel('Name', { exact: true }).fill('E2E Typo');
 	await editor.getByLabel('PIN codes', { exact: true }).fill('560001\n56O*');
 	await editor.getByRole('button', { name: 'Save' }).click();
 
-	await expect(editor.getByText('56O* is not a PIN code, a prefix such as 560* or a range such as 560001...560099.')).toBeVisible();
-	await editor.getByRole('button', { name: 'Cancel' }).click();
+	await expect(page.locator('.notice-error')).toContainText('56O* is not a PIN code, a prefix such as 560* or a range such as 560001...560099.');
+	await page.getByRole('link', { name: 'Cancel' }).click();
 	await expect(page.getByRole('listitem', { name: 'E2E Typo' })).toHaveCount(0);
 });
 
-test('the areas api is closed to anyone who is not staff', async ({ request }) => {
-	expect((await request.get('/wp-json/storewright/v1/areas')).status()).toBe(401);
+test('the areas routes are closed to anyone who is not staff', async ({ request }) => {
+	expect((await request.get('/wp-json/storewright/v1/areas')).status()).toBe(404);
 	expect((await request.post('/wp-json/storewright/v1/areas/test', { data: { pin: '560001' } })).status()).toBe(401);
 });

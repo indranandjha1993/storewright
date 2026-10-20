@@ -4,14 +4,13 @@
 
 Storewright is an online store platform built on WordPress and WooCommerce. It sells physical
 and digital products, takes payment through Stripe and Razorpay, tracks shipments through to
-delivery, and replaces the stock WordPress dashboard with an operator console built for running
-a shop. Everything ships as one Docker image, so the store you run locally is the store you
+delivery, and dresses the WordPress admin as the store's own console. Everything ships as one Docker image, so the store you run locally is the store you
 deploy.
 
 ## Status
 
 Version 0.5.0. A store can take orders and payments, deliver to the areas it chooses, ship in
-parcels, issue GST invoices and handle returns, all run from the console, and it deploys to its
+parcels, issue GST invoices and handle returns, all run from one admin, and it deploys to its
 own server with one script. Carrier integrations come next. Every release is listed in
 [CHANGELOG.md](CHANGELOG.md).
 
@@ -23,8 +22,9 @@ own server with one script. Carrier integrations come next. Every release is lis
   touch the store. An INR store offers Razorpay first.
 - Shipments built on WooCommerce fulfillments, with carrier integrations (manual, Shiprocket,
   Delhivery first), a tracking page for the customer and delivery notifications.
-- An operator console: dashboard, orders, fulfillments, products, customers, payments and
-  settings, with a setup wizard for a new store. wp-admin stays available for the rare case.
+- One admin for everything: the WordPress and WooCommerce screens, white-labelled and skinned
+  from the store's brand, plus pages for returns, payments, delivery areas and the brand, and
+  a dashboard that shows the day, the insights and a getting started list for a new store.
 - Invoices with GST support for India, coupons, reviews, wishlists, search and customer accounts.
 - A block theme that is the store's design system, extended through the WooCommerce
   checkout and Store APIs rather than template overrides.
@@ -32,8 +32,7 @@ own server with one script. Carrier integrations come next. Every release is lis
 ## How it is built
 
 ```
-web/app/plugins/storewright-core/         payments, fulfillments, carriers, invoices, settings, REST
-web/app/plugins/storewright-console/      the operator console (React, @wordpress/boot, dataviews)
+web/app/plugins/storewright-core/         payments, fulfillments, carriers, invoices, admin pages, REST
 web/app/mu-plugins/storewright-platform/  always-on: branding, hardening, health, migrations
 web/app/themes/storewright/               block theme
 docker/                                   image build, nginx and php configuration
@@ -77,7 +76,7 @@ robots file. See [docs/seo.md](docs/seo.md).
 ## Returns
 
 Customers ask to return items from their order page within the return window; staff approve,
-collect and refund from the console. See [docs/returns.md](docs/returns.md).
+collect and refund under Store, Returns. See [docs/returns.md](docs/returns.md).
 
 ## Invoices
 
@@ -86,7 +85,7 @@ words, ready to print or save as PDF. See [docs/invoices.md](docs/invoices.md).
 
 ## Shipping
 
-Ship an order in one parcel or several from the console, with carrier and tracking, and the
+Ship an order in one parcel or several from the order screen, with carrier and tracking, and the
 customer gets an email and a card per parcel on their order. See [docs/fulfilment.md](docs/fulfilment.md).
 
 ## Delivery areas
@@ -119,13 +118,14 @@ are not printed. See [docs/security.md](docs/security.md).
 
 ## Branding
 
-Name, logo, colours, typefaces and corners are set once in the console and reach the storefront,
-checkout, emails, sign-in page and console. See [docs/branding.md](docs/branding.md).
+Name, logo, colours, typefaces and corners are set once under Store, Brand and reach the
+storefront, checkout, emails, sign-in page and admin. See [docs/branding.md](docs/branding.md).
 
-## Console
+## Admin
 
-Store staff work in a full-screen console. Build it with `npm ci && make console`; how it is put
-together is in [docs/console.md](docs/console.md).
+Store staff work in the WordPress admin, which is the store's own console: how the screens are
+arranged and what each one does is in [docs/admin.md](docs/admin.md). Run `npm ci && make assets`
+once after cloning for the typefaces and the map library.
 
 ## White label
 
@@ -133,8 +133,8 @@ What staff see in place of WordPress and WooCommerce is in [docs/white-label.md]
 
 ## Design language
 
-The tokens, type scale, spacing and controls the console and the advanced admin are built
-against, and how the skin survives WordPress updates, are in [docs/design.md](docs/design.md).
+The tokens, type scale, spacing and controls the admin is built against, and how the skin
+survives WordPress updates, are in [docs/design.md](docs/design.md).
 
 ## Deploying
 

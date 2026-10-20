@@ -1,7 +1,6 @@
 .git
 .github
 **/node_modules
-web/app/plugins/storewright-console/build
 web/app/themes/storewright/assets/fonts
 vendor
 web/wp

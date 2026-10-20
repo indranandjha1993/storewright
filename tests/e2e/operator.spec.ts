@@ -48,7 +48,7 @@ test('the operator menu shows the journal and leaves out comments, tools and the
 test('the plugins and the theme a store needs cannot be switched off', async ({ page }) => {
 	await logIn(page, account('owner.e2e'));
 	await page.goto('/wp/wp-admin/plugins.php');
-	for (const slug of ['woocommerce', 'woo-razorpay', 'storewright-core', 'storewright-console']) {
+	for (const slug of ['woocommerce', 'woo-razorpay', 'storewright-core']) {
 		const row = page.locator(`tr[data-slug="${slug}"]`);
 		await expect(row).toContainText('Required by Storewright');
 		await expect(row.getByRole('link', { name: /^Deactivate/ })).toHaveCount(0);

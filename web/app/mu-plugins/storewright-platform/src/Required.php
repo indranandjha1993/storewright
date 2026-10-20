@@ -10,7 +10,6 @@ final class Required {
 		'woocommerce/woocommerce.php',
 		'woo-razorpay/woo-razorpay.php',
 		'storewright-core/storewright-core.php',
-		'storewright-console/storewright-console.php',
 	];
 
 	public const THEME = 'storewright';

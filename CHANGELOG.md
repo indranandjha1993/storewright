@@ -4,6 +4,14 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+One admin. The React console is gone; WordPress and WooCommerce's own screens, white-labelled and skinned from the brand, are the console.
+
+- Orders, products, customers, coupons, pages and the journal are worked in their WooCommerce and WordPress screens.
+- Returns, Payments, Delivery areas and Brand are pages under the Store menu, with the delivery map and the brand's live preview kept.
+- Phone, GSTIN, GST rate, invoice prefix, the return window and the cash on delivery limit are fields on the general settings tab.
+- The dashboard carries the day's numbers, the insights, the getting started list, gateway health and background work, and staff land on it after sign-in.
+- Every task has one door: WooCommerce's Home and the shipping zones section hand over to the dashboard and Delivery areas, and the WooCommerce Payments menu entry is gone.
+- The image no longer builds a JavaScript app; the typefaces and the map library are copied from npm at build time.
 - Background work in the console: whether the job runner is alive, jobs waiting and overdue, and every failed job with what went wrong, to run again or dismiss; /health reports a runner that has been silent for 15 minutes.
 - docs/design.md writes down the tokens, type scale, spacing, controls and surfaces the console and the advanced admin share; admin page titles now sit on the same scale as console titles.
 - The browser suite checks the computed styles of five admin screens against the brand tokens, so a WordPress or WooCommerce update that moves a selector the skin relies on fails CI before it reaches a store.

@@ -5,15 +5,13 @@ COPY composer.json composer.lock ./
 RUN --mount=type=cache,target=/tmp/cache \
     composer install --no-dev --no-interaction --no-progress --optimize-autoloader
 
-FROM node:24-alpine AS console
+FROM node:24-alpine AS assets
 WORKDIR /build
 COPY package.json package-lock.json ./
-COPY web/app/plugins/storewright-console/package.json web/app/plugins/storewright-console/
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --workspace storewright-console --include-workspace-root --no-audit --no-fund
-COPY bin/fonts.mjs bin/
-COPY web/app/plugins/storewright-console web/app/plugins/storewright-console
-RUN npm run fonts && npm run build --workspace storewright-console
+    npm ci --no-audit --no-fund
+COPY bin/fonts.mjs bin/vendor.mjs bin/
+RUN npm run assets
 
 FROM php:8.4-fpm-alpine AS base
 COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
@@ -40,11 +38,10 @@ COPY --from=vendor /build/vendor ./vendor
 COPY --from=vendor /build/web/wp ./web/wp
 COPY --from=vendor /build/web/app/plugins ./web/app/plugins
 COPY web/app/plugins/storewright-core ./web/app/plugins/storewright-core
-COPY web/app/plugins/storewright-console ./web/app/plugins/storewright-console
-COPY --from=console /build/web/app/plugins/storewright-console/build ./web/app/plugins/storewright-console/build
+COPY --from=assets /build/web/app/plugins/storewright-core/assets/vendor ./web/app/plugins/storewright-core/assets/vendor
 COPY web/app/mu-plugins ./web/app/mu-plugins
 COPY web/app/themes/storewright ./web/app/themes/storewright
-COPY --from=console /build/web/app/themes/storewright/assets/fonts ./web/app/themes/storewright/assets/fonts
+COPY --from=assets /build/web/app/themes/storewright/assets/fonts ./web/app/themes/storewright/assets/fonts
 COPY config ./config
 COPY web/index.php web/wp-config.php ./web/
 COPY wp-cli.yml ./

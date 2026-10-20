@@ -1,13 +1,11 @@
 # Branding
 
 Every surface a client or their shoppers see is styled from one set of choices: the store name,
-the logo, four colours, two typefaces and a corner style. Staff change them in the console under
-Brand. The same choices reach:
+the logo, four colours, two typefaces and a corner style. Staff change them under Store, Brand. The same choices reach:
 
 - the storefront, through the theme's palette, typefaces and corner sizes (`theme.json`)
 - the checkout and account pages, which use the same theme tokens
 - the sign-in page and the regular admin, through CSS variables and the admin colour
-- the console, whose screens read the same variables
 - transactional emails, which take the colours and the closest email-safe typeface
 - the browser's `theme-color`, so the address bar matches on phones
 
@@ -39,7 +37,7 @@ The list is the system typeface plus six open typefaces under the SIL Open Font 
 as variable fonts: Inter, Manrope, Space Grotesk, Fraunces, Playfair Display and Source Serif.
 A new store starts with Fraunces for headings and Inter for text.
 Their files are not in git. `npm run fonts` copies the Latin subsets and licences from the
-`@fontsource-variable` packages into `web/app/themes/storewright/assets/fonts/`; `make console`
+`@fontsource-variable` packages into `web/app/themes/storewright/assets/fonts/`; `make assets`
 runs it, the image build runs it, and CI runs it. Only the typefaces a store uses are loaded on
 its pages.
 
@@ -62,7 +60,7 @@ palette: the accent for buttons and links, the background behind the card, text 
 
 Order received, on hold and completed emails end with a "View your order" button: the account
 order page for customers with an account, the order confirmation page for guests. The new order
-email to staff links the order number to the order in the console.
+email to staff links the order number to the order screen.
 
 To see them, place an order on the local stack and open Mailpit on `http://localhost:8601`.
 
@@ -95,4 +93,4 @@ defaults, so the storefront looks the same with the platform plugin off.
 Custom CSS should use the tokens, never a literal colour:
 
 - storefront: `var(--wp--preset--color--accent)`, `var(--wp--custom--radius)`, `var(--wp--preset--font-family--heading)`
-- admin, login and console: `var(--sw-accent)`, `var(--sw-radius)`, `var(--sw-font-heading)`
+- admin and login: `var(--sw-accent)`, `var(--sw-radius)`, `var(--sw-font-heading)`

@@ -3,7 +3,7 @@
 Every order gets an invoice number the first time it is paid or marked complete. Numbers run
 `INV/26-27/0001`, `INV/26-27/0002` and start again at 0001 each April, as GST requires a
 consecutive series per financial year of at most 16 characters. The prefix (one to four letters
-or digits) is set in the console under Settings. The counter is a single row incremented in the
+or digits) is set under Store, Settings, General. The counter is a single row incremented in the
 database, so two orders paid at the same moment never share a number.
 
 ## What the invoice shows
@@ -28,7 +28,7 @@ tax columns and a line saying it is not registered under GST.
 
 The invoice is a page made for printing: Print or save as PDF uses the browser's own dialog, and
 the page drops its background and button when printed. It is linked from the order confirmation
-page, the customer's account order page and the console's order panel.
+page, the customer's account order page and the order screen.
 
 The address is `/?storewright-invoice=<order id>&key=<order key>`. Staff can open any invoice; a
 customer can open their own orders' invoices, and anyone holding the order key (the same key as

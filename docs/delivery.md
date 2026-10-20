@@ -14,7 +14,7 @@ for example "Same-day delivery, ₹49.00", so the cost is known before the bag.
 
 ## Editing areas
 
-Staff edit areas in the console under Delivery areas. The list shows the areas in the order
+Staff edit areas under Store, Delivery areas; WooCommerce's shipping zones tab leads there too. The list shows the areas in the order
 addresses are checked; Move up and Move down change that order. Everywhere else always comes last
 and only its delivery methods can change.
 
@@ -29,9 +29,9 @@ Each area has:
   on the map (click to add corners, drag a corner to move it). "Show a PIN code on the map" moves
   the map to a PIN code first.
 - **Delivery methods**: a delivery charge or free delivery, optionally from an order amount. Methods
-  with settings the console does not edit, such as a charge worked out per item or free delivery
-  with a coupon, can be switched on or off and removed; their other settings are changed in the
-  advanced settings.
+  with settings the page does not edit, such as a charge worked out per item or free delivery
+  with a coupon, can be switched on or off and removed; their other settings are changed under
+  Store, Settings, Shipping.
 
 "Test an address" takes a PIN code, or a click on the map, and answers with the message a shopper
 would see, the area that decided it and the options they could choose.
@@ -47,7 +47,7 @@ add_filter( 'storewright_map_tiles', fn() => [
 ] );
 ```
 
-The console uses `storewright/v1/areas` (list, create, update, delete, reorder and test). It needs
+The page's map asks `POST /wp-json/storewright/v1/areas/test` where a PIN code sits. It needs
 the `manage_woocommerce` capability.
 
 ## From the command line

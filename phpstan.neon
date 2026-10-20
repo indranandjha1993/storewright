@@ -5,8 +5,6 @@ parameters:
 	treatPhpDocTypesAsCertain: false
 	paths:
 		- web/app/plugins/storewright-core
-		- web/app/plugins/storewright-console/storewright-console.php
-		- web/app/plugins/storewright-console/src
 		- web/app/mu-plugins/storewright-platform
 		- web/app/mu-plugins/storewright-platform.php
 		- web/app/themes/storewright/functions.php

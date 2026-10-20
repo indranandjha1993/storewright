@@ -5,9 +5,9 @@ Shipments use WooCommerce's own fulfilments (`woocommerce_feature_fulfillments_e
 carrier, a tracking number and a tracking link. Downloads and other virtual items are marked as
 delivered by WooCommerce as soon as the order is paid, so only goods that travel are left to ship.
 
-## In the console
+## On the order screen
 
-Open an order and use Shipments:
+Open an order under Store, Orders and use WooCommerce's Fulfillments panel:
 
 1. Press Ship items. Every item still to send is listed with its quantity; lower a quantity or set
    it to 0 to send part of the order now and the rest later.
@@ -30,7 +30,7 @@ show a card per shipment and what is still to ship.
 
 ## REST
 
-The console calls WooCommerce's routes: `GET` and `POST /wp-json/wc/v3/orders/{id}/fulfillments`
+The order screen uses WooCommerce's routes: `GET` and `POST /wp-json/wc/v3/orders/{id}/fulfillments`
 and `DELETE /wp-json/wc/v3/orders/{id}/fulfillments/{fulfilment id}`. Items go in the `_items`
 meta as `[{"item_id": 12, "qty": 1}]`, the carrier key in `_shipment_provider`, and
 `_tracking_number`, `_tracking_url` and `_provider_name` (for "Another carrier") alongside.
