@@ -376,7 +376,7 @@ test('order emails carry the store brand and point each reader to the right plac
 	expect(customer).not.toMatch(/WooCommerce|WordPress/);
 
 	const { html: staff } = await mailFor(page, `subject:"new order: #${order}"`);
-	expect(staff).toContain(`p=%2Forders&amp;order=${order}`);
+	expect(staff).toContain(`page=wc-orders&amp;action=edit&amp;id=${order}`);
 	expect(staff).not.toContain('Get the app');
 	expect(staff).not.toMatch(/WooCommerce|WordPress/);
 });
