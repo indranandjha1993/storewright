@@ -49,6 +49,7 @@ final class Console {
 			'content'   => [ __( 'Pages and journal', 'storewright' ), '/content' ],
 			'brand'     => [ __( 'Brand', 'storewright' ), '/brand' ],
 			'settings'  => [ __( 'Settings', 'storewright' ), '/settings' ],
+			'jobs'      => [ __( 'Background work', 'storewright' ), '/jobs' ],
 		];
 		foreach ( $items as $id => [ $label, $path ] ) {
 			self::generated( 'storewright_console_register_storewright_menu_item', $id, $label, $path );

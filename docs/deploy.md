@@ -95,6 +95,10 @@ the store on the version that worked. Updates never run `wp storewright setup`, 
 store settings. Storewright's own tables upgrade themselves on the first request of a new
 version; migrations only add, so rolling back is safe.
 
+`/health` also answers 503 when the `cron` container has not run the job queue for 15 minutes,
+so a monitor on that address notices a stopped runner. The console's Background work screen
+shows the same heartbeat, with the failed jobs to run again.
+
 Backups keep the last `BACKUP_KEEP` (14 by default). Copy `backups/` off the server, for example
 with a nightly cron entry on the host:
 

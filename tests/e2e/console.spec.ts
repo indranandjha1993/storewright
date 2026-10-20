@@ -221,3 +221,32 @@ test('customers and content screens list what staff expect', async ({ page }) =>
 	await expect(pages).not.toContainText('Checkout');
 	await expect(page.getByRole('region', { name: 'Journal' })).toContainText('Caring for stoneware');
 });
+
+test('staff see the job runner and can run a failed job again or dismiss it', async ({ page }) => {
+	const schedule = (order: number) => wp('eval', `$id = as_schedule_single_action( time() - 300, "storewright_e2e_job", [ "order" => ${order} ], "storewright" ); ActionScheduler_Store::instance()->mark_failure( $id ); ActionScheduler_Logger::instance()->log( $id, "action failed: the courier did not answer" ); echo $id;`);
+	const status = (id: string) => wp('eval', `echo ActionScheduler_Store::instance()->get_status( ${id} );`);
+	const retry = schedule(4101);
+	const dismiss = schedule(4102);
+	await logIn(page, staff);
+	await page.getByRole('link', { name: 'Background work' }).click();
+
+	await expect(page.getByRole('heading', { level: 1, name: 'Background work' })).toBeVisible();
+	const runner = page.getByRole('region', { name: 'Runner' });
+	await expect(runner).toContainText(/Last run|has not run yet/);
+	await expect(runner).toContainText('Waiting to run');
+	const failed = page.getByRole('region', { name: 'Failed' });
+	const retryRow = failed.getByRole('row').filter({ hasText: '"order":4101' });
+	await expect(retryRow).toContainText('storewright_e2e_job');
+	await expect(retryRow).toContainText('the courier did not answer');
+
+	await retryRow.getByRole('button', { name: 'Run again' }).click();
+	await expect(retryRow).toHaveCount(0);
+	expect(status(retry)).toBe('canceled');
+	expect(Number(wp('eval', 'echo count( as_get_scheduled_actions( [ "hook" => "storewright_e2e_job", "args" => [ "order" => 4101 ], "status" => [ "pending", "in-progress", "complete" ] ], "ids" ) );'))).toBeGreaterThan(0);
+
+	const dismissRow = failed.getByRole('row').filter({ hasText: '"order":4102' });
+	await dismissRow.getByRole('button', { name: 'Dismiss' }).click();
+	await expect(dismissRow).toHaveCount(0);
+	expect(status(dismiss)).toBe('canceled');
+	wp('eval', 'as_unschedule_all_actions( "storewright_e2e_job" );');
+});

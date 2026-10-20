@@ -1,0 +1,35 @@
+@use '../../lib/screen';
+
+.sw-jobs {
+	display: grid;
+	gap: 1.5rem;
+}
+
+.sw-jobs__facts {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.4rem 1rem;
+	margin: 0;
+
+	dt {
+		color: var(--sw-muted);
+	}
+
+	dd {
+		margin: 0;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+
+		&.is-bad {
+			color: var(--sw-sale);
+		}
+	}
+}
+
+.sw-jobs code {
+	font-size: 0.8125rem;
+}
+
+.sw-jobs td:first-child {
+	white-space: nowrap;
+}

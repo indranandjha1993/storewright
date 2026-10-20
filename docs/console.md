@@ -54,6 +54,9 @@ so a deployment needs nothing extra.
 
 Links into a screen carry their state in the query string: `p=/orders&status=processing` opens
 the fulfilment queue and `p=/orders&order=42` opens one order.
+- **Background work** (`/jobs`): whether the job runner is alive and when it last ran, how many
+  jobs wait and how many are overdue, and every failed job with what went wrong, to run again or
+  dismiss. Jobs are WooCommerce's scheduled actions: emails, webhooks, stock and cleanup.
 - **Delivery areas** (`/areas`): the delivery areas in the order addresses are checked, an editor
   for each one and a box that tests a PIN code or a spot on the map. See
   [delivery.md](delivery.md).
