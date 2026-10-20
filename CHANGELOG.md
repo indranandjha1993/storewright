@@ -4,6 +4,10 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+## 0.7.0 - 2026-10-20
+
+Taxes and charges, permission guards checked per user, and every admin field doing something.
+
 - Every settings field now does something: the email template colours, typeface and logo that the brand decides are gone from the Emails tab, the Razorpay key fields that the server provides are replaced by a note with the mode, and the cash on delivery PIN rules that only the command line could set have a field under Taxes and charges.
 - A permissions spec opens every admin screen and the main API routes as a guest, a shopper, a staff member and the owner, and checks each one is let in or kept out as their role says.
 - A Taxes and charges tab under Store, Settings holds the GSTIN, the usual GST rate and the invoice prefix, and two checkout charges: packing and handling (free from an order amount if wanted) and a cash on delivery handling charge, each shown as its own line and carried onto the invoice. WooCommerce's own tax switch is no longer shown, since prices include GST.
