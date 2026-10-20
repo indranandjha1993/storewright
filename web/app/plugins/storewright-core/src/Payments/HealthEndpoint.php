@@ -25,6 +25,10 @@ final class HealthEndpoint {
 	}
 
 	public static function show(): WP_REST_Response {
+		return new WP_REST_Response( self::describe() );
+	}
+
+	public static function describe(): array {
 		global $wpdb;
 		$modes  = class_exists( GatewayCredentials::class ) ? GatewayCredentials::modes( wp_get_environment_type() ) : [];
 		$rows   = $wpdb->get_results(
@@ -57,11 +61,9 @@ final class HealthEndpoint {
 			];
 		}
 		$cod = (array) get_option( 'woocommerce_cod_settings', [] );
-		return new WP_REST_Response(
-			[
-				'gateways'       => $out,
-				'cashOnDelivery' => ( $cod['enabled'] ?? 'no' ) === 'yes',
-			]
-		);
+		return [
+			'gateways'       => $out,
+			'cashOnDelivery' => ( $cod['enabled'] ?? 'no' ) === 'yes',
+		];
 	}
 }

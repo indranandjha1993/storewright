@@ -7,55 +7,15 @@ namespace Storewright\Core\Admin;
 use DateTimeImmutable;
 use DateTimeZone;
 use Storewright\Core\Returns\ReturnRequests;
-use WP_REST_Request;
-use WP_REST_Response;
 
-final class InsightsEndpoint {
+final class Insights {
 
-
-	public static function register(): void {
-		register_rest_route(
-			'storewright/v1',
-			'/insights',
-			[
-				'methods'             => 'GET',
-				'callback'            => [ self::class, 'respond' ],
-				'permission_callback' => static fn(): bool => current_user_can( 'manage_woocommerce' ),
-				'args'                => [
-					'after'  => [
-						'type'     => 'string',
-						'required' => true,
-					],
-					'before' => [
-						'type'     => 'string',
-						'required' => true,
-					],
-				],
-			]
-		);
-	}
-
-	public static function respond( WP_REST_Request $request ): WP_REST_Response {
-		$after  = self::gmt( (string) $request['after'] );
-		$before = self::gmt( (string) $request['before'] );
-		return new WP_REST_Response(
-			[
-				'payments'  => self::payments( $after, $before ),
-				'customers' => self::customers( $after, $before ),
-				'cities'    => self::cities( $after, $before ),
-				'delivery'  => self::delivery( $after, $before ),
-				'stock'     => self::stock(),
-				'returns'   => self::openReturns(),
-			]
-		);
-	}
-
-	private static function gmt( string $local ): string {
+	public static function gmt( string $local ): string {
 		$date = new DateTimeImmutable( $local, wp_timezone() );
 		return $date->setTimezone( new DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' );
 	}
 
-	private static function payments( string $after, string $before ): array {
+	public static function payments( string $after, string $before ): array {
 		global $wpdb;
 		$rows  = $wpdb->get_results(
 			$wpdb->prepare(
@@ -88,7 +48,7 @@ final class InsightsEndpoint {
 		return $mix;
 	}
 
-	private static function customers( string $after, string $before ): array {
+	public static function customers( string $after, string $before ): array {
 		global $wpdb;
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
@@ -114,7 +74,7 @@ final class InsightsEndpoint {
 		];
 	}
 
-	private static function cities( string $after, string $before ): array {
+	public static function cities( string $after, string $before ): array {
 		global $wpdb;
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
@@ -139,7 +99,7 @@ final class InsightsEndpoint {
 		);
 	}
 
-	private static function delivery( string $after, string $before ): array {
+	public static function delivery( string $after, string $before ): array {
 		global $wpdb;
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
@@ -162,7 +122,7 @@ final class InsightsEndpoint {
 		);
 	}
 
-	private static function stock(): array {
+	public static function stock(): array {
 		global $wpdb;
 		$days  = 30;
 		$since = gmdate( 'Y-m-d H:i:s', time() - $days * DAY_IN_SECONDS );
@@ -197,7 +157,7 @@ final class InsightsEndpoint {
 		return array_slice( $items, 0, 5 );
 	}
 
-	private static function openReturns(): int {
+	public static function openReturns(): int {
 		return count(
 			wc_get_orders(
 				[

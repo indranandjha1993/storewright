@@ -20,6 +20,7 @@ node_modules/
 build/
 dist/
 /web/app/themes/storewright/assets/fonts/
+/web/app/plugins/storewright-core/assets/vendor/
 *.zip
 *.log
 
