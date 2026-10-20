@@ -10,7 +10,7 @@ on:
     outputs:
       build:
         description: the image tag the suite passed on, such as sha-1a2b3c4
-        value: ${{ jobs.stack.outputs.build }}
+        value: ${{ jobs.build.outputs.build }}
 
 permissions:
   contents: read
@@ -46,13 +46,11 @@ jobs:
       - run: composer analyse
       - run: composer test
 
-  stack:
-    name: compose, install, seed, smoke
+  build:
+    name: build the images
     needs: check
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-    env:
-      COMPOSE_FILE: deploy/docker-compose.yml:docker/compose.ci.yml
+    timeout-minutes: 15
     outputs:
       build: ${{ steps.version.outputs.build }}
     steps:
@@ -62,23 +60,23 @@ jobs:
       - name: version
         id: version
         run: echo "build=sha-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
-      - name: write .env
+      - name: deploy files
         run: |
-          cp .env.example .env
-          sed -i 's/^ADMIN_PASSWORD=.*/ADMIN_PASSWORD=ci-only-password/' .env
-          for s in AUTH_KEY SECURE_AUTH_KEY LOGGED_IN_KEY NONCE_KEY AUTH_SALT SECURE_AUTH_SALT LOGGED_IN_SALT NONCE_SALT; do
-            sed -i "s/^$s=.*/$s=$(openssl rand -hex 32)/" .env
-          done
-          printf 'DB_ROOT_PASSWORD=ci-only-root\nSTORE_NAME=storewright\nSTOREWRIGHT_VERSION=%s\n' "${{ steps.version.outputs.build }}" >> .env
-          cp .env deploy/.env
+          bash -n deploy/deploy.sh bin/install bin/release
+          STOREWRIGHT_VERSION=ci docker compose -f deploy/docker-compose.yml --env-file deploy/.env.example config --quiet
       - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: build app
         uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/app/Dockerfile
           target: app
-          load: true
+          push: true
           build-args: |
             STOREWRIGHT_VERSION=${{ steps.version.outputs.build }}
             GIT_SHA=${{ github.sha }}
@@ -91,21 +89,42 @@ jobs:
           context: .
           file: docker/app/Dockerfile
           target: web
-          load: true
+          push: true
           build-args: |
             STOREWRIGHT_VERSION=${{ steps.version.outputs.build }}
             GIT_SHA=${{ github.sha }}
           tags: ${{ env.IMAGE }}-web:${{ steps.version.outputs.build }}
           cache-from: type=gha
+
+  stack:
+    name: ${{ matrix.project }} on the images
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [mobile, desktop, admin]
+    env:
+      COMPOSE_FILE: deploy/docker-compose.yml:docker/compose.ci.yml
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+      - name: write .env
+        run: |
+          cp .env.example .env
+          sed -i 's/^ADMIN_PASSWORD=.*/ADMIN_PASSWORD=ci-only-password/' .env
+          for s in AUTH_KEY SECURE_AUTH_KEY LOGGED_IN_KEY NONCE_KEY AUTH_SALT SECURE_AUTH_SALT LOGGED_IN_SALT NONCE_SALT; do
+            sed -i "s/^$s=.*/$s=$(openssl rand -hex 32)/" .env
+          done
+          printf 'DB_ROOT_PASSWORD=ci-only-root\nSTORE_NAME=storewright\nSTOREWRIGHT_VERSION=%s\n' "${{ needs.build.outputs.build }}" >> .env
+          cp .env deploy/.env
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - name: deploy files
-        run: |
-          bash -n deploy/deploy.sh bin/install bin/release
-          STOREWRIGHT_VERSION=ci docker compose -f deploy/docker-compose.yml --env-file deploy/.env.example config --quiet
       - run: make up
       - name: wait for the app to fill the plugins volume
         run: for _ in $(seq 1 60); do curl -fsS -o /dev/null http://localhost:8600/health && break; sleep 2; done
@@ -116,28 +135,17 @@ jobs:
       - name: smoke
         run: |
           curl -fsS http://localhost:8600/health | tee /dev/stderr | grep -q '"ok":true'
-          curl -fsS http://localhost:8600/version | tee /dev/stderr | grep -q '"version":"${{ steps.version.outputs.build }}"'
+          curl -fsS http://localhost:8600/version | tee /dev/stderr | grep -q '"version":"${{ needs.build.outputs.build }}"'
           curl -fsS http://localhost:8600/shop/ | grep -q 'themes/storewright/style.css'
           test "$(curl -fsS 'http://localhost:8600/wp-json/wc/store/v1/products?per_page=20' | jq length)" = "5"
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8600/wp/xmlrpc.php)" = "403"
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test
+      - run: npx playwright test --project ${{ matrix.project }} --no-deps
       - if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: tests/e2e/report
           retention-days: 7
       - if: failure()
         run: docker compose logs --no-color app web db | tail -200
-      - name: keep the tested images
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - if: github.event_name != 'pull_request'
-        run: |
-          docker push "$IMAGE:${{ steps.version.outputs.build }}"
-          docker push "$IMAGE-web:${{ steps.version.outputs.build }}"
