@@ -40,6 +40,9 @@ Shiprocket and the store:
 5. Follows the parcel: every half hour the store asks Shiprocket where each open shipment is, and
    a webhook can make that immediate. New scans become an order note and the latest one shows on
    the customer's order page and the tracking page ("Out for delivery, Bengaluru, 22 Oct 09:10").
+6. Completes the order once every parcel is delivered, which starts the return window.
+
+Return pickups are booked the same way when a return is approved; see [returns.md](returns.md).
 
 Cancel this shipment cancels it with Shiprocket and removes the fulfilment, so the items can be
 shipped again. Removing the fulfilment from WooCommerce's own panel cancels it the same way. A
@@ -49,7 +52,7 @@ the dashboard like any failed job.
 Server settings: `SHIPROCKET_EMAIL` and `SHIPROCKET_PASSWORD` of an API user (made in the
 Shiprocket panel under Settings, API Users), `SHIPROCKET_API_URL=https://api-sandbox.shiprocket.in`
 to use Shiprocket's sandbox (its own test servers, enabled from Settings, Additional Settings,
-Sandbox; nothing is really shipped), and `SHIPROCKET_WEBHOOK_TOKEN` for the webhook. Live
+Sandbox; nothing is really shipped, and no tracking updates come back), and `SHIPROCKET_WEBHOOK_TOKEN` for the webhook. Live
 credentials work only when `WP_ENV` is production, like the payment keys. `/version` reports the
 mode under `carriers`. The pickup address is the one named under Carriers, else the first one in
 the account, else one named Store is made from the store address.

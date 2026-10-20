@@ -4,6 +4,7 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- Returns through Shiprocket: approving a return books the pickup from the customer with the recommended reverse courier, emails them the courier and waybill, follows the parcel, and marks the return as back with the store when it arrives; the Returns page shows the pickup and can book it again. An order is completed on its own once every parcel is delivered, which starts the return window.
 - Shipping with Shiprocket: the order screen quotes every courier for the parcel and books the chosen one in the background, allots the waybill to the fulfilment, emails the customer, asks for the pickup and the label with retries, follows the parcel every half hour or on a webhook, and shows the latest scan to the customer; cancel puts the items back. Credentials come from SHIPROCKET_EMAIL, SHIPROCKET_PASSWORD and SHIPROCKET_API_URL (sandbox or live, live only in production), the pickup address and parcel defaults sit under Store, Settings, Carriers.
 ## 0.8.1 - 2026-10-20
 

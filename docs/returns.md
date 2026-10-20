@@ -25,7 +25,13 @@ stock. Razorpay and Stripe orders are refunded to the customer's payment automat
 delivery the refund is recorded and the order note reminds staff to send the money by UPI or bank
 transfer. The staff address that receives new-order emails also gets an email for every new return.
 
-Pickups are arranged by hand for now; a carrier adapter can book them later.
+With Shiprocket on (see [fulfilment.md](fulfilment.md)), approving a return books the pickup from
+the customer's delivery address with the recommended reverse courier, in the background like an
+outbound shipment: the customer gets an email with the courier and waybill, the Returns page shows
+the waybill and where the parcel is, and when the courier's scans say it is delivered back to the
+store the return moves to Back with us on its own. If Shiprocket cannot book it, the order note says
+why and the Returns page offers Book pickup with Shiprocket to try again, or the pickup is arranged
+by hand as before. Without Shiprocket the approval email still promises a pickup and staff arrange it.
 
 ## Data and REST
 
