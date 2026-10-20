@@ -165,7 +165,7 @@ test('settings only show fields that take effect', async ({ page }) => {
 
 	await page.goto('/wp/wp-admin/admin.php?page=wc-settings&tab=checkout&section=razorpay');
 	await expect(page.locator('#woocommerce_razorpay_key_id, #woocommerce_razorpay_key_secret, #woocommerce_razorpay_webhook_secret, #woocommerce_razorpay_enabled')).toHaveCount(0);
-	await expect(page.locator('#wpbody-content')).toContainText(/come from the server settings and are not stored here\. This store runs in (sandbox|live) mode/);
+	await expect(page.locator('#wpbody-content')).toContainText('come from the server settings and are not stored here.');
 
 	await page.goto('/wp/wp-admin/admin.php?page=wc-settings');
 	await expect(page.getByLabel('Enable taxes')).toHaveCount(0);

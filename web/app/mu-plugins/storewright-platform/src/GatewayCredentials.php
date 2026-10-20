@@ -22,19 +22,18 @@ final class GatewayCredentials {
 	}
 
 	public static function razorpayForm( array $fields ): array {
-		$mode = self::razorpayMode();
-		if ( $mode === null ) {
-			return $fields;
-		}
 		$fields = array_diff_key( $fields, array_flip( [ ...self::RAZORPAY_FIELDS, 'enabled' ] ) );
-		$note   = [
+		$status = self::status( self::razorpayMode(), wp_get_environment_type() );
+		$state  = match ( $status ) {
+			self::OFF     => __( 'No keys are set, so the gateway is off: add RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET and RAZORPAY_WEBHOOK_SECRET to the server settings to turn it on.', 'storewright' ),
+			self::REFUSED => __( 'Live keys are refused outside production, so the gateway is off here.', 'storewright' ),
+			/* translators: %s: sandbox or live */
+			default       => sprintf( __( 'This store runs in %s mode; the gateway is on while keys are present.', 'storewright' ), $status ),
+		};
+		$note = [
 			'title'       => __( 'Keys', 'storewright' ),
 			'type'        => 'title',
-			'description' => sprintf(
-				/* translators: %s: sandbox or live */
-				__( 'The Razorpay keys and the webhook secret come from the server settings and are not stored here. This store runs in %s mode; the gateway is on while keys are present.', 'storewright' ),
-				self::status( $mode, wp_get_environment_type() )
-			),
+			'description' => __( 'The Razorpay keys and the webhook secret come from the server settings and are not stored here.', 'storewright' ) . ' ' . $state,
 		];
 		return [ 'storewright_keys' => $note ] + $fields;
 	}
