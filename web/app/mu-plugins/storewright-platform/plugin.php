@@ -42,4 +42,5 @@ WhiteLabel\AdminSkin::register();
 WhiteLabel\PluginList::register();
 WhiteLabel\Promotions::register();
 WhiteLabel\OperatorMenus::register();
+WhiteLabel\StoreMenu::register();
 WhiteLabel\Journal::register();

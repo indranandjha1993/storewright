@@ -68,7 +68,6 @@ final class AdminChrome {
 
 	public static function menu(): void {
 		global $menu;
-		remove_menu_page( 'index.php' );
 		foreach ( (array) $menu as $position => $item ) {
 			$slug = (string) ( $item[2] ?? '' );
 			$icon = match ( true ) {

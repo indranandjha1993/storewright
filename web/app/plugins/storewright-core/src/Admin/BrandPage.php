@@ -134,7 +134,7 @@ final class BrandPage {
 		$button = $url !== '' ? __( 'Replace', 'storewright' ) : __( 'Upload', 'storewright' );
 		/* translators: %s: field label */
 		$file = sprintf( __( '%s file', 'storewright' ), $label );
-		printf( '<input type="hidden" name="%1$s" value="%2$d"><label class="sw-brand__file"><span>%3$s</span><input type="file" name="%1$s_file" accept="image/png,image/jpeg,image/svg+xml,image/webp" aria-label="%4$s"></label>', esc_attr( $field ), $id, esc_html( $button ), esc_attr( $file ) );
+		printf( '<input type="hidden" name="%1$s" value="%2$d"><label class="sw-brand__file"><span>%3$s</span><input type="file" name="%1$s_file" accept="image/png,image/jpeg,image/svg+xml,image/webp" aria-label="%4$s"></label>', esc_attr( $field ), (int) $id, esc_html( $button ), esc_attr( $file ) );
 		if ( $url !== '' ) {
 			printf( '<label class="sw-areas__choice"><input type="checkbox" name="%s_remove" value="1"> %s</label>', esc_attr( $field ), esc_html__( 'Remove', 'storewright' ) );
 		}
