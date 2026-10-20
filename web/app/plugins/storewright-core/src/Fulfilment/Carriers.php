@@ -24,8 +24,6 @@ final class Carriers {
 		'shiprocket' => 'Shiprocket',
 	];
 
-	private const ABROAD = [ 'dhl', 'fedex', 'ups' ];
-
 	public static function register(): void {
 		add_filter( 'woocommerce_fulfillment_shipping_providers', [ self::class, 'providers' ], 15 );
 	}
