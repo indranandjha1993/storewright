@@ -4,6 +4,8 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- On a fresh server the cron container now starts after the app, so only the app fills the plugins volume on first boot; two containers filling it at once could leave the store without its plugins.
+- The pipeline builds the two images once and runs the three browser suites side by side on their own runners, so a run takes about six minutes instead of ten.
 - The pipeline is drawn as nodes: check, build, three browser suites side by side, and on a tag version, scan, publish and deploy, each node writing what it did to the run summary; the repeated store steps live in two small actions, every action is pinned to a commit, and the token is read-only unless a node needs more.
 
 ## 0.8.0 - 2026-10-20
