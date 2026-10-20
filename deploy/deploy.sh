@@ -70,15 +70,22 @@ cmd_init() {
   echo "wrote .env with fresh secrets; set DOMAIN, WP_HOME, ADMIN_EMAIL and mail before ./deploy.sh up"
 }
 
+# The app copies its plugins into the shared volume as it starts; nothing may run inside it before it answers.
+started() {
+  healthy || { echo "the store did not answer /health" >&2; return 1; }
+}
+
 cmd_up() {
   use_version "${1:-$(current)}"
   pull
   compose up -d --remove-orphans
+  started || exit 1
   if ! compose exec -T app wp core is-installed >/dev/null 2>&1; then
     compose exec -T app bin/install
   fi
   healthy || { echo "the store did not answer /health" >&2; exit 1; }
   echo "$STOREWRIGHT_VERSION" >"$STATE/current"
+  [ -n "$(env_value MAIL_HOST)" ] || echo "MAIL_HOST is empty, so the store cannot send order or account emails until it is set" >&2
   echo "store $STOREWRIGHT_VERSION is up at $(env_value WP_HOME), staff sign in at $(env_value WP_HOME)/$(env_value LOGIN_PATH)/"
 }
 
@@ -87,13 +94,14 @@ cmd_update() {
   from="$(current)"
   to="${1:?usage: deploy.sh update <version>}"
   [ -n "$from" ] || { echo "nothing deployed yet, use ./deploy.sh up $to" >&2; exit 1; }
+  [ "$from" != "$to" ] || { echo "already on $to"; exit 0; }
   use_version "$to"
   pull
   use_version "$from"
   cmd_backup
   use_version "$to"
   compose up -d --remove-orphans
-  if migrate && healthy; then
+  if started && migrate && healthy; then
     echo "$from" >"$STATE/previous"
     echo "$to" >"$STATE/current"
     echo "updated $from -> $to"
@@ -110,14 +118,22 @@ cmd_rollback() {
   local to
   to="$(cat "$STATE/previous" 2>/dev/null || true)"
   [ -n "$to" ] || { echo "no earlier version recorded" >&2; exit 1; }
+  local from
+  from="$(current)"
   use_version "$to"
   pull
   compose up -d --remove-orphans
-  compose exec -T app wp cache flush --quiet
-  healthy || { echo "$to did not answer /health" >&2; exit 1; }
-  current >"$STATE/previous"
-  echo "$to" >"$STATE/current"
-  echo "rolled back to $to"
+  if started && compose exec -T app wp cache flush --quiet && healthy; then
+    echo "$from" >"$STATE/previous"
+    echo "$to" >"$STATE/current"
+    echo "rolled back to $to"
+    return
+  fi
+  echo "$to did not come up, staying on $from" >&2
+  use_version "$from"
+  compose up -d --remove-orphans
+  healthy && echo "still on $from" >&2
+  exit 1
 }
 
 cmd_backup() {

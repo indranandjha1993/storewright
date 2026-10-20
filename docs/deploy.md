@@ -165,6 +165,16 @@ WordPress or WooCommerce security release is bumped and released the week it app
 GitHub's security alerts stay on for the repository and name a pinned package only when a known
 vulnerability affects it; nothing else opens pull requests.
 
+## Rehearse on your own machine
+
+The whole server routine runs on a laptop with Docker, with no server and no card: copy
+`deploy/` to a folder outside the repository, `./deploy.sh init`, set `WEB_BIND` to a free
+loopback port, leave `COMPOSE_PROFILES` empty, give the store a public address through a tunnel
+if you want to test payments and webhooks, and go through `up`, `update`, `rollback`, a
+`backup` and a `restore` as above. The images come from the registry exactly as they would on a
+server. What a laptop cannot rehearse is the pipeline's deploy stage reaching the box over SSH;
+that step is the same `./deploy.sh update` run by a machine instead of you.
+
 ## Drill
 
 Run on 2026-10-17 against images built from 0.2.0, as a staging store on port 8610:
