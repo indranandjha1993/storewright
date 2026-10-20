@@ -27,9 +27,10 @@ theme headers and the README (`bin/version`), turns the Unreleased section into 
 heading, commits `release 0.8.0` as you, tags `v0.8.0` and pushes both.
 
 Two workflow files take it from there, each stage gated on the one before. `ci.yml` is the
-module: lint, analysis and unit tests; then the stack, which builds both production images once,
-tagged `sha-<commit>`, and runs install, seed, smoke and the whole browser suite against those
-very images through the server compose file plus `docker/compose.ci.yml`. `release.yml` runs on
+module: lint, analysis and unit tests; then a build of both production images, tagged
+`sha-<commit>` and pushed; then the stack, three runners at once, one per browser project
+(phone, desktop, admin), each pulling those very images, installing a fresh store through the
+server compose file plus `docker/compose.ci.yml`, and running its part of the suite. `release.yml` runs on
 a tag, calls `ci.yml` as its first job, and only then continues: the tested images are scanned
 with Trivy (any critical issue with a fix stops the release) and promoted to the version tag by
 retagging, so the image a server pulls is the one the suite passed, and the GitHub release is
