@@ -44,9 +44,14 @@ runs:
       env:
         VERSION: ${{ inputs.version }}
       run: |
-        curl -fsS http://localhost:8600/health | tee /dev/stderr | grep -q '"ok":true'
-        curl -fsS http://localhost:8600/version | tee /dev/stderr | grep -q "\"version\":\"$VERSION\""
-        curl -fsS http://localhost:8600/shop/ | grep -q 'themes/storewright/style.css'
+        health="$(curl -fsS http://localhost:8600/health)"
+        echo "$health"
+        grep -q '"ok":true' <<< "$health"
+        version="$(curl -fsS http://localhost:8600/version)"
+        echo "$version"
+        grep -q "\"version\":\"$VERSION\"" <<< "$version"
+        shop="$(curl -fsS http://localhost:8600/shop/)"
+        grep -q 'themes/storewright/style.css' <<< "$shop"
         test "$(curl -fsS 'http://localhost:8600/wp-json/wc/store/v1/products?per_page=20' | jq length)" = "5"
         test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8600/wp/xmlrpc.php)" = "403"
         {
