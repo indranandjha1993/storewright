@@ -20,8 +20,14 @@ services:
   app:
     <<: *app
 
+  # Both mount the plugins volume; the app fills it first, or Docker fills it twice at once and fails.
   cron:
     <<: *app
+    depends_on:
+      app:
+        condition: service_started
+      db:
+        condition: service_healthy
     entrypoint: []
     command: ["sh", "-c", "while true; do wp cron event run --due-now --quiet || true; sleep 60; done"]
 
