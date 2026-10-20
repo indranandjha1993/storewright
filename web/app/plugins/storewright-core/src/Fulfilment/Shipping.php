@@ -93,6 +93,30 @@ final class Shipping {
 	}
 
 	public static function ship( WC_Order $order, string $service ): int {
+		self::lock( $order->get_id() );
+		try {
+			return self::open( $order, $service );
+		} finally {
+			delete_option( self::lockName( $order->get_id() ) );
+		}
+	}
+
+	public static function lock( int $orderId ): void {
+		$name = self::lockName( $orderId );
+		$held = get_option( $name );
+		if ( is_numeric( $held ) && (int) $held < time() - MINUTE_IN_SECONDS ) {
+			delete_option( $name );
+		}
+		if ( ! add_option( $name, (string) time(), '', false ) ) {
+			throw new CarrierException( esc_html__( 'A booking for this order is already on its way; give it a moment.', 'storewright' ), false );
+		}
+	}
+
+	private static function lockName( int $orderId ): string {
+		return 'storewright_booking_' . $orderId;
+	}
+
+	private static function open( WC_Order $order, string $service ): int {
 		$items = self::pending( $order );
 		if ( $items === [] ) {
 			throw new CarrierException( esc_html__( 'Everything in this order has already been shipped.', 'storewright' ), false );
@@ -120,12 +144,22 @@ final class Shipping {
 	}
 
 	/** @param array<int|string, int> $items */
-	public static function collect( WC_Order $order, string $reverseId, array $items ): int {
+	public static function collect( WC_Order $order, string $returnId, array $items ): int {
 		$carrier = self::carrier();
 		if ( $carrier === null ) {
 			throw new CarrierException( esc_html__( 'Shiprocket is off on this store.', 'storewright' ), false );
 		}
-		if ( self::store()->forReturn( $order->get_id(), $reverseId ) !== null ) {
+		self::lock( $order->get_id() );
+		try {
+			return self::openReturn( $order, $returnId, $items, $carrier );
+		} finally {
+			delete_option( self::lockName( $order->get_id() ) );
+		}
+	}
+
+	/** @param array<int|string, int> $items */
+	private static function openReturn( WC_Order $order, string $returnId, array $items, Carrier $carrier ): int {
+		if ( self::store()->forReturn( $order->get_id(), $returnId ) !== null ) {
 			throw new CarrierException( esc_html__( 'A pickup is already booked for this return.', 'storewright' ), false );
 		}
 		$list = [];
@@ -143,7 +177,7 @@ final class Shipping {
 			[
 				'kind'      => ShipmentStore::RETURN,
 				'order_id'  => $order->get_id(),
-				'return_id' => $reverseId,
+				'return_id' => $returnId,
 				'carrier'   => Shiprocket::KEY,
 				'service'   => self::bestService( $quotes ),
 				'status'    => ShipmentStore::BOOKING,
