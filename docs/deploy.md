@@ -137,8 +137,9 @@ reviewer to its environment.
 Stores never update WordPress, WooCommerce or plugins from their own admin: `DISALLOW_FILE_MODS`
 removes install, update and delete everywhere. New versions arrive as a release instead.
 
-Every Monday Dependabot opens pull requests for new versions: WordPress, WooCommerce and the
-Razorpay plugin together, then the JavaScript packages and the CI actions. CI runs the full suite
+Every Monday Dependabot opens a pull request when WordPress, WooCommerce or the Razorpay plugin
+has a new version, and one for the PHP tools; the JavaScript tools and the CI actions come once
+a month in one pull request each, without patch releases. CI runs the full suite
 on each, `wp storewright templates` fails if WooCommerce changed a template the theme
 overrides, and the browser suite fails if an update moved a selector the admin skin relies on
 (see [design.md](design.md)). Merge with a short message such as `update woocommerce to 11.3.0`, add the change to
