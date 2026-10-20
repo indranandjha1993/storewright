@@ -17,22 +17,29 @@
 		return data.select( 'wc/store/cart' ).isCustomerDataUpdating() || checkout.isCalculating() || ! checkout.isIdle();
 	}
 
+	function taken() {
+		const checkout = data.select( 'wc/store/checkout' );
+		return checkout.isBeforeProcessing() || checkout.isProcessing() || checkout.isAfterProcessing() || checkout.isComplete() || checkout.hasError();
+	}
+
 	function resend( pending ) {
 		let tries = 0;
 		const timer = window.setInterval( () => {
 			tries++;
-			if ( press !== pending || tries > 100 ) {
+			if ( press !== pending || tries > 100 || taken() ) {
 				window.clearInterval( timer );
+				press = null;
 				return;
 			}
-			if ( busy() || pending.target.disabled ) {
+			const target = pending.target.isConnected ? pending.target : document.querySelector( button );
+			if ( busy() || ! target || target.disabled ) {
 				return;
 			}
 			window.clearInterval( timer );
 			press = null;
-			if ( pending.target.isConnected && quote() === pending.quote ) {
+			if ( quote() === pending.quote ) {
 				document.dispatchEvent( new CustomEvent( 'storewright:place-order-resent', { detail: { pressed: pending.quote, now: quote() } } ) );
-				pending.target.click();
+				target.click();
 			}
 		}, 100 );
 	}
@@ -41,7 +48,7 @@
 		'pointerdown',
 		( event ) => {
 			const target = event.button === 0 && event.target.closest && event.target.closest( button );
-			press = target && ! target.disabled ? { target, quote: quote() } : null;
+			press = target ? { target, quote: quote() } : null;
 		},
 		true
 	);
@@ -58,17 +65,8 @@
 				press = null;
 				return;
 			}
+			// WooCommerce drops a click that lands while it is still calculating, so the press is judged by the store, not the click.
 			window.setTimeout( () => press === pending && resend( pending ), 250 );
-		},
-		true
-	);
-
-	document.addEventListener(
-		'click',
-		( event ) => {
-			if ( event.isTrusted && event.target.closest && event.target.closest( button ) ) {
-				press = null;
-			}
 		},
 		true
 	);

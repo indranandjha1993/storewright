@@ -237,6 +237,9 @@ test('cash on delivery is not offered when the bag holds a download', async ({ p
 });
 
 test('place order pressed straight after typing the address still places the order', async ({ page }) => {
+	// A slow phone keeps the checkout re-rendering across the press, which is the case this guards.
+	const cdp = await page.context().newCDPSession(page);
+	await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
 	await addToBag(page, products.mug);
 	await page.goto('/checkout/');
 	await typeAddressThenPayCash(page, places.yelahanka);
