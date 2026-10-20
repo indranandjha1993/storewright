@@ -83,3 +83,49 @@ test('every template opens in the site editor without broken blocks', async ({ p
 	}
 	expect(problems, 'blocks that fail validation').toEqual([]);
 });
+
+test('the admin skin holds on every screen staff use', async ({ page }) => {
+	await logIn(page, operator);
+
+	for (const path of ['admin.php?page=wc-orders', 'edit.php?post_type=product', 'post-new.php?post_type=product', 'admin.php?page=wc-settings', 'edit.php?post_type=shop_coupon']) {
+		await page.goto(`/wp/wp-admin/${path}`);
+		await expect(page.locator('#wpbody-content')).not.toBeEmpty();
+		const drift = await page.evaluate(() => {
+			const probe = document.body.appendChild(document.createElement('span'));
+			const token = (property: string, name: string) => {
+				probe.style.setProperty(property, `var(${name})`);
+				return getComputedStyle(probe).getPropertyValue(property);
+			};
+			const style = (selector: string) => {
+				const element = document.querySelector<HTMLElement>(selector);
+				return element ? getComputedStyle(element) : null;
+			};
+			const checks: Array<[string, string, string | undefined, string]> = [
+				['body font', 'font-family', style('body.wp-admin')?.fontFamily, token('font-family', '--sw-font-body')],
+				['menu background', 'background-color', style('#adminmenu')?.backgroundColor, token('background-color', '--sw-base')],
+				['current menu item', 'color', style('#adminmenu li.wp-has-current-submenu > a.menu-top, #adminmenu li.current > a.menu-top')?.color, token('color', '--sw-accent')],
+				['current menu item background', 'background-color', style('#adminmenu li.wp-has-current-submenu > a.menu-top, #adminmenu li.current > a.menu-top')?.backgroundColor, token('background-color', '--sw-accent-soft')],
+				['brand block', 'display', style('#adminmenuwrap .sw-shell__brand')?.display, 'grid'],
+				['content surface', 'background-color', style('#wpcontent')?.backgroundColor, token('background-color', '--sw-surface')],
+				['content corners', 'border-radius', style('#wpcontent')?.borderRadius, '12px'],
+				['admin bar', 'display', style('#wpadminbar')?.display, 'none'],
+				['title typeface', 'font-family', style('.wrap h1')?.fontFamily, token('font-family', '--sw-font-heading')],
+				['title size', 'font-size', style('.wrap h1')?.fontSize, '32px'],
+				['primary button', 'background-color', style('.wp-core-ui .button-primary')?.backgroundColor, token('background-color', '--sw-accent')],
+				['primary button text', 'color', style('.wp-core-ui .button-primary')?.color, token('color', '--sw-on-accent')],
+				['input corners', 'border-radius', style('#wpbody-content input[type="text"], #wpbody-content input[type="search"]')?.borderRadius, token('border-radius', '--sw-radius-small')],
+				['input typeface', 'font-family', style('#wpbody-content input[type="text"], #wpbody-content input[type="search"]')?.fontFamily, token('font-family', '--sw-font-body')],
+				['table head', 'text-transform', style('.wp-list-table thead th')?.textTransform, 'uppercase'],
+				['table head colour', 'color', style('.wp-list-table thead th')?.color, token('color', '--sw-muted')],
+				['box heading typeface', 'font-family', style('.postbox .hndle')?.fontFamily, token('font-family', '--sw-font-heading')],
+				['tab', 'color', style('.nav-tab-active')?.color, token('color', '--sw-contrast')],
+			];
+			probe.remove();
+			return checks.filter(([, , actual, expected]) => actual !== undefined && actual !== expected).map(([what, property, actual, expected]) => `${what}: ${property} is ${actual}, expected ${expected}`);
+		});
+		expect(drift, `${path} lost the skin`).toEqual([]);
+		for (const required of ['#adminmenu li.wp-has-current-submenu > a.menu-top, #adminmenu li.current > a.menu-top', '#adminmenuwrap .sw-shell__brand', '.wrap h1', '.wp-core-ui .button-primary, .components-button.is-primary']) {
+			await expect(page.locator(required).first(), `${path} has no ${required}`).toBeAttached();
+		}
+	}
+});

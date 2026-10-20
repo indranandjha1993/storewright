@@ -17,12 +17,12 @@ body.wp-admin {
 	padding-bottom: 3rem;
 }
 
-#wpwrap a:not(.button):not(.components-button):not(.page-title-action) {
+#wpwrap a:not(.button):not(.components-button):not(.page-title-action):not(.nav-tab) {
 	color: var(--sw-accent);
 }
 
-#wpwrap a:not(.button):not(.components-button):not(.page-title-action):hover,
-#wpwrap a:not(.button):not(.components-button):not(.page-title-action):focus {
+#wpwrap a:not(.button):not(.components-button):not(.page-title-action):not(.nav-tab):hover,
+#wpwrap a:not(.button):not(.components-button):not(.page-title-action):not(.nav-tab):focus {
 	color: var(--sw-accent-hover);
 }
 
@@ -61,8 +61,8 @@ h1.wp-heading-inline,
 .wrap h1,
 h1.wp-heading-inline {
 	margin-bottom: 0.5rem;
-	font-size: 1.75rem;
-	line-height: 1.2;
+	font-size: 2rem;
+	line-height: 1.1;
 }
 
 .wrap h2.title,
@@ -335,10 +335,10 @@ table.widefat,
 	overflow: hidden;
 }
 
-.wp-list-table thead th,
-.wp-list-table thead td,
-.widefat thead th,
-.widefat thead td {
+.wp-list-table thead tr th,
+.wp-list-table thead tr td,
+.widefat thead tr th,
+.widefat thead tr td {
 	padding: 0.75rem;
 	border-bottom: 1px solid var(--sw-line);
 	color: var(--sw-muted);
@@ -973,7 +973,7 @@ html body.woocommerce_page_wc-settings .wrap h1.screen-reader-text {
 	overflow: visible;
 	clip: auto;
 	clip-path: none;
-	font-size: 1.75rem;
+	font-size: 2rem;
 }
 
 .plugins tr[data-plugin^="storewright-"] .requires,

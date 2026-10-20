@@ -135,8 +135,9 @@ removes install, update and delete everywhere. New versions arrive as a release 
 
 Every Monday Dependabot opens pull requests for new versions: WordPress, WooCommerce and the
 Razorpay plugin together, then the JavaScript packages and the CI actions. CI runs the full suite
-on each and `wp storewright templates` fails if WooCommerce changed a template the theme
-overrides. Merge with a short message such as `update woocommerce to 11.3.0`, add the change to
+on each, `wp storewright templates` fails if WooCommerce changed a template the theme
+overrides, and the browser suite fails if an update moved a selector the admin skin relies on
+(see [design.md](design.md)). Merge with a short message such as `update woocommerce to 11.3.0`, add the change to
 `CHANGELOG.md`, and tag a patch release; connected stores then update on their own. Security
 releases go the same way, the day they appear.
 

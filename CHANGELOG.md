@@ -5,6 +5,7 @@ All notable changes are listed here. Versions follow semantic versioning once th
 ## Unreleased
 
 - docs/design.md writes down the tokens, type scale, spacing, controls and surfaces the console and the advanced admin share; admin page titles now sit on the same scale as console titles.
+- The browser suite checks the computed styles of five admin screens against the brand tokens, so a WordPress or WooCommerce update that moves a selector the skin relies on fails CI before it reaches a store.
 
 ## 0.5.0 - 2026-10-20
 
