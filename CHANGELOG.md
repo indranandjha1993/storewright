@@ -4,6 +4,8 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+## 0.8.0 - 2026-10-20
+
 - The pipeline builds the production images once, runs the whole browser suite against them, and a release promotes those tested images to the version tag instead of building again.
 - deploy.sh waits for the app to answer before running anything inside it, which made a rollback fail while the plugin volume was still being swapped; it also puts the running version back if a rollback fails, refuses an update to the version already running, and says so when no mail host is set.
 - One pipeline for every push and tag, each stage gated on the one before, so a release is only built, scanned, published and deployed after the whole suite has passed on that commit; `bin/release x.y.z` is the one command that cuts a release.
