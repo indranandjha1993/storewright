@@ -203,7 +203,8 @@
 	form.querySelectorAll( '[data-add-method]' ).forEach( function ( button ) {
 		button.addEventListener( 'click', function () {
 			var template = form.querySelector( '[data-method-template="' + button.getAttribute( 'data-add-method' ) + '"]' );
-			var html = template.innerHTML.split( '__index__' ).join( String( next++ ) );
+			var html = template.innerHTML.split( '__index__' ).join( String( next ) ).split( '__number__' ).join( String( rows.children.length + 1 ) );
+			next++;
 			rows.insertAdjacentHTML( 'beforeend', html );
 			noMethods();
 		} );

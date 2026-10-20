@@ -1,8 +1,0 @@
-{
-  "name": "storewright-console-content",
-  "private": true,
-  "route": {
-    "path": "/content",
-    "page": "storewright"
-  }
-}

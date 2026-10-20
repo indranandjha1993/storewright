@@ -14,8 +14,15 @@ final class StoreSettings {
 
 	public static function register(): void {
 		add_filter( 'woocommerce_general_settings', [ self::class, 'fields' ] );
-		add_filter( 'woocommerce_admin_settings_sanitize_option_' . self::OPTION . '[store_gstin]', [ self::class, 'gstin' ] );
-		add_filter( 'woocommerce_admin_settings_sanitize_option_' . self::OPTION . '[invoice_prefix]', [ self::class, 'prefix' ] );
+		add_filter( 'woocommerce_admin_settings_sanitize_option_' . self::OPTION, [ self::class, 'sanitize' ], 10, 2 );
+	}
+
+	public static function sanitize( mixed $value, array $option ): mixed {
+		return match ( $option['id'] ?? '' ) {
+			self::OPTION . '[store_gstin]'    => self::gstin( $value ),
+			self::OPTION . '[invoice_prefix]' => self::prefix( $value ),
+			default                           => $value,
+		};
 	}
 
 	public static function fields( array $settings ): array {

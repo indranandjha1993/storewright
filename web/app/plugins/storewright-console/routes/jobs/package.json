@@ -1,8 +1,0 @@
-{
-  "name": "storewright-console-jobs",
-  "private": true,
-  "route": {
-    "path": "/jobs",
-    "page": "storewright"
-  }
-}

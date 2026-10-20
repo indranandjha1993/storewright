@@ -1,5 +1,0 @@
-{
-  "name": "@storewright-console/console-init",
-  "private": true,
-  "wpScriptModuleExports": "./src/index.js"
-}

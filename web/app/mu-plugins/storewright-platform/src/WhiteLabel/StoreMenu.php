@@ -8,10 +8,11 @@ final class StoreMenu {
 
 	private const ORDER = [ 'wc-orders', 'storewright-returns', 'wc-admin&path=/customers', 'storewright-payments', 'storewright-areas', 'storewright-brand', 'wc-settings', 'wc-reports', 'wc-admin&path=/analytics/overview', 'wc-status' ];
 
-	private const REMOVED = [ 'wc-admin', 'wc-addons' ];
+	private const REMOVED = [ 'wc-addons' ];
 
 	public static function register(): void {
 		add_action( 'admin_menu', [ self::class, 'arrange' ], 9999 );
+		add_action( 'admin_init', [ self::class, 'home' ] );
 		add_action( 'admin_init', [ self::class, 'zones' ] );
 		add_filter( 'woocommerce_get_sections_shipping', [ self::class, 'sections' ] );
 	}
@@ -35,6 +36,13 @@ final class StoreMenu {
 			return count( self::ORDER );
 		};
 		usort( $submenu['woocommerce'], static fn( array $a, array $b ): int => $rank( $a ) <=> $rank( $b ) ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	}
+
+	public static function home(): void {
+		if ( ( $_GET['page'] ?? '' ) === 'wc-admin' && ! isset( $_GET['path'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			wp_safe_redirect( admin_url() );
+			exit;
+		}
 	}
 
 	public static function zones(): void {

@@ -1,8 +1,0 @@
-{
-  "name": "storewright-console-payments",
-  "private": true,
-  "route": {
-    "path": "/payments",
-    "page": "storewright"
-  }
-}

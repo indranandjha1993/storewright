@@ -64,8 +64,14 @@ final class AreasPage {
 	public static function save(): void {
 		$id      = Action::text( 'id' );
 		$editing = $id === '' ? 'new' : $id;
+		$fields  = self::fields();
 		try {
-			$input = AreaInput::from( self::input() );
+			$input = AreaInput::from(
+				[
+					...$fields,
+					'shape' => self::shape( $fields ),
+				]
+			);
 			if ( $id === '' ) {
 				self::areas()->create( $input );
 			} else {
@@ -76,7 +82,7 @@ final class AreasPage {
 			Flash::success( sprintf( __( '%s saved.', 'storewright' ), $id === '0' ? __( 'Everywhere else', 'storewright' ) : $input->name ) );
 			Action::back( self::url() );
 		} catch ( InvalidArgumentException | OutOfBoundsException $e ) {
-			set_transient( self::DRAFT . get_current_user_id(), self::input(), 10 * MINUTE_IN_SECONDS );
+			set_transient( self::DRAFT . get_current_user_id(), $fields, 10 * MINUTE_IN_SECONDS );
 			Flash::error( $e->getMessage() );
 			Action::back( self::url( [ 'area' => $editing ] ) );
 		}
@@ -349,9 +355,10 @@ final class AreasPage {
 	}
 
 	private static function methodRow( array $method, string $index ): void {
-		$name = 'methods[' . $index . ']';
-		/* translators: %s: method number or placeholder */
-		printf( '<div class="sw-areas__method" role="group" data-method-row><input type="hidden" name="%1$s[id]" value="%2$d"><input type="hidden" name="%1$s[type]" value="%3$s">', esc_attr( $name ), (int) $method['id'], esc_attr( $method['type'] ) );
+		$name   = 'methods[' . $index . ']';
+		$number = is_numeric( $index ) ? (string) ( (int) $index + 1 ) : '__number__';
+		/* translators: %s: method number in the list */
+		printf( '<div class="sw-areas__method" role="group" aria-label="%4$s" data-method-row><input type="hidden" name="%1$s[id]" value="%2$d"><input type="hidden" name="%1$s[type]" value="%3$s">', esc_attr( $name ), (int) $method['id'], esc_attr( $method['type'] ), esc_attr( sprintf( __( 'Delivery method %s', 'storewright' ), $number ) ) );
 		printf( '<label class="sw-areas__choice"><input type="checkbox" name="%s[enabled]" value="1"%s> %s</label>', esc_attr( $name ), $method['enabled'] ? ' checked' : '', esc_html__( 'Offered', 'storewright' ) );
 		if ( $method['editable'] ) {
 			printf( '<div class="sw-field"><label>%s<input type="text" name="%s[title]" value="%s" class="regular-text"></label></div>', esc_html__( 'Name shoppers see', 'storewright' ), esc_attr( $name ), esc_attr( $method['title'] ) );
@@ -421,7 +428,7 @@ final class AreasPage {
 		];
 	}
 
-	private static function input(): array {
+	private static function fields(): array {
 		$places  = array_column( Places::options(), null, 'code' );
 		$regions = [];
 		foreach ( (array) ( $_POST['regions'] ?? [] ) as $code ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -445,45 +452,45 @@ final class AreasPage {
 				'enabled'   => ! empty( $method['enabled'] ),
 			];
 		}
-		$kind    = Action::text( 'shape_kind' );
-		$lat     = Action::text( 'shape_lat' );
-		$lng     = Action::text( 'shape_lng' );
-		$corners = json_decode( Action::text( 'shape_corners' ) ?: '[]', true );
-		$shape   = null;
-		if ( $kind === 'radius' ) {
-			if ( $lat === '' || $lng === '' ) {
-				throw new InvalidArgumentException( esc_html__( 'Click the map to place the centre of the radius.', 'storewright' ) );
-			}
-			if ( (float) Action::text( 'radius_km' ) <= 0 ) {
-				throw new InvalidArgumentException( esc_html__( 'The radius must be more than 0 km.', 'storewright' ) );
-			}
-			$shape = [
-				'kind'     => 'radius',
-				'lat'      => (float) $lat,
-				'lng'      => (float) $lng,
-				'radius_m' => (float) Action::text( 'radius_km' ) * 1000,
-			];
-		} elseif ( $kind === 'polygon' ) {
-			if ( ! is_array( $corners ) || count( $corners ) < 3 ) {
-				throw new InvalidArgumentException( esc_html__( 'Click the map at least three times to draw the area.', 'storewright' ) );
-			}
-			$shape = [
-				'kind'    => 'polygon',
-				'polygon' => $corners,
-			];
-		}
 		return [
 			'name'          => Action::text( 'name' ),
 			'regions'       => $regions,
 			'pins'          => Action::lines( 'pins' ),
-			'shape'         => $shape,
 			'methods'       => $methods,
-			'shape_kind'    => $kind,
-			'shape_lat'     => $lat,
-			'shape_lng'     => $lng,
+			'shape_kind'    => Action::text( 'shape_kind' ),
+			'shape_lat'     => Action::text( 'shape_lat' ),
+			'shape_lng'     => Action::text( 'shape_lng' ),
 			'shape_corners' => Action::text( 'shape_corners' ),
 			'radius_km'     => Action::text( 'radius_km' ),
 		];
+	}
+
+	private static function shape( array $fields ): ?array {
+		if ( $fields['shape_kind'] === 'radius' ) {
+			if ( $fields['shape_lat'] === '' || $fields['shape_lng'] === '' ) {
+				throw new InvalidArgumentException( esc_html__( 'Click the map to place the centre of the radius.', 'storewright' ) );
+			}
+			if ( (float) $fields['radius_km'] <= 0 ) {
+				throw new InvalidArgumentException( esc_html__( 'The radius must be more than 0 km.', 'storewright' ) );
+			}
+			return [
+				'kind'     => 'radius',
+				'lat'      => (float) $fields['shape_lat'],
+				'lng'      => (float) $fields['shape_lng'],
+				'radius_m' => (float) $fields['radius_km'] * 1000,
+			];
+		}
+		if ( $fields['shape_kind'] === 'polygon' ) {
+			$corners = json_decode( $fields['shape_corners'] ?: '[]', true );
+			if ( ! is_array( $corners ) || count( $corners ) < 3 ) {
+				throw new InvalidArgumentException( esc_html__( 'Click the map at least three times to draw the area.', 'storewright' ) );
+			}
+			return [
+				'kind'    => 'polygon',
+				'polygon' => $corners,
+			];
+		}
+		return null;
 	}
 
 	private static function map(): void {

@@ -1,8 +1,0 @@
-{
-  "name": "storewright-console-areas",
-  "private": true,
-  "route": {
-    "path": "/areas",
-    "page": "storewright"
-  }
-}

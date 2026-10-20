@@ -1,8 +1,0 @@
-{
-  "name": "storewright-console-today",
-  "private": true,
-  "route": {
-    "path": "/",
-    "page": "storewright"
-  }
-}
