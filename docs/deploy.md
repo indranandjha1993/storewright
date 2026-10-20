@@ -135,16 +135,24 @@ reviewer to its environment.
 ## Keeping WordPress and WooCommerce current
 
 Stores never update WordPress, WooCommerce or plugins from their own admin: `DISALLOW_FILE_MODS`
-removes install, update and delete everywhere. New versions arrive as a release instead.
+removes install, update and delete everywhere. New versions arrive as a release instead, and
+versions are bumped by hand, not by a bot. Before each release tag:
 
-Every Monday Dependabot opens a pull request when WordPress, WooCommerce or the Razorpay plugin
-has a new version, and one for the PHP tools; the JavaScript tools and the CI actions come once
-a month in one pull request each, without patch releases. CI runs the full suite
-on each, `wp storewright templates` fails if WooCommerce changed a template the theme
-overrides, and the browser suite fails if an update moved a selector the admin skin relies on
-(see [design.md](design.md)). Merge with a short message such as `update woocommerce to 11.3.0`, add the change to
-`CHANGELOG.md`, and tag a patch release; connected stores then update on their own. Security
-releases go the same way, the day they appear.
+```
+composer outdated --direct
+npm outdated
+```
+
+Bump what is due in `composer.json` or `package.json`, run `composer update <package>` or
+`npm update <package>`, then the full suite: `composer lint && composer analyse && composer test`
+and `npx playwright test`. `wp storewright templates` fails if WooCommerce changed a template the
+theme overrides, and the operator spec fails if a bump moved a selector the admin skin relies on
+(see [design.md](design.md)). Commit the bump with a short message such as
+`update woocommerce to 11.3.0`, add the change to `CHANGELOG.md`, and tag. A WordPress or
+WooCommerce security release is bumped and tagged the week it appears, on its own.
+
+GitHub's security alerts stay on for the repository and name a pinned package only when a known
+vulnerability affects it; nothing else opens pull requests.
 
 ## Drill
 
