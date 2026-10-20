@@ -13,6 +13,7 @@ export default defineConfig({
 	timeout: 60_000,
 	workers: ci ? undefined : 1,
 	retries: ci ? 1 : 0,
+	failOnFlakyTests: ci,
 	reporter: [['list'], ['html', { outputFolder: 'tests/e2e/report', open: 'never' }]],
 	use: {
 		baseURL: process.env.STORE_URL ?? `http://localhost:${process.env.WEB_PORT ?? '8600'}`,

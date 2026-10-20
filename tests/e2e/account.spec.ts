@@ -45,6 +45,7 @@ test('saved addresses say whether we deliver and can become the default', async 
 	await expect(pune).toContainText('We deliver here.');
 
 	await pune.getByRole('button', { name: 'Make default' }).click();
+	await expect(page.getByText('Deliveries now go to that address unless you choose another at checkout.')).toBeVisible({ timeout: 15_000 });
 	await expect(page.locator('.sw-address.is-default')).toContainText('12 FC Road');
 	await expect(cards.filter({ hasText: '4 Lavelle Road' }).getByRole('button', { name: 'Remove' })).toBeVisible();
 
