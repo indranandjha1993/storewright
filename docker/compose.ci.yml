@@ -8,6 +8,7 @@ services:
     ports:
       - "${MAIL_PORT:-8601}:8025"
 
+  # Paths resolve against the first compose file, so the pipeline copies .env next to it.
   cli:
     image: ${STOREWRIGHT_IMAGE:-ghcr.io/indranandjha1993/storewright}:${STOREWRIGHT_VERSION:?set by the pipeline}
     profiles: ["tools"]
