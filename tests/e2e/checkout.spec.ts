@@ -421,12 +421,11 @@ test('packing and cash on delivery charges show at checkout and on the invoice',
 		await addToBag(page, products.mug);
 		await page.goto('/checkout/');
 		await fillDeliveryAddress(page);
+		// Without online gateway keys, as in CI, cash on delivery is the only method and is chosen from the start.
 		const rows = page.locator('.wc-block-components-totals-fees');
-		await expect(rows).toHaveCount(1);
-		await expect(rows.first()).toContainText('Packing and handling');
+		await expect(rows.filter({ hasText: 'Packing and handling' })).toContainText('₹15.00');
 		await page.getByRole('radio', { name: /Cash on delivery/ }).check();
-		await expect(rows).toHaveCount(2, { timeout: 15_000 });
-		await expect(rows.filter({ hasText: 'Cash on delivery handling' })).toContainText('₹25.00');
+		await expect(rows.filter({ hasText: 'Cash on delivery handling' })).toContainText('₹25.00', { timeout: 15_000 });
 		await placeOrder(page);
 		await expect(page).toHaveURL(/order-received\/(\d+)/, { timeout: 30_000 });
 		const order = page.url().match(/order-received\/(\d+)/)?.[1] ?? '';
