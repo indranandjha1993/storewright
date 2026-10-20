@@ -4,6 +4,8 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- The pipeline is drawn as nodes: check, build, three browser suites side by side, and on a tag version, scan, publish and deploy, each node writing what it did to the run summary; the repeated store steps live in two small actions, every action is pinned to a commit, and the token is read-only unless a node needs more.
+
 ## 0.8.0 - 2026-10-20
 
 - The pipeline builds the production images once, runs the whole browser suite against them, and a release promotes those tested images to the version tag instead of building again.

@@ -26,19 +26,41 @@ It refuses to run unless main is clean, in step with origin and green in CI, and
 theme headers and the README (`bin/version`), turns the Unreleased section into the release
 heading, commits `release 0.8.0` as you, tags `v0.8.0` and pushes both.
 
-Two workflow files take it from there, each stage gated on the one before. `ci.yml` is the
-module: lint, analysis and unit tests; then a build of both production images, tagged
-`sha-<commit>` and pushed; then the stack, three runners at once, one per browser project
-(phone, desktop, admin), each pulling those very images, installing a fresh store through the
-server compose file plus `docker/compose.ci.yml`, and running its part of the suite. `release.yml` runs on
-a tag, calls `ci.yml` as its first job, and only then continues: the tested images are scanned
-with Trivy (any critical issue with a fix stops the release) and promoted to the version tag by
-retagging, so the image a server pulls is the one the suite passed, and the GitHub release is
-created from that version's section of `CHANGELOG.md`; then the deploy job (below). The release
+Two workflow files take it from there, and the run page draws them as a graph of nodes, each
+gated on the one before and each writing a line to the run summary saying what it did.
+
+`ci.yml` is the module every push, pull request and release runs:
+
+    lint, analyse, test  ->  build the images  ->  suite mobile
+                                                   suite desktop
+                                                   suite admin
+
+The build node pushes both production images tagged `sha-<commit>`. The three suite nodes run
+at once, one per browser project: each pulls those very images, writes a throwaway `.env`
+(`.github/actions/store-env`), starts and installs a fresh store through the server compose file
+plus `docker/compose.ci.yml`, seeds it and smoke-tests it (`.github/actions/store-up`), then runs
+its part of the Playwright suite and reports passed, failed and flaky counts. Flaky counts as
+failed. A whole run takes about six minutes.
+
+`release.yml` runs on a tag:
+
+    version from the tag  \
+                            ->  scan app  \
+    ci (the module above) /     scan web   ->  publish x.y.z  ->  deploy to <target>
+
+The version node refuses a tag that is not `vX.Y.Z` or has no heading in `CHANGELOG.md`. The
+scan nodes start the app image once and run Trivy on each image; any critical issue with a fix
+stops the release. Publish retags the tested `sha-<commit>` images as the version, so the image a
+server pulls is the one the suite passed, and creates the GitHub release from that version's
+section of `CHANGELOG.md`. Deploy (below) runs only when `DEPLOY_TARGETS` is set. The release
 workflow can also be started by hand for an existing tag, to rebuild or redeploy it, for tags cut
 after 0.8.0. The images are public, so a server pulls them without logging in. The running
 container reports the deployed tag on `/version` because the compose file passes
 `STOREWRIGHT_VERSION` in.
+
+Every action is pinned to a commit with its version beside it, the token has read access unless
+a node needs more, and values from the event reach shell steps through environment variables.
+`actionlint` checks the files locally (`brew install actionlint`, then `actionlint`).
 
 ## The server
 
