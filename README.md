@@ -131,6 +131,11 @@ together is in [docs/console.md](docs/console.md).
 
 What staff see in place of WordPress and WooCommerce is in [docs/white-label.md](docs/white-label.md).
 
+## Design language
+
+The tokens, type scale, spacing and controls the console and the advanced admin are built
+against, and how the skin survives WordPress updates, are in [docs/design.md](docs/design.md).
+
 ## Deploying
 
 One server per store. `deploy/` holds a compose file, a Caddyfile for TLS and `deploy.sh` with

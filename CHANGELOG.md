@@ -4,6 +4,8 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- docs/design.md writes down the tokens, type scale, spacing, controls and surfaces the console and the advanced admin share; admin page titles now sit on the same scale as console titles.
+
 ## 0.5.0 - 2026-10-20
 
 One shell for console and admin, a storefront that answers back, and insights on Today.

@@ -5,7 +5,8 @@ the `manage_woocommerce` capability (shop managers and administrators) lands the
 in. Everyone else gets a refusal. The sidebar's Advanced link opens the regular admin, and the
 admin's Console menu item leads back.
 
-The console is the `storewright-console` plugin. WordPress mounts it with its own `@wordpress/boot`
+The console is the `storewright-console` plugin. Its tokens, type scale, spacing and controls are
+in [design.md](design.md); the advanced admin is skinned from the same page. WordPress mounts it with its own `@wordpress/boot`
 module, so the plugin ships only its screens.
 
 ## Building
