@@ -10,8 +10,12 @@ git fetch -q origin main
 [ -z "$(git tag -l "v$version")" ] || { echo "v$version already exists" >&2; exit 1; }
 grep -q '^## Unreleased$' CHANGELOG.md || { echo "CHANGELOG.md needs an Unreleased section" >&2; exit 1; }
 awk '/^## Unreleased$/ {on=1; next} on && /^## / {exit} on && NF {found=1} END {exit !found}' CHANGELOG.md || { echo "nothing under Unreleased in CHANGELOG.md" >&2; exit 1; }
-run="$(gh run list --branch main --workflow ci --commit "$(git rev-parse HEAD)" --limit 1 --json conclusion --jq '.[0].conclusion' 2>/dev/null || true)"
-[ "$run" = success ] || { echo "ci is not green on this commit (${run:-no run}); wait for it or fix it" >&2; exit 1; }
+
+# The pipeline skips docs-only pushes, so the last run may sit a few such commits behind HEAD.
+last="$(gh run list --branch main --workflow ci --event push --status completed --limit 1 --json headSha,conclusion --jq '.[0] | "\(.headSha) \(.conclusion)"' 2>/dev/null || true)"
+[ "${last#* }" = success ] || { echo "ci is not green on main (${last:-no run}); wait for it or fix it" >&2; exit 1; }
+unchecked="$(git diff --name-only "${last% *}" HEAD | grep -vE '^docs/|\.md$|^LICENSE$' || true)"
+[ -z "$unchecked" ] || { echo "ci has not run on these changes yet:" >&2; echo "$unchecked" >&2; exit 1; }
 
 bin/version "$version"
 awk -v h="## $version - $(date +%F)" '/^## Unreleased$/ {print; print ""; print h; next} {print}' CHANGELOG.md > CHANGELOG.md.new
