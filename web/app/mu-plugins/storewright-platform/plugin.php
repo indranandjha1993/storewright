@@ -20,6 +20,7 @@ spl_autoload_register(
 const VERSION = '0.5.0';
 
 Health::register();
+Heartbeat::register();
 Hardening::register();
 Required::register();
 PluginManagement::register();

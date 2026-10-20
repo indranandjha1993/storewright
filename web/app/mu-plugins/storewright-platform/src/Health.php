@@ -41,6 +41,7 @@ final class Health {
 		$checks ??= [
 			'database' => self::database( ... ),
 			'cache'    => self::cache( ... ),
+			'cron'     => Heartbeat::healthy( ... ),
 		];
 		$results = array_map( static fn( callable $check ): bool => $check(), $checks );
 		return [
