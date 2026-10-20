@@ -26,16 +26,17 @@ It refuses to run unless main is clean, in step with origin and green in CI, and
 theme headers and the README (`bin/version`), turns the Unreleased section into the release
 heading, commits `release 0.8.0` as you, tags `v0.8.0` and pushes both.
 
-The one pipeline (`.github/workflows/ci.yml`) takes it from there, each stage gated on the one
-before: lint, analysis and unit tests; then the stack, which builds both production images once,
+Two workflow files take it from there, each stage gated on the one before. `ci.yml` is the
+module: lint, analysis and unit tests; then the stack, which builds both production images once,
 tagged `sha-<commit>`, and runs install, seed, smoke and the whole browser suite against those
-very images through the server compose file plus `docker/compose.ci.yml`; then, for a tag only,
-the tested images are scanned with Trivy (any critical issue with a fix stops the release) and
-promoted to the version tag by retagging, so the image a server pulls is the one the suite
-passed, and the GitHub release is created from that version's section of `CHANGELOG.md`; then
-the deploy job (below). The pipeline can also be started by hand for an existing tag, to
-rebuild or redeploy it, for tags cut after 0.7.0. The images are public, so a server pulls them without logging in. The
-running container reports the deployed tag on `/version` because the compose file passes
+very images through the server compose file plus `docker/compose.ci.yml`. `release.yml` runs on
+a tag, calls `ci.yml` as its first job, and only then continues: the tested images are scanned
+with Trivy (any critical issue with a fix stops the release) and promoted to the version tag by
+retagging, so the image a server pulls is the one the suite passed, and the GitHub release is
+created from that version's section of `CHANGELOG.md`; then the deploy job (below). The release
+workflow can also be started by hand for an existing tag, to rebuild or redeploy it, for tags cut
+after 0.8.0. The images are public, so a server pulls them without logging in. The running
+container reports the deployed tag on `/version` because the compose file passes
 `STOREWRIGHT_VERSION` in.
 
 ## The server
