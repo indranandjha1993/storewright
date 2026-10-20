@@ -11,6 +11,12 @@ for _ in $(seq 1 45); do
 done
 wp db check >/dev/null
 
+# On a server the app container fills the plugins volume as it starts; wait for that copy to land.
+for _ in $(seq 1 60); do
+  [ -f web/app/plugins/woocommerce/woocommerce.php ] && [ ! -d web/app/plugins/.sync-lock ] && break
+  sleep 2
+done
+
 if ! wp core is-installed >/dev/null 2>&1; then
   wp core install --url="$WP_HOME" --title="$title" --admin_user="$ADMIN_USER" \
     --admin_email="$ADMIN_EMAIL" --admin_password="$ADMIN_PASSWORD" --skip-email
