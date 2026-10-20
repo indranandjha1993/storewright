@@ -108,7 +108,7 @@ jobs:
           bash -n deploy/deploy.sh bin/install bin/release
           STOREWRIGHT_VERSION=ci docker compose -f deploy/docker-compose.yml --env-file deploy/.env.example config --quiet
       - run: make up
-      - run: make install
+      - run: docker compose run --rm cli bin/install
       - run: make wp -- storewright templates
       - run: make seed
       - run: make pins
