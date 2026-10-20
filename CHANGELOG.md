@@ -4,6 +4,8 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+## 0.6.0 - 2026-10-20
+
 One admin. The React console is gone; WordPress and WooCommerce's own screens, white-labelled and skinned from the brand, are the console.
 
 - Orders, products, customers, coupons, pages and the journal are worked in their WooCommerce and WordPress screens.

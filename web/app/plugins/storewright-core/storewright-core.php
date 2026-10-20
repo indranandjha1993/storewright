@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Storewright Core
  * Description: Payments routing, fulfilments, invoices and store settings for Storewright.
- * Version: 0.5.0
+ * Version: 0.6.0
  * Requires at least: 7.0
  * Requires PHP: 8.3
  * Requires Plugins: woocommerce
@@ -17,7 +17,7 @@ namespace Storewright\Core;
 
 defined( 'ABSPATH' ) || exit;
 
-const VERSION = '0.5.0';
+const VERSION = '0.6.0';
 const FILE    = __FILE__;
 
 spl_autoload_register(
