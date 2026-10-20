@@ -1,0 +1,55 @@
+name: store up
+description: Start a store from the published images through the server compose file, install it, seed it and check it answers
+
+inputs:
+  version:
+    description: The image tag the store runs, such as sha-1a2b3c4
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: start the containers
+      shell: bash
+      run: make up
+
+    - name: wait for the app to fill the plugins volume
+      shell: bash
+      run: |
+        for _ in $(seq 1 60); do
+          curl -fsS -o /dev/null http://localhost:8600/health && exit 0
+          sleep 2
+        done
+        echo "::error title=store::the app did not answer within two minutes"
+        exit 1
+
+    - name: install WordPress and the store defaults
+      shell: bash
+      run: docker compose run --rm cli bin/install
+
+    - name: check the template overrides still match WooCommerce
+      shell: bash
+      run: make wp -- storewright templates
+
+    - name: seed the demo catalogue
+      shell: bash
+      run: make seed
+
+    - name: import the PIN directory
+      shell: bash
+      run: make pins
+
+    - name: smoke
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+      run: |
+        curl -fsS http://localhost:8600/health | tee /dev/stderr | grep -q '"ok":true'
+        curl -fsS http://localhost:8600/version | tee /dev/stderr | grep -q "\"version\":\"$VERSION\""
+        curl -fsS http://localhost:8600/shop/ | grep -q 'themes/storewright/style.css'
+        test "$(curl -fsS 'http://localhost:8600/wp-json/wc/store/v1/products?per_page=20' | jq length)" = "5"
+        test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8600/wp/xmlrpc.php)" = "403"
+        {
+          echo "### Store"
+          echo "- images \`$VERSION\`, health ok, 5 products seeded, xmlrpc refused"
+        } >> "$GITHUB_STEP_SUMMARY"

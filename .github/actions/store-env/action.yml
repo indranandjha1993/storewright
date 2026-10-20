@@ -1,0 +1,23 @@
+name: store env
+description: Write the .env a throwaway store needs, with fresh salts, beside the server compose file
+
+inputs:
+  version:
+    description: The image tag the store runs, such as sha-1a2b3c4
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: write .env
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+      run: |
+        cp .env.example .env
+        sed -i 's/^ADMIN_PASSWORD=.*/ADMIN_PASSWORD=ci-only-password/' .env
+        for s in AUTH_KEY SECURE_AUTH_KEY LOGGED_IN_KEY NONCE_KEY AUTH_SALT SECURE_AUTH_SALT LOGGED_IN_SALT NONCE_SALT; do
+          sed -i "s/^$s=.*/$s=$(openssl rand -hex 32)/" .env
+        done
+        printf 'DB_ROOT_PASSWORD=ci-only-root\nSTORE_NAME=storewright\nSTOREWRIGHT_VERSION=%s\n' "$VERSION" >> .env
+        cp .env deploy/.env

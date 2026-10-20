@@ -14,7 +14,7 @@ export default defineConfig({
 	workers: ci ? undefined : 1,
 	retries: ci ? 1 : 0,
 	failOnFlakyTests: ci,
-	reporter: [['list'], ['html', { outputFolder: 'tests/e2e/report', open: 'never' }]],
+	reporter: [['list'], ['html', { outputFolder: 'tests/e2e/report', open: 'never' }], ['json', { outputFile: 'tests/e2e/results/summary.json' }]],
 	use: {
 		baseURL: process.env.STORE_URL ?? `http://localhost:${process.env.WEB_PORT ?? '8600'}`,
 		trace: 'retain-on-failure',
