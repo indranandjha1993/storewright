@@ -47,6 +47,7 @@ add_action(
 		Checkout\PinAutofill::register();
 		Checkout\PlaceOrderPress::register();
 		Checkout\FreeDelivery::register();
+		Checkout\Charges::register();
 		Account\AccountPages::register();
 		Emails\OrderButton::register();
 		Emails\ShipmentCopy::register();
@@ -68,6 +69,7 @@ add_action(
 		add_action( 'rest_api_init', [ Delivery\LocationEndpoint::class, 'register' ] );
 		add_action( 'rest_api_init', [ Delivery\AreasEndpoint::class, 'register' ] );
 		Admin\StoreSettings::register();
+		Admin\ChargesSettings::register();
 		Admin\Flash::register();
 		Admin\Dashboard::register();
 		Admin\ReturnsPage::register();

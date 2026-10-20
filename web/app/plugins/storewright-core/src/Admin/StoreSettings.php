@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Storewright\Core\Admin;
 
 use Storewright\Core\Checkout\Gstin;
-use Storewright\Core\Invoice\Gst;
 use WC_Admin_Settings;
 
 final class StoreSettings {
@@ -14,23 +13,24 @@ final class StoreSettings {
 
 	public static function register(): void {
 		add_filter( 'woocommerce_general_settings', [ self::class, 'fields' ] );
-		add_filter( 'woocommerce_admin_settings_sanitize_option_' . self::OPTION, [ self::class, 'sanitize' ], 10, 2 );
+		add_filter( 'woocommerce_admin_settings_sanitize_option_' . self::OPTION, [ self::class, 'sanitize' ], 10, 3 );
 	}
 
-	public static function sanitize( mixed $value, array $option ): mixed {
+	public static function sanitize( mixed $value, array $option, mixed $raw ): mixed {
 		return match ( $option['id'] ?? '' ) {
 			self::OPTION . '[store_gstin]'    => self::gstin( $value ),
 			self::OPTION . '[invoice_prefix]' => self::prefix( $value ),
+			self::OPTION . '[cod_postcodes]'  => self::rules( $raw ),
 			default                           => $value,
 		};
 	}
 
 	public static function fields( array $settings ): array {
-		$ours = [
+		$ours     = [
 			[
 				'title' => __( 'Store details', 'storewright' ),
 				'type'  => 'title',
-				'desc'  => __( 'Printed on emails and invoices.', 'storewright' ),
+				'desc'  => __( 'The phone is printed on emails and invoices. GST and charges are under Taxes and charges.', 'storewright' ),
 				'id'    => 'storewright_store_details',
 			],
 			[
@@ -38,33 +38,6 @@ final class StoreSettings {
 				'id'      => self::OPTION . '[store_phone]',
 				'type'    => 'text',
 				'default' => '',
-			],
-			[
-				'title'             => __( 'GSTIN', 'storewright' ),
-				'desc'              => __( 'Leave empty if the business is not registered for GST.', 'storewright' ),
-				'desc_tip'          => true,
-				'id'                => self::OPTION . '[store_gstin]',
-				'type'              => 'text',
-				'default'           => '',
-				'custom_attributes' => [ 'maxlength' => 15 ],
-			],
-			[
-				'title'    => __( 'Usual GST rate', 'storewright' ),
-				'desc'     => __( 'Used for products without their own rate. Prices already include it.', 'storewright' ),
-				'desc_tip' => true,
-				'id'       => self::OPTION . '[gst_rate]',
-				'type'     => 'select',
-				'default'  => '18',
-				'options'  => array_combine( array_map( 'strval', Gst::RATES ), array_map( static fn( int $rate ): string => $rate . '%', Gst::RATES ) ),
-			],
-			[
-				'title'             => __( 'Invoice prefix', 'storewright' ),
-				'desc'              => __( 'Invoices are numbered like INV/26-27/0001, starting again each April.', 'storewright' ),
-				'desc_tip'          => true,
-				'id'                => self::OPTION . '[invoice_prefix]',
-				'type'              => 'text',
-				'default'           => 'INV',
-				'custom_attributes' => [ 'maxlength' => 4 ],
 			],
 			[
 				'title'             => __( 'Returns accepted for', 'storewright' ),
@@ -79,23 +52,11 @@ final class StoreSettings {
 				],
 			],
 			[
-				'title'             => __( 'Cash on delivery up to', 'storewright' ),
-				'desc'              => __( 'Orders above this total have to be paid online.', 'storewright' ),
-				'desc_tip'          => true,
-				'id'                => self::OPTION . '[cod_max_total]',
-				'type'              => 'number',
-				'default'           => '10000',
-				'css'               => 'width: 8em',
-				'custom_attributes' => [
-					'min'  => 0,
-					'step' => 100,
-				],
-			],
-			[
 				'type' => 'sectionend',
 				'id'   => 'storewright_store_details',
 			],
 		];
+		$settings = array_values( array_filter( $settings, static fn( array $field ): bool => ( $field['id'] ?? '' ) !== 'woocommerce_calc_taxes' ) );
 		foreach ( $settings as $index => $field ) {
 			if ( ( $field['type'] ?? '' ) === 'sectionend' ) {
 				array_splice( $settings, $index + 1, 0, $ours );
@@ -112,6 +73,11 @@ final class StoreSettings {
 			return '';
 		}
 		return $gstin;
+	}
+
+	public static function rules( mixed $value ): array {
+		$lines = preg_split( '/[\r\n,]+/', (string) $value ) ?: [];
+		return array_values( array_filter( array_map( static fn( string $line ): string => strtoupper( trim( $line ) ), $lines ) ) );
 	}
 
 	public static function prefix( mixed $value ): string {

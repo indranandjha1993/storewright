@@ -9,13 +9,16 @@ final class Settings {
 	private const OPTION = 'storewright_settings';
 
 	private const DEFAULTS = [
-		'cod_max_total'  => 10000,
-		'cod_postcodes'  => [],
-		'store_phone'    => '',
-		'store_gstin'    => '',
-		'gst_rate'       => 18,
-		'invoice_prefix' => 'INV',
-		'return_days'    => 7,
+		'cod_max_total'          => 10000,
+		'cod_postcodes'          => [],
+		'cod_fee'                => 0,
+		'handling_fee'           => 0,
+		'handling_fee_free_from' => 0,
+		'store_phone'            => '',
+		'store_gstin'            => '',
+		'gst_rate'               => 18,
+		'invoice_prefix'         => 'INV',
+		'return_days'            => 7,
 	];
 
 	public static function get( string $key ): mixed {

@@ -413,3 +413,31 @@ test('an order gets a numbered gst invoice that only its buyer can open', async 
 	}
 });
 
+
+test('packing and cash on delivery charges show at checkout and on the invoice', async ({ page }, testInfo) => {
+	test.skip(testInfo.project.name !== 'desktop', 'charges are store-wide, so only one project may change them');
+	wp('eval', '$s = (array) get_option( "storewright_settings", [] ); $s["handling_fee"] = 15; $s["handling_fee_free_from"] = 1000; $s["cod_fee"] = 25; $s["store_gstin"] = "29ABCDE1234F1ZW"; update_option( "storewright_settings", $s );');
+	try {
+		await addToBag(page, products.mug);
+		await page.goto('/checkout/');
+		await fillDeliveryAddress(page);
+		const rows = page.locator('.wc-block-components-totals-fees');
+		await expect(rows).toHaveCount(1);
+		await expect(rows.first()).toContainText('Packing and handling');
+		await page.getByRole('radio', { name: /Cash on delivery/ }).check();
+		await expect(rows).toHaveCount(2, { timeout: 15_000 });
+		await expect(rows.filter({ hasText: 'Cash on delivery handling' })).toContainText('₹25.00');
+		await placeOrder(page);
+		await expect(page).toHaveURL(/order-received\/(\d+)/, { timeout: 30_000 });
+		const order = page.url().match(/order-received\/(\d+)/)?.[1] ?? '';
+
+		const fees = wp('eval', `$o = wc_get_order( ${order} ); foreach ( $o->get_fees() as $f ) { echo $f->get_name(), "=", $f->get_total(), ";"; }`).split(';').filter(Boolean).sort();
+		expect(fees).toEqual(['Cash on delivery handling=25', 'Packing and handling=15']);
+		const link = page.getByRole('link', { name: /^Invoice INV\// });
+		await page.goto((await link.getAttribute('href')) ?? '');
+		await expect(page.getByText('Packing and handling')).toBeVisible();
+		await expect(page.getByText('Cash on delivery handling')).toBeVisible();
+	} finally {
+		wp('eval', '$s = (array) get_option( "storewright_settings", [] ); $s["handling_fee"] = 0; $s["handling_fee_free_from"] = 0; $s["cod_fee"] = 0; $s["store_gstin"] = ""; update_option( "storewright_settings", $s );');
+	}
+});

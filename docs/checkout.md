@@ -30,3 +30,13 @@ will charge.
 The checkout has its own short header: the store's logo or name, a line about payment options and
 a way back to the shop. The terms page seeded with the store is linked in the checkout's terms
 notice.
+
+## Charges
+
+Two amounts can be added to an order under Store, Settings, Taxes and charges. Packing and
+handling is added to every order that ships, or only below an order amount of your choosing.
+Cash on delivery handling is added the moment a shopper picks cash on delivery, and leaves again
+if they pick an online method. Both appear as their own line in the bag, the checkout, the
+emails and the invoice, where they carry GST at the usual rate like delivery does. The block
+checkout learns the chosen method through a Store API update (`storewright` namespace), which
+`assets/js/checkout-charges.js` sends when the method changes.

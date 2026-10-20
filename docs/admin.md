@@ -30,9 +30,10 @@ Every task has one place. The menu, top to bottom:
     section leads here. See [delivery.md](delivery.md).
   - **Brand**: name, logo, colours, typefaces and corners for every surface, with a live preview.
     See [branding.md](branding.md).
-  - **Settings**: WooCommerce's settings. The General tab carries the store's phone, GSTIN, usual
-    GST rate, invoice prefix (see [invoices.md](invoices.md)), the return window and the cash on
-    delivery limit; Payments, Shipping, Accounts and Emails are WooCommerce's own tabs.
+  - **Settings**: WooCommerce's settings. The General tab carries the store's phone and the return
+    window; Taxes and charges carries the GSTIN, the usual GST rate and the invoice prefix (see
+    [invoices.md](invoices.md)) and the checkout charges (see [checkout.md](checkout.md));
+    Payments, Shipping, Accounts and Emails are WooCommerce's own tabs.
 - **Products**: WooCommerce's catalogue, with quick edit for price and stock.
 - **Analytics**: WooCommerce's reports.
 - **Marketing**: coupons.

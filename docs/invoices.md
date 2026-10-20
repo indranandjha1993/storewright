@@ -3,7 +3,7 @@
 Every order gets an invoice number the first time it is paid or marked complete. Numbers run
 `INV/26-27/0001`, `INV/26-27/0002` and start again at 0001 each April, as GST requires a
 consecutive series per financial year of at most 16 characters. The prefix (one to four letters
-or digits) is set under Store, Settings, General. The counter is a single row incremented in the
+or digits) is set under Store, Settings, Taxes and charges. The counter is a single row incremented in the
 database, so two orders paid at the same moment never share a number.
 
 ## What the invoice shows
