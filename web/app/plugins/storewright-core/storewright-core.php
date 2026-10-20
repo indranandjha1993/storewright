@@ -53,6 +53,8 @@ add_action(
 		Emails\ShipmentCopy::register();
 		Fulfilment\Carriers::register();
 		Fulfilment\CustomerView::register();
+		Fulfilment\Shipping::register();
+		add_action( 'rest_api_init', [ Fulfilment\ShiprocketWebhook::class, 'register' ] );
 		Checkout\ThankYou::register();
 		Seo\Sitemap::register();
 		Seo\Robots::register();
@@ -70,6 +72,8 @@ add_action(
 		add_action( 'rest_api_init', [ Delivery\AreasEndpoint::class, 'register' ] );
 		Admin\StoreSettings::register();
 		Admin\ChargesSettings::register();
+		Admin\CarriersSettings::register();
+		Admin\ShipmentsBox::register();
 		Admin\Flash::register();
 		Admin\Dashboard::register();
 		Admin\ReturnsPage::register();

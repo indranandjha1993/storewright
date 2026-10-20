@@ -90,6 +90,24 @@ test('staff ship an order in parts with carrier and tracking', async ({ page }) 
 	await customer.close();
 });
 
+test('the order screen offers shiprocket couriers, or says why it cannot', async ({ page }) => {
+	const id = wp('eval', '$order = wc_create_order(); $order->add_product( wc_get_product( wc_get_product_id_by_sku( "SW-MUG" ) ), 1 ); $order->set_address( [ "first_name" => "Quote", "last_name" => "Check", "email" => "quote.check@example.com", "address_1" => "12 Market Street", "city" => "Bengaluru", "postcode" => "560064", "country" => "IN", "state" => "KA", "phone" => "9123456780" ], "billing" ); $order->set_address( [ "first_name" => "Quote", "last_name" => "Check", "address_1" => "12 Market Street", "city" => "Bengaluru", "postcode" => "560064", "country" => "IN", "state" => "KA" ], "shipping" ); $order->calculate_totals(); $order->set_status( "processing" ); $order->save(); echo $order->get_id();');
+	const mode = wp('eval', 'echo Storewright\\Platform\\CarrierCredentials::modes( wp_get_environment_type() )["shiprocket"];');
+	await logIn(page, staff);
+	await page.goto(`/wp/wp-admin/admin.php?page=wc-orders&action=edit&id=${id}`);
+
+	const box = page.locator('#storewright-shipping');
+	await expect(box).toContainText('Shipping with Shiprocket');
+	if (mode === 'off') {
+		await expect(box).toContainText('Shiprocket is off');
+		return;
+	}
+	const courier = box.getByLabel('Courier');
+	await expect(courier).toBeVisible();
+	expect(await courier.locator('option').count()).toBeGreaterThan(1);
+	await expect(box.getByRole('button', { name: /Ship 1 item with Shiprocket/ })).toBeVisible();
+});
+
 test('the payments page shows gateway health and orders still waiting for money', async ({ page }) => {
 	const id = wp('eval', '$order = wc_create_order(); $order->add_product( wc_get_product( wc_get_product_id_by_sku( "SW-NOTE" ) ), 1 ); $order->set_address( [ "first_name" => "Pay", "last_name" => "Check", "email" => "pay.check@example.com" ], "billing" ); $order->set_payment_method( "razorpay" ); $order->set_payment_method_title( "Razorpay" ); $order->calculate_totals(); $order->set_date_created( time() - 20 * MINUTE_IN_SECONDS ); $order->save(); echo $order->get_order_number();');
 	await logIn(page, staff);
