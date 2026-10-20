@@ -63,7 +63,9 @@ jobs:
       - name: deploy files
         run: |
           bash -n deploy/deploy.sh bin/install bin/release
-          STOREWRIGHT_VERSION=ci docker compose -f deploy/docker-compose.yml --env-file deploy/.env.example config --quiet
+          cp deploy/.env.example deploy/.env
+          STOREWRIGHT_VERSION=ci docker compose -f deploy/docker-compose.yml --env-file deploy/.env config --quiet
+          rm deploy/.env
       - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v4
         with:
