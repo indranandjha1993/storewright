@@ -72,6 +72,7 @@ add_action(
 		Admin\Dashboard::register();
 		Admin\ReturnsPage::register();
 		Admin\PaymentsPage::register();
+		Admin\AreasPage::register();
 		add_action( 'woocommerce_delete_shipping_zone', [ Delivery\ShapeStore::class, 'zoneDeleted' ] );
 		add_action( 'init', [ Delivery\DeliveryBlock::class, 'register' ] );
 		add_action( 'init', [ Account\SaveButton::class, 'register' ] );

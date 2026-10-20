@@ -1422,3 +1422,247 @@ html #wpwrap .sw-dash__queues a {
 	color: var(--sw-sale);
 	box-shadow: none;
 }
+
+.sw-areas__layout {
+	display: grid;
+	grid-template-columns: minmax(20rem, 28rem) minmax(0, 1fr);
+	gap: 1.5rem;
+	align-items: start;
+}
+
+.sw-areas__map {
+	position: sticky;
+	top: 1rem;
+	min-height: 36rem;
+	height: calc(100vh - 4rem);
+	border: 1px solid var(--sw-line);
+	border-radius: var(--sw-radius);
+	overflow: hidden;
+	background: var(--sw-base);
+}
+
+.sw-areas__handle {
+	width: 14px;
+	height: 14px;
+	border: 2px solid #d63638;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 1px 2px rgb(0 0 0 / 30%);
+}
+
+.sw-areas__test,
+.sw-areas__card,
+.sw-areas__method {
+	display: grid;
+	gap: 0.75rem;
+	margin: 0 0 1rem;
+	padding: 1.25rem;
+	border: 1px solid var(--sw-line);
+	border-radius: var(--sw-radius);
+	background: var(--sw-surface);
+}
+
+.wrap .sw-areas__test h2,
+.wrap .sw-areas__card legend {
+	margin: 0;
+	padding: 0;
+	font-family: var(--sw-font-heading);
+	font-size: 1.125rem;
+	font-weight: 600;
+}
+
+.sw-areas__hint,
+.sw-areas .description {
+	margin: 0;
+	color: var(--sw-muted);
+	font-size: 0.8125rem;
+}
+
+.sw-areas__row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 0.25rem 0.5rem;
+	align-items: center;
+}
+
+.sw-areas__row > label {
+	grid-column: 1 / -1;
+	margin: 0;
+}
+
+.sw-areas [hidden] {
+	display: none !important;
+}
+
+.sw-areas__row label,
+.sw-field > label,
+.sw-field label {
+	display: block;
+	margin-bottom: 0.25rem;
+	font-weight: 500;
+}
+
+.sw-areas__row .sw-areas__hint {
+	grid-column: 1 / -1;
+}
+
+.sw-field {
+	display: grid;
+	gap: 0.25rem;
+}
+
+.sw-areas .sw-field input[type="text"],
+.sw-areas .sw-field select,
+.sw-areas .sw-field textarea,
+.sw-areas__row input[type="text"] {
+	width: 100%;
+	max-width: none;
+}
+
+.sw-areas__choice {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.sw-areas__answer {
+	display: grid;
+	gap: 0.35rem;
+	padding: 0.875rem 1rem;
+	border-left: 4px solid var(--sw-accent);
+	border-radius: var(--sw-radius-small);
+	background: var(--sw-accent-soft);
+}
+
+.sw-areas__answer.is-undeliverable,
+.sw-areas__answer.is-no_methods {
+	border-left-color: var(--sw-sale);
+	background: color-mix(in srgb, var(--sw-sale) 10%, var(--sw-surface));
+}
+
+.sw-areas__answer p,
+.sw-areas__answer ul {
+	margin: 0;
+}
+
+.sw-areas__answer-message {
+	font-weight: 600;
+}
+
+.sw-areas__options {
+	padding-left: 1.1rem;
+	list-style: disc;
+}
+
+.sw-areas__items {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.sw-areas__item {
+	display: grid;
+	grid-template-columns: 2rem minmax(0, 1fr);
+	gap: 1rem;
+	margin-bottom: 0.75rem;
+	padding: 1.25rem;
+	border: 1px solid var(--sw-line);
+	border-radius: var(--sw-radius);
+	background: var(--sw-surface);
+	transition: box-shadow 160ms ease;
+}
+
+.sw-areas__item.is-highlighted {
+	box-shadow: 0 0 0 2px var(--sw-accent);
+}
+
+.sw-areas__position {
+	display: grid;
+	place-items: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 50%;
+	color: #fff;
+	font-weight: 700;
+}
+
+.sw-areas__body {
+	display: grid;
+	gap: 0.5rem;
+	min-width: 0;
+}
+
+.wrap .sw-areas__name {
+	margin: 0;
+	padding: 0;
+	font-size: 1.125rem;
+}
+
+.sw-areas__facts {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	gap: 0.25rem 1rem;
+	margin: 0;
+}
+
+.sw-areas__facts dt {
+	color: var(--sw-muted);
+}
+
+.sw-areas__facts dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.sw-areas__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	font-weight: 600;
+}
+
+html #wpwrap a.sw-quiet,
+.wp-core-ui .button-link.sw-quiet {
+	color: var(--sw-muted);
+	font-weight: 500;
+}
+
+.sw-areas__buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+	margin: 0;
+}
+
+.sw-areas__method {
+	margin: 0;
+	background: var(--sw-base);
+}
+
+.sw-areas__method .button-link {
+	justify-self: start;
+}
+
+.sw-areas__delete {
+	margin-top: 1.5rem;
+	color: var(--sw-muted);
+}
+
+.sw-areas__delete summary {
+	cursor: pointer;
+	color: var(--sw-sale);
+	font-weight: 500;
+}
+
+@media (max-width: 1100px) {
+	.sw-areas__layout {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.sw-areas__map {
+		position: static;
+		height: 28rem;
+		min-height: 0;
+	}
+}
