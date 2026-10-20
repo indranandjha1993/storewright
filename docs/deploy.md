@@ -58,7 +58,9 @@ after 0.8.0. The images are public, so a server pulls them without logging in. T
 container reports the deployed tag on `/version` because the compose file passes
 `STOREWRIGHT_VERSION` in.
 
-Every action is pinned to a commit with its version beside it, the token has read access unless
+Every job names its runner image (`ubuntu-24.04`) rather than `ubuntu-latest`, which GitHub moves
+to a new Ubuntu every two years, so a run does not change operating system between one day and
+the next; moving to a newer image is its own pull request. Every action is pinned to a commit with its version beside it, the token has read access unless
 a node needs more, and values from the event reach shell steps through environment variables.
 `actionlint` checks the files locally (`brew install actionlint`, then `actionlint`).
 

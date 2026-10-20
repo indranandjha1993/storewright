@@ -28,7 +28,7 @@ env:
 jobs:
   version:
     name: version from the tag
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       tag: ${{ steps.version.outputs.tag }}
@@ -59,7 +59,7 @@ jobs:
   scan:
     name: scan ${{ matrix.image }}
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -90,7 +90,7 @@ jobs:
   publish:
     name: publish ${{ needs.version.outputs.version }}
     needs: [version, scan, verify]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: write
@@ -137,7 +137,7 @@ jobs:
     name: deploy to ${{ matrix.target }}
     needs: [version, publish]
     if: vars.DEPLOY_TARGETS != ''
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false

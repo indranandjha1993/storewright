@@ -30,7 +30,7 @@ env:
 jobs:
   check:
     name: lint, analyse, test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: checkout
@@ -62,7 +62,7 @@ jobs:
   build:
     name: build the images
     needs: check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -129,7 +129,7 @@ jobs:
   suite:
     name: suite ${{ matrix.project }}
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
