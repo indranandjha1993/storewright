@@ -70,7 +70,7 @@ final class ShipmentsBox {
 		self::act(
 			static function ( int $id ): void {
 				Shipping::cancel( $id );
-				Flash::success( __( 'The shipment is cancelled with Shiprocket and the items can be shipped again.', 'storewright' ) );
+				Flash::success( __( 'Cancelled with Shiprocket.', 'storewright' ) );
 			}
 		);
 	}
@@ -93,6 +93,21 @@ final class ShipmentsBox {
 		);
 	}
 
+	public static function where( array $row ): string {
+		$status = (string) $row['status'];
+		$text   = match ( $status ) {
+			ShipmentStore::BOOKING   => __( 'Booking with Shiprocket', 'storewright' ),
+			ShipmentStore::BOOKED    => $row['pickup_at'] !== '' && $row['pickup_at'] !== null ? __( 'Pickup requested', 'storewright' ) : __( 'Waybill allotted, pickup being arranged', 'storewright' ),
+			ShipmentStore::FAILED    => __( 'Booking failed', 'storewright' ),
+			ShipmentStore::CANCELLED => __( 'Cancelled', 'storewright' ),
+			default                  => TrackingEvent::words( $status ),
+		};
+		if ( $row['last_error'] !== '' && $row['last_error'] !== null ) {
+			$text .= ': ' . $row['last_error'];
+		}
+		return $text;
+	}
+
 	private static function act( callable $work ): void {
 		$id  = (int) Action::query( 'id' );
 		$row = Shipping::store()->find( $id );
@@ -105,8 +120,9 @@ final class ShipmentsBox {
 		} catch ( CarrierException $e ) {
 			Flash::error( $e->getMessage() );
 		}
+		$back  = Action::query( 'back' );
 		$order = wc_get_order( (int) $row['order_id'] );
-		Action::back( $order instanceof WC_Order ? $order->get_edit_order_url() : admin_url( 'admin.php?page=wc-orders' ) );
+		Action::back( $back !== '' ? admin_url( $back ) : ( $order instanceof WC_Order ? $order->get_edit_order_url() : admin_url( 'admin.php?page=wc-orders' ) ) );
 	}
 
 	private static function bookings( WC_Order $order ): void {
@@ -116,9 +132,14 @@ final class ShipmentsBox {
 		}
 		echo '<table class="widefat striped sw-shipping__table"><thead><tr><th>' . esc_html__( 'Courier', 'storewright' ) . '</th><th>' . esc_html__( 'Waybill', 'storewright' ) . '</th><th>' . esc_html__( 'Where it is', 'storewright' ) . '</th><th>' . esc_html__( 'Label', 'storewright' ) . '</th><th></th></tr></thead><tbody>';
 		foreach ( $rows as $row ) {
-			$id = (int) $row['fulfillment_id'];
+			$id      = (int) $row['id'];
+			$courier = $row['courier'] !== '' ? (string) $row['courier'] : __( 'Being chosen', 'storewright' );
+			if ( $row['kind'] === ShipmentStore::RETURN ) {
+				/* translators: %s: courier name */
+				$courier = sprintf( __( 'Return pickup, %s', 'storewright' ), $courier );
+			}
 			echo '<tr>';
-			echo '<td>' . esc_html( $row['courier'] !== '' ? (string) $row['courier'] : __( 'Being chosen', 'storewright' ) ) . '</td>';
+			echo '<td>' . esc_html( $courier ) . '</td>';
 			echo '<td>' . ( $row['awb'] !== '' ? '<a href="' . esc_url( 'https://shiprocket.co/tracking/' . $row['awb'] ) . '" target="_blank" rel="noopener">' . esc_html( (string) $row['awb'] ) . '</a>' : '&mdash;' ) . '</td>';
 			echo '<td>' . esc_html( self::where( $row ) ) . '</td>';
 			echo '<td>' . self::labelCell( $row ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -134,21 +155,6 @@ final class ShipmentsBox {
 		echo '</tbody></table>';
 	}
 
-	private static function where( array $row ): string {
-		$status = (string) $row['status'];
-		$text   = match ( $status ) {
-			ShipmentStore::BOOKING   => __( 'Booking with Shiprocket', 'storewright' ),
-			ShipmentStore::BOOKED    => $row['pickup_at'] !== '' && $row['pickup_at'] !== null ? __( 'Pickup requested', 'storewright' ) : __( 'Waybill allotted, pickup being arranged', 'storewright' ),
-			ShipmentStore::FAILED    => __( 'Booking failed', 'storewright' ),
-			ShipmentStore::CANCELLED => __( 'Cancelled', 'storewright' ),
-			default                  => TrackingEvent::words( $status ),
-		};
-		if ( $row['last_error'] !== '' && $row['last_error'] !== null ) {
-			$text .= ': ' . $row['last_error'];
-		}
-		return $text;
-	}
-
 	private static function labelCell( array $row ): string {
 		if ( $row['label_url'] !== '' && $row['label_url'] !== null ) {
 			return '<a href="' . esc_url( (string) $row['label_url'] ) . '" target="_blank" rel="noopener">' . esc_html__( 'Print label', 'storewright' ) . '</a>';
@@ -156,7 +162,7 @@ final class ShipmentsBox {
 		if ( $row['awb'] === '' || ShipmentStore::isClosed( (string) $row['status'] ) ) {
 			return '&mdash;';
 		}
-		return '<a href="' . esc_url( Action::url( 'shipment_label', [ 'id' => (int) $row['fulfillment_id'] ] ) ) . '">' . esc_html__( 'Fetch label', 'storewright' ) . '</a>';
+		return '<a href="' . esc_url( Action::url( 'shipment_label', [ 'id' => (int) $row['id'] ] ) ) . '">' . esc_html__( 'Fetch label', 'storewright' ) . '</a>';
 	}
 
 	private static function offer( WC_Order $order, string $mode ): void {

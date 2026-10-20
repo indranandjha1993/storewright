@@ -12,6 +12,7 @@ use Storewright\Core\Fulfilment\CarrierException;
 use Storewright\Core\Fulfilment\Consignment;
 use Storewright\Core\Fulfilment\Quote;
 use Storewright\Core\Fulfilment\TrackingEvent;
+use Storewright\Core\Settings;
 
 final class Shiprocket implements Carrier {
 
@@ -28,14 +29,16 @@ final class Shiprocket implements Carrier {
 	}
 
 	public function quotes( Consignment $consignment ): array {
+		$store  = $this->pickupLocation()['pin'];
 		$data   = $this->client->get(
 			'courier/serviceability/',
 			[
-				'pickup_postcode'   => $this->pickupLocation()['pin'],
-				'delivery_postcode' => $consignment->customer['pin'],
+				'pickup_postcode'   => $consignment->reverse ? $consignment->customer['pin'] : $store,
+				'delivery_postcode' => $consignment->reverse ? $store : $consignment->customer['pin'],
 				'weight'            => $consignment->weight,
 				'cod'               => $consignment->cod ? 1 : 0,
 				'declared_value'    => $consignment->total(),
+				'is_return'         => $consignment->reverse ? 1 : 0,
 			]
 		)['data'] ?? [];
 		$quotes = self::parseQuotes( is_array( $data ) ? $data : [] );
@@ -63,11 +66,13 @@ final class Shiprocket implements Carrier {
 	}
 
 	public function create( Consignment $consignment ): Booking {
-		$data = $this->client->post( 'orders/create/adhoc', self::payload( $consignment, $this->pickupLocation()['name'] ) );
+		$data = $consignment->reverse
+			? $this->client->post( 'orders/create/return', self::returnPayload( $consignment, self::storeAddress( true ) ) )
+			: $this->client->post( 'orders/create/adhoc', self::payload( $consignment, $this->pickupLocation()['name'] ) );
 		if ( empty( $data['shipment_id'] ) ) {
 			throw new CarrierException( esc_html( (string) ( $data['message'] ?? 'Shiprocket did not open a shipment' ) ), false );
 		}
-		return new Booking( (string) $data['order_id'], (string) $data['shipment_id'] );
+		return new Booking( (string) $data['order_id'], (string) $data['shipment_id'], reverse: $consignment->reverse );
 	}
 
 	public static function payload( Consignment $c, string $pickup ): array {
@@ -86,16 +91,7 @@ final class Shiprocket implements Carrier {
 			'billing_email'         => $c->customer['email'],
 			'billing_phone'         => $c->customer['phone'],
 			'shipping_is_billing'   => true,
-			'order_items'           => array_map(
-				static fn( array $item ): array => [
-					'name'          => $item['name'],
-					'sku'           => $item['sku'] !== '' ? $item['sku'] : 'item-' . $item['item_id'],
-					'units'         => $item['qty'],
-					'selling_price' => $item['price'],
-					'hsn'           => $item['hsn'],
-				],
-				$c->items
-			),
+			'order_items'           => self::items( $c ),
 			'payment_method'        => $c->cod ? 'COD' : 'Prepaid',
 			'shipping_charges'      => $c->charges,
 			'sub_total'             => $c->subtotal,
@@ -106,16 +102,50 @@ final class Shiprocket implements Carrier {
 		];
 	}
 
+	public static function returnPayload( Consignment $c, array $store ): array {
+		return [
+			'order_id'               => $c->reference,
+			'order_date'             => $c->orderedAt,
+			'pickup_customer_name'   => $c->customer['first'],
+			'pickup_last_name'       => $c->customer['last'],
+			'pickup_address'         => $c->customer['address'],
+			'pickup_address_2'       => $c->customer['address2'],
+			'pickup_city'            => $c->customer['city'],
+			'pickup_state'           => $c->customer['state'],
+			'pickup_country'         => $c->customer['country'],
+			'pickup_pincode'         => $c->customer['pin'],
+			'pickup_email'           => $c->customer['email'],
+			'pickup_phone'           => $c->customer['phone'],
+			'shipping_customer_name' => $store['name'],
+			'shipping_last_name'     => '',
+			'shipping_address'       => $store['address'],
+			'shipping_address_2'     => $store['address2'],
+			'shipping_city'          => $store['city'],
+			'shipping_state'         => $store['state'],
+			'shipping_country'       => $store['country'],
+			'shipping_pincode'       => $store['pin'],
+			'shipping_email'         => $store['email'],
+			'shipping_phone'         => $store['phone'],
+			'order_items'            => self::items( $c ),
+			'payment_method'         => 'Prepaid',
+			'sub_total'              => $c->subtotal,
+			'length'                 => $c->length,
+			'breadth'                => $c->breadth,
+			'height'                 => $c->height,
+			'weight'                 => $c->weight,
+		];
+	}
+
 	public function assign( Booking $booking, string $service ): Booking {
 		// Shiprocket takes half a minute to allot a waybill, so this only ever runs inside a job.
-		$data = $this->client->post(
-			'courier/assign/awb',
-			[
-				'shipment_id' => (int) $booking->shipment,
-				'courier_id'  => (int) $service,
-			],
-			90
-		);
+		$body = [
+			'shipment_id' => (int) $booking->shipment,
+			'courier_id'  => (int) $service,
+		];
+		if ( $booking->reverse ) {
+			$body['is_return'] = 1;
+		}
+		$data = $this->client->post( 'courier/assign/awb', $body, 90 );
 		$awb  = (string) ( $data['response']['data']['awb_code'] ?? '' );
 		if ( (int) ( $data['awb_assign_status'] ?? 0 ) !== 1 || $awb === '' ) {
 			$reason = $data['response']['data'] ?? $data['message'] ?? 'Shiprocket could not allot a waybill';
@@ -199,22 +229,56 @@ final class Shiprocket implements Carrier {
 		return $found;
 	}
 
-	private function addStorePickup(): array {
+	public static function storeAddress( bool $complete = false ): array {
 		[ $country, $state ] = array_pad( explode( ':', (string) get_option( 'woocommerce_default_country', 'IN:KA' ) ), 2, '' );
-		$states              = WC()->countries->get_states( $country );
-		$data                = $this->client->post(
+		$phone               = Consignment::phone( (string) Settings::get( 'store_phone' ) );
+		if ( $complete && ( $phone === '' || (string) get_option( 'woocommerce_store_address' ) === '' || (string) get_option( 'woocommerce_store_postcode' ) === '' ) ) {
+			throw new CarrierException( esc_html__( 'The courier needs the store address and phone: fill them under Store, Settings, General.', 'storewright' ), false );
+		}
+		return [
+			'name'     => (string) get_bloginfo( 'name' ),
+			'email'    => (string) get_option( 'admin_email' ),
+			'phone'    => $phone,
+			'address'  => (string) get_option( 'woocommerce_store_address' ),
+			'address2' => (string) get_option( 'woocommerce_store_address_2' ),
+			'city'     => (string) get_option( 'woocommerce_store_city' ),
+			'state'    => Consignment::stateName( $country, $state ),
+			'country'  => Consignment::countryName( $country ),
+			'pin'      => (string) get_option( 'woocommerce_store_postcode' ),
+		];
+	}
+
+	private static function items( Consignment $c ): array {
+		return array_map(
+			static fn( array $item ): array => array_filter(
+				[
+					'name'          => $item['name'],
+					'sku'           => $item['sku'] !== '' ? $item['sku'] : 'item-' . $item['item_id'],
+					'units'         => $item['qty'],
+					'selling_price' => $item['price'],
+					'hsn'           => $item['hsn'],
+				],
+				static fn( mixed $value ): bool => $value !== ''
+			),
+			$c->items
+		);
+	}
+
+	private function addStorePickup(): array {
+		$store = self::storeAddress( true );
+		$data  = $this->client->post(
 			'settings/company/addpickup',
 			[
 				'pickup_location' => self::DEFAULT_PICKUP,
-				'name'            => get_bloginfo( 'name' ),
-				'email'           => (string) get_option( 'admin_email' ),
-				'phone'           => Consignment::phone( (string) \Storewright\Core\Settings::get( 'store_phone' ) ),
-				'address'         => (string) get_option( 'woocommerce_store_address' ),
-				'address_2'       => (string) get_option( 'woocommerce_store_address_2' ),
-				'city'            => (string) get_option( 'woocommerce_store_city' ),
-				'state'           => is_array( $states ) && isset( $states[ $state ] ) ? html_entity_decode( (string) $states[ $state ] ) : $state,
-				'country'         => (string) ( WC()->countries->get_countries()[ $country ] ?? $country ),
-				'pin_code'        => (string) get_option( 'woocommerce_store_postcode' ),
+				'name'            => $store['name'],
+				'email'           => $store['email'],
+				'phone'           => $store['phone'],
+				'address'         => $store['address'],
+				'address_2'       => $store['address2'],
+				'city'            => $store['city'],
+				'state'           => $store['state'],
+				'country'         => $store['country'],
+				'pin_code'        => $store['pin'],
 			]
 		);
 		if ( empty( $data['success'] ) || ! is_array( $data['address'] ?? null ) ) {

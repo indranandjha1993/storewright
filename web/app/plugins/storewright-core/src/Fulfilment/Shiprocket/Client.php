@@ -98,7 +98,7 @@ final class Client {
 
 	private static function reason( mixed $data, int $code ): string {
 		if ( is_array( $data ) ) {
-			foreach ( [ 'message', 'error', 'errors' ] as $key ) {
+			foreach ( [ 'errors', 'message', 'error' ] as $key ) {
 				if ( ! empty( $data[ $key ] ) ) {
 					return is_array( $data[ $key ] ) ? wp_json_encode( $data[ $key ] ) : (string) $data[ $key ];
 				}

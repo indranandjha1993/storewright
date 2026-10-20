@@ -6,7 +6,7 @@ namespace Storewright\Core;
 
 final class Schema {
 
-	public const VERSION = '4';
+	public const VERSION = '5';
 	private const OPTION = 'storewright_schema_version';
 
 	public static function register(): void {
@@ -60,10 +60,17 @@ final class Schema {
   KEY lat_lng (lat, lng)
 ) {$charset};"
 		);
+		if ( get_option( self::OPTION ) === '4' ) {
+			// Schema 4 keyed shipments by fulfilment and never shipped in a release.
+			$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}storewright_shipment_events, {$wpdb->prefix}storewright_shipments" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		}
 		dbDelta(
 			"CREATE TABLE {$wpdb->prefix}storewright_shipments (
-  fulfillment_id bigint(20) unsigned NOT NULL,
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  kind varchar(10) NOT NULL DEFAULT 'outbound',
   order_id bigint(20) unsigned NOT NULL,
+  fulfillment_id bigint(20) unsigned NOT NULL DEFAULT 0,
+  return_id varchar(40) NOT NULL DEFAULT '',
   carrier varchar(20) NOT NULL,
   reference varchar(40) NOT NULL DEFAULT '',
   shipment varchar(40) NOT NULL DEFAULT '',
@@ -77,8 +84,9 @@ final class Schema {
   tries tinyint(3) unsigned NOT NULL DEFAULT 0,
   last_error text NULL,
   updated_at datetime NOT NULL,
-  PRIMARY KEY  (fulfillment_id),
+  PRIMARY KEY  (id),
   KEY order_id (order_id),
+  KEY fulfillment_id (fulfillment_id),
   KEY awb (awb),
   KEY status (status)
 ) {$charset};"
@@ -86,15 +94,15 @@ final class Schema {
 		dbDelta(
 			"CREATE TABLE {$wpdb->prefix}storewright_shipment_events (
   id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  fulfillment_id bigint(20) unsigned NOT NULL,
+  shipment_id bigint(20) unsigned NOT NULL,
   status varchar(20) NOT NULL,
   raw_status varchar(100) NOT NULL,
   location varchar(191) NOT NULL DEFAULT '',
   occurred_at datetime NOT NULL,
   source varchar(20) NOT NULL,
   PRIMARY KEY  (id),
-  UNIQUE KEY scan (fulfillment_id, occurred_at, raw_status),
-  KEY fulfillment_id (fulfillment_id)
+  UNIQUE KEY scan (shipment_id, occurred_at, raw_status),
+  KEY shipment_id (shipment_id)
 ) {$charset};"
 		);
 		update_option( self::OPTION, self::VERSION, false );

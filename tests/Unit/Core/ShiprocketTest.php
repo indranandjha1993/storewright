@@ -149,6 +149,68 @@ final class ShiprocketTest extends TestCase {
 		self::assertSame( 977.0, $consignment->total() );
 	}
 
+	public function test_a_return_is_picked_up_from_the_customer_and_sent_to_the_store(): void {
+		$consignment = new Consignment(
+			'1042-R3',
+			'2026-10-21 09:00',
+			'Store',
+			[
+				'first'    => 'Asha',
+				'last'     => 'Menon',
+				'address'  => '12 Market Street',
+				'address2' => '',
+				'city'     => 'Bengaluru',
+				'state'    => 'Karnataka',
+				'pin'      => '560064',
+				'country'  => 'India',
+				'email'    => 'asha@example.com',
+				'phone'    => '9123456780',
+			],
+			[
+				[
+					'item_id' => 12,
+					'name'    => 'Stoneware Mug',
+					'sku'     => 'SW-MUG',
+					'qty'     => 1,
+					'price'   => 449.0,
+					'hsn'     => '',
+				],
+			],
+			false,
+			449.0,
+			0.0,
+			0.4,
+			12.0,
+			9.0,
+			10.0,
+			true
+		);
+
+		$payload = Shiprocket::returnPayload(
+			$consignment,
+			[
+				'name'     => 'Demo Store',
+				'email'    => 'shop@example.com',
+				'phone'    => '9000000000',
+				'address'  => '14 Church Street',
+				'address2' => '',
+				'city'     => 'Bengaluru',
+				'state'    => 'Karnataka',
+				'country'  => 'India',
+				'pin'      => '560001',
+			]
+		);
+
+		self::assertSame( '560064', $payload['pickup_pincode'] );
+		self::assertSame( 'Asha', $payload['pickup_customer_name'] );
+		self::assertSame( '560001', $payload['shipping_pincode'] );
+		self::assertSame( 'Demo Store', $payload['shipping_customer_name'] );
+		self::assertSame( 'Prepaid', $payload['payment_method'] );
+		self::assertSame( 'SW-MUG', $payload['order_items'][0]['sku'] );
+		self::assertArrayNotHasKey( 'hsn', $payload['order_items'][0] );
+		self::assertArrayNotHasKey( 'shipping_charges', $payload );
+	}
+
 	public function test_phones_keep_the_last_ten_digits(): void {
 		self::assertSame( '9123456780', Consignment::phone( '+91 91234 56780' ) );
 		self::assertSame( '9123456780', Consignment::phone( '09123456780' ) );

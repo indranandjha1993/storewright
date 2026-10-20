@@ -134,7 +134,7 @@ final class CustomerView {
 	}
 
 	private static function latest( int $fulfillmentId ): ?string {
-		$event = Shipping::store()->latest( $fulfillmentId );
+		$event = Shipping::store()->latestForFulfillment( $fulfillmentId );
 		if ( $event === null ) {
 			return null;
 		}

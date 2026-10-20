@@ -40,15 +40,20 @@ final class CarriersSettings {
 			/* translators: %s: sandbox or live */
 			default                     => sprintf( __( 'Shiprocket is on in %s mode. Shipments are booked from the order screen.', 'storewright' ), $mode ),
 		};
+		$webhook = match ( $mode ) {
+			CarrierCredentials::SANDBOX => __( 'The sandbox sends no tracking updates, so no webhook is needed there; the store still asks it where each parcel is every half hour.', 'storewright' ),
+			CarrierCredentials::LIVE    => sprintf(
+				/* translators: %s: webhook address */
+				__( 'The store asks Shiprocket where each parcel is every half hour. For updates within the minute, add a webhook in Shiprocket under Settings, API, Webhooks pointing at %s with the token from SHIPROCKET_WEBHOOK_TOKEN.', 'storewright' ),
+				home_url( '/wp-json/storewright/v1/webhooks/shiprocket' )
+			),
+			default                     => '',
+		};
 		return [
 			[
 				'title' => __( 'Shiprocket', 'storewright' ),
 				'type'  => 'title',
-				'desc'  => $state . ' ' . sprintf(
-					/* translators: %s: webhook address */
-					__( 'For live tracking updates, add a webhook in Shiprocket under Settings, API, Webhooks pointing at %s with the token from SHIPROCKET_WEBHOOK_TOKEN; without it the store asks for updates every half hour.', 'storewright' ),
-					home_url( '/wp-json/storewright/v1/webhooks/shiprocket' )
-				),
+				'desc'  => trim( $state . ' ' . $webhook ),
 				'id'    => 'storewright_shiprocket',
 			],
 			[

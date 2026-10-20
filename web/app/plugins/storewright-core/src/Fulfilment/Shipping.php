@@ -9,6 +9,9 @@ use Automattic\WooCommerce\Admin\Features\Fulfillments\Fulfillment;
 use Automattic\WooCommerce\Admin\Features\Fulfillments\FulfillmentUtils;
 use Storewright\Core\Fulfilment\Shiprocket\Client;
 use Storewright\Core\Fulfilment\Shiprocket\Shiprocket;
+use Storewright\Core\Returns\ReturnDesk;
+use Storewright\Core\Returns\ReturnMail;
+use Storewright\Core\Returns\ReturnRequests;
 use Storewright\Core\Settings;
 use Storewright\Platform\CarrierCredentials;
 use WC_Order;
@@ -70,8 +73,9 @@ final class Shipping {
 		return $items;
 	}
 
-	public static function consignment( WC_Order $order, array $items, int $fulfillmentId = 0 ): Consignment {
-		$first = self::store()->forOrder( $order->get_id() ) === [];
+	/** @param list<array{item_id: int, qty: int}> $items */
+	public static function consignment( WC_Order $order, array $items, string $reference = '', bool $reverse = false ): Consignment {
+		$first = ! $reverse && self::store()->forOrder( $order->get_id() ) === [];
 		return Consignment::fromOrder(
 			$order,
 			$items,
@@ -82,8 +86,9 @@ final class Shipping {
 				'breadth' => (float) Settings::get( 'parcel_breadth' ),
 				'height'  => (float) Settings::get( 'parcel_height' ),
 			],
-			$fulfillmentId > 0 ? $order->get_order_number() . '-' . $fulfillmentId : (string) $order->get_order_number(),
-			$first ? (float) $order->get_shipping_total() + (float) $order->get_total_fees() : 0.0
+			$reference !== '' ? $reference : (string) $order->get_order_number(),
+			$first ? (float) $order->get_shipping_total() + (float) $order->get_total_fees() : 0.0,
+			$reverse
 		);
 	}
 
@@ -99,16 +104,14 @@ final class Shipping {
 		$fulfillment->set_shipment_provider( Shiprocket::KEY );
 		$fulfillment->set_status( 'unfulfilled' );
 		$fulfillment->save();
-		$id = $fulfillment->get_id();
-		self::store()->save(
-			$id,
+		$id = self::store()->insert(
 			[
-				'order_id'   => $order->get_id(),
-				'carrier'    => Shiprocket::KEY,
-				'service'    => $service,
-				'status'     => ShipmentStore::BOOKING,
-				'tries'      => 0,
-				'last_error' => '',
+				'kind'           => ShipmentStore::OUTBOUND,
+				'order_id'       => $order->get_id(),
+				'fulfillment_id' => $fulfillment->get_id(),
+				'carrier'        => Shiprocket::KEY,
+				'service'        => $service,
+				'status'         => ShipmentStore::BOOKING,
 			]
 		);
 		as_enqueue_async_action( self::BOOK, [ $id ], self::GROUP );
@@ -116,24 +119,68 @@ final class Shipping {
 		return $id;
 	}
 
-	public static function book( int $fulfillmentId ): void {
+	/** @param array<int|string, int> $items */
+	public static function collect( WC_Order $order, string $reverseId, array $items ): int {
+		$carrier = self::carrier();
+		if ( $carrier === null ) {
+			throw new CarrierException( esc_html__( 'Shiprocket is off on this store.', 'storewright' ), false );
+		}
+		if ( self::store()->forReturn( $order->get_id(), $reverseId ) !== null ) {
+			throw new CarrierException( esc_html__( 'A pickup is already booked for this return.', 'storewright' ), false );
+		}
+		$list = [];
+		foreach ( $items as $itemId => $qty ) {
+			$list[] = [
+				'item_id' => (int) $itemId,
+				'qty'     => (int) $qty,
+			];
+		}
+		$quotes = $carrier->quotes( self::consignment( $order, $list, '', true ) );
+		if ( $quotes === [] ) {
+			throw new CarrierException( esc_html__( 'No courier offers a pickup from that address.', 'storewright' ), false );
+		}
+		$id = self::store()->insert(
+			[
+				'kind'      => ShipmentStore::RETURN,
+				'order_id'  => $order->get_id(),
+				'return_id' => $reverseId,
+				'carrier'   => Shiprocket::KEY,
+				'service'   => self::bestService( $quotes ),
+				'status'    => ShipmentStore::BOOKING,
+			]
+		);
+		as_enqueue_async_action( self::BOOK, [ $id ], self::GROUP );
+		$order->add_order_note( __( 'Booking the return pickup with Shiprocket.', 'storewright' ) );
+		return $id;
+	}
+
+	/** @param list<Quote> $quotes */
+	public static function bestService( array $quotes ): string {
+		foreach ( $quotes as $quote ) {
+			if ( $quote->recommended ) {
+				return $quote->service;
+			}
+		}
+		return $quotes[0]->service;
+	}
+
+	public static function book( int $id ): void {
 		$store   = self::store();
-		$row     = $store->find( $fulfillmentId );
+		$row     = $store->find( $id );
 		$carrier = self::carrier();
 		if ( $row === null || $carrier === null || $row['status'] === ShipmentStore::CANCELLED ) {
 			return;
 		}
-		$order       = wc_get_order( (int) $row['order_id'] );
-		$fulfillment = new Fulfillment( (string) $fulfillmentId );
-		if ( ! $order instanceof WC_Order || $fulfillment->get_id() === 0 ) {
+		$order = wc_get_order( (int) $row['order_id'] );
+		if ( ! $order instanceof WC_Order ) {
 			return;
 		}
 		try {
-			$booking = new Booking( (string) $row['reference'], (string) $row['shipment'], (string) $row['awb'], (string) $row['courier'], (string) $row['service'] );
+			$booking = self::bookingOf( $row );
 			if ( $booking->reference === '' ) {
-				$booking = $carrier->create( self::consignment( $order, self::itemsOf( $fulfillment ), $fulfillmentId ) );
+				$booking = $carrier->create( self::consignmentOf( $order, $row ) );
 				$store->save(
-					$fulfillmentId,
+					$id,
 					[
 						'reference' => $booking->reference,
 						'shipment'  => $booking->shipment,
@@ -144,11 +191,11 @@ final class Shipping {
 				$booking = $carrier->assign( $booking, (string) $row['service'] );
 			}
 		} catch ( CarrierException $e ) {
-			self::failed( $order, $fulfillmentId, $e );
+			self::failed( $order, $id, $e );
 			throw $e;
 		}
 		$store->save(
-			$fulfillmentId,
+			$id,
 			[
 				'awb'        => $booking->awb,
 				'courier'    => $booking->courier,
@@ -158,21 +205,18 @@ final class Shipping {
 				'tries'      => 0,
 			]
 		);
-		$fulfillment->set_shipment_provider( Carriers::keyFor( $booking->courier ) );
-		$fulfillment->set_tracking_number( $booking->awb );
-		$fulfillment->set_tracking_url( $booking->trackingUrl );
-		$fulfillment->set_status( 'fulfilled' );
-		$fulfillment->save();
-		/* translators: 1: courier name, 2: waybill number */
-		$order->add_order_note( sprintf( __( 'Shipment booked with %1$s, waybill %2$s. The courier is being asked to pick it up.', 'storewright' ), $booking->courier, $booking->awb ) );
-		do_action( 'woocommerce_fulfillment_created_notification', $order->get_id(), $fulfillment, $order ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		as_enqueue_async_action( self::PICKUP, [ $fulfillmentId, 1 ], self::GROUP );
-		as_enqueue_async_action( self::LABEL, [ $fulfillmentId, 1 ], self::GROUP );
+		if ( $row['kind'] === ShipmentStore::RETURN ) {
+			self::returnBooked( $order, $row, $booking );
+		} else {
+			self::shipmentBooked( $order, (int) $row['fulfillment_id'], $booking );
+		}
+		as_enqueue_async_action( self::PICKUP, [ $id, 1 ], self::GROUP );
+		as_enqueue_async_action( self::LABEL, [ $id, 1 ], self::GROUP );
 	}
 
-	public static function pickup( int $fulfillmentId, int $attempt = 1 ): void {
+	public static function pickup( int $id, int $attempt = 1 ): void {
 		self::step(
-			$fulfillmentId,
+			$id,
 			$attempt,
 			self::PICKUP,
 			static fn( Carrier $carrier, Booking $booking ): array => [ 'pickup_at' => $carrier->pickup( $booking ) ],
@@ -180,9 +224,9 @@ final class Shipping {
 		);
 	}
 
-	public static function label( int $fulfillmentId, int $attempt = 1 ): void {
+	public static function label( int $id, int $attempt = 1 ): void {
 		self::step(
-			$fulfillmentId,
+			$id,
 			$attempt,
 			self::LABEL,
 			static fn( Carrier $carrier, Booking $booking ): array => [ 'label_url' => $carrier->label( $booking ) ],
@@ -190,9 +234,9 @@ final class Shipping {
 		);
 	}
 
-	public static function track( int $fulfillmentId ): void {
+	public static function track( int $id ): void {
 		$store   = self::store();
-		$row     = $store->find( $fulfillmentId );
+		$row     = $store->find( $id );
 		$carrier = self::carrier();
 		if ( $row === null || $carrier === null || $row['awb'] === '' || ShipmentStore::isClosed( (string) $row['status'] ) ) {
 			return;
@@ -201,31 +245,35 @@ final class Shipping {
 		if ( $events === [] ) {
 			return;
 		}
-		$added  = $store->addEvents( $fulfillmentId, $events, 'poll' );
+		$added  = $store->addEvents( $id, $events, 'poll' );
 		$latest = $events[ array_key_last( $events ) ];
 		if ( $latest->status === $row['status'] && $added === 0 ) {
 			return;
 		}
 		$store->save(
-			$fulfillmentId,
+			$id,
 			[
 				'status'     => $latest->status,
 				'raw_status' => $latest->raw,
 			]
 		);
 		$order = wc_get_order( (int) $row['order_id'] );
-		if ( $order instanceof WC_Order && $latest->status !== $row['status'] ) {
-			/* translators: 1: waybill number, 2: status in plain words, 3: place */
-			$order->add_order_note( trim( sprintf( __( 'Waybill %1$s: %2$s %3$s', 'storewright' ), $row['awb'], TrackingEvent::words( $latest->status ), $latest->location !== '' ? '(' . $latest->location . ')' : '' ) ) );
+		if ( ! $order instanceof WC_Order || $latest->status === $row['status'] ) {
+			return;
+		}
+		/* translators: 1: waybill number, 2: status in plain words, 3: place */
+		$order->add_order_note( trim( sprintf( __( 'Waybill %1$s: %2$s %3$s', 'storewright' ), $row['awb'], TrackingEvent::words( $latest->status ), $latest->location !== '' ? '(' . $latest->location . ')' : '' ) ) );
+		if ( $latest->status === TrackingEvent::DELIVERED ) {
+			self::delivered( $order, $row );
 		}
 	}
 
 	public static function poll(): void {
 		foreach ( self::store()->open() as $row ) {
 			try {
-				self::track( (int) $row['fulfillment_id'] );
+				self::track( (int) $row['id'] );
 			} catch ( CarrierException $e ) {
-				self::store()->save( (int) $row['fulfillment_id'], [ 'last_error' => $e->getMessage() ] );
+				self::store()->save( (int) $row['id'], [ 'last_error' => $e->getMessage() ] );
 			}
 		}
 	}
@@ -235,15 +283,15 @@ final class Shipping {
 		if ( $row === null ) {
 			return false;
 		}
-		if ( ! as_has_scheduled_action( self::TRACK, [ (int) $row['fulfillment_id'] ], self::GROUP ) ) {
-			as_enqueue_async_action( self::TRACK, [ (int) $row['fulfillment_id'] ], self::GROUP );
+		if ( ! as_has_scheduled_action( self::TRACK, [ (int) $row['id'] ], self::GROUP ) ) {
+			as_enqueue_async_action( self::TRACK, [ (int) $row['id'] ], self::GROUP );
 		}
 		return true;
 	}
 
-	public static function cancel( int $fulfillmentId ): void {
+	public static function cancel( int $id ): void {
 		$store   = self::store();
-		$row     = $store->find( $fulfillmentId );
+		$row     = $store->find( $id );
 		$carrier = self::carrier();
 		if ( $row === null || $carrier === null ) {
 			return;
@@ -252,31 +300,32 @@ final class Shipping {
 			$carrier->cancel( self::bookingOf( $row ) );
 		}
 		$store->save(
-			$fulfillmentId,
+			$id,
 			[
 				'status'     => ShipmentStore::CANCELLED,
 				'raw_status' => 'CANCELED',
 			]
 		);
-		$fulfillment = new Fulfillment( (string) $fulfillmentId );
-		if ( $fulfillment->get_id() > 0 ) {
+		$fulfillment = (int) $row['fulfillment_id'] > 0 ? new Fulfillment( (string) $row['fulfillment_id'] ) : null;
+		if ( $fulfillment && $fulfillment->get_id() > 0 ) {
 			$fulfillment->delete();
 		}
 		$order = wc_get_order( (int) $row['order_id'] );
 		if ( $order instanceof WC_Order ) {
-			/* translators: %s: waybill number or "the booking" */
-			$order->add_order_note( sprintf( __( 'Shiprocket shipment %s cancelled; the items can be shipped again.', 'storewright' ), $row['awb'] !== '' ? $row['awb'] : __( 'booking', 'storewright' ) ) );
+			$what = $row['kind'] === ShipmentStore::RETURN ? __( 'return pickup', 'storewright' ) : __( 'shipment', 'storewright' );
+			/* translators: 1: shipment or return pickup, 2: waybill number or "booking" */
+			$order->add_order_note( sprintf( __( 'Shiprocket %1$s %2$s cancelled.', 'storewright' ), $what, $row['awb'] !== '' ? $row['awb'] : __( 'booking', 'storewright' ) ) );
 		}
 	}
 
-	public static function retry( int $fulfillmentId ): void {
+	public static function retry( int $id ): void {
 		$store = self::store();
-		$row   = $store->find( $fulfillmentId );
+		$row   = $store->find( $id );
 		if ( $row === null ) {
 			return;
 		}
 		$store->save(
-			$fulfillmentId,
+			$id,
 			[
 				'last_error' => '',
 				'tries'      => 0,
@@ -284,14 +333,14 @@ final class Shipping {
 			]
 		);
 		if ( $row['awb'] === '' ) {
-			as_enqueue_async_action( self::BOOK, [ $fulfillmentId ], self::GROUP );
+			as_enqueue_async_action( self::BOOK, [ $id ], self::GROUP );
 			return;
 		}
 		if ( $row['pickup_at'] === '' || $row['pickup_at'] === null ) {
-			as_enqueue_async_action( self::PICKUP, [ $fulfillmentId, 1 ], self::GROUP );
+			as_enqueue_async_action( self::PICKUP, [ $id, 1 ], self::GROUP );
 		}
 		if ( $row['label_url'] === '' || $row['label_url'] === null ) {
-			as_enqueue_async_action( self::LABEL, [ $fulfillmentId, 1 ], self::GROUP );
+			as_enqueue_async_action( self::LABEL, [ $id, 1 ], self::GROUP );
 		}
 	}
 
@@ -299,7 +348,7 @@ final class Shipping {
 		if ( ! $fulfillment instanceof Fulfillment ) {
 			return;
 		}
-		$row = self::store()->find( $fulfillment->get_id() );
+		$row = self::store()->forFulfillment( $fulfillment->get_id() );
 		if ( $row === null || $row['status'] === ShipmentStore::CANCELLED || self::carrier() === null ) {
 			return;
 		}
@@ -308,10 +357,10 @@ final class Shipping {
 				self::carrier()->cancel( self::bookingOf( $row ) );
 			}
 		} catch ( CarrierException $e ) {
-			self::store()->save( $fulfillment->get_id(), [ 'last_error' => $e->getMessage() ] );
+			self::store()->save( (int) $row['id'], [ 'last_error' => $e->getMessage() ] );
 		}
 		self::store()->save(
-			$fulfillment->get_id(),
+			(int) $row['id'],
 			[
 				'status'     => ShipmentStore::CANCELLED,
 				'raw_status' => 'CANCELED',
@@ -325,51 +374,121 @@ final class Shipping {
 		}
 	}
 
-	private static function step( int $fulfillmentId, int $attempt, string $hook, callable $work, string $gaveUp ): void {
+	/** @param list<array<string, mixed>> $rows */
+	public static function allDelivered( array $rows ): bool {
+		$counted = 0;
+		foreach ( $rows as $row ) {
+			if ( $row['kind'] !== ShipmentStore::OUTBOUND || in_array( $row['status'], [ ShipmentStore::CANCELLED, ShipmentStore::FAILED ], true ) ) {
+				continue;
+			}
+			if ( $row['status'] !== TrackingEvent::DELIVERED ) {
+				return false;
+			}
+			++$counted;
+		}
+		return $counted > 0;
+	}
+
+	private static function delivered( WC_Order $order, array $row ): void {
+		if ( $row['kind'] === ShipmentStore::RETURN ) {
+			$request = ReturnRequests::find( $order, (string) $row['return_id'] );
+			if ( $request !== null && $request['status'] === 'approved' ) {
+				ReturnDesk::move( $order->get_id(), (string) $row['return_id'], 'received', '' );
+			}
+			return;
+		}
+		if ( $order->get_status() === 'processing' && self::pending( $order ) === [] && self::allDelivered( self::store()->forOrder( $order->get_id() ) ) ) {
+			$order->update_status( 'completed', __( 'Every parcel is delivered.', 'storewright' ) );
+		}
+	}
+
+	private static function shipmentBooked( WC_Order $order, int $fulfillmentId, Booking $booking ): void {
+		$fulfillment = new Fulfillment( (string) $fulfillmentId );
+		if ( $fulfillment->get_id() === 0 ) {
+			return;
+		}
+		$fulfillment->set_shipment_provider( Carriers::keyFor( $booking->courier ) );
+		$fulfillment->set_tracking_number( $booking->awb );
+		$fulfillment->set_tracking_url( $booking->trackingUrl );
+		$fulfillment->set_status( 'fulfilled' );
+		$fulfillment->save();
+		/* translators: 1: courier name, 2: waybill number */
+		$order->add_order_note( sprintf( __( 'Shipment booked with %1$s, waybill %2$s. The courier is being asked to pick it up.', 'storewright' ), $booking->courier, $booking->awb ) );
+		do_action( 'woocommerce_fulfillment_created_notification', $order->get_id(), $fulfillment, $order ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	}
+
+	private static function returnBooked( WC_Order $order, array $row, Booking $booking ): void {
+		/* translators: 1: courier name, 2: waybill number */
+		$order->add_order_note( sprintf( __( 'Return pickup booked with %1$s, waybill %2$s.', 'storewright' ), $booking->courier, $booking->awb ) );
+		$request = ReturnRequests::find( $order, (string) $row['return_id'] );
+		if ( $request !== null ) {
+			ReturnMail::pickup( $order, $request, $booking->courier, $booking->awb );
+		}
+	}
+
+	private static function consignmentOf( WC_Order $order, array $row ): Consignment {
+		if ( $row['kind'] === ShipmentStore::RETURN ) {
+			$request = ReturnRequests::find( $order, (string) $row['return_id'] );
+			$items   = [];
+			foreach ( (array) ( $request['items'] ?? [] ) as $itemId => $qty ) {
+				$items[] = [
+					'item_id' => (int) $itemId,
+					'qty'     => (int) $qty,
+				];
+			}
+			return self::consignment( $order, $items, $order->get_order_number() . '-R' . $row['id'], true );
+		}
+		$fulfillment = new Fulfillment( (string) $row['fulfillment_id'] );
+		$items       = [];
+		foreach ( $fulfillment->get_items() as $item ) {
+			$items[] = [
+				'item_id' => (int) $item['item_id'],
+				'qty'     => (int) $item['qty'],
+			];
+		}
+		return self::consignment( $order, $items, $order->get_order_number() . '-' . $row['id'] );
+	}
+
+	private static function step( int $id, int $attempt, string $hook, callable $work, string $gaveUp ): void {
 		$store   = self::store();
-		$row     = $store->find( $fulfillmentId );
+		$row     = $store->find( $id );
 		$carrier = self::carrier();
 		if ( $row === null || $carrier === null || $row['awb'] === '' || ShipmentStore::isClosed( (string) $row['status'] ) ) {
 			return;
 		}
 		try {
-			$store->save( $fulfillmentId, $work( $carrier, self::bookingOf( $row ) ) + [ 'last_error' => '' ] );
+			$store->save( $id, $work( $carrier, self::bookingOf( $row ) ) + [ 'last_error' => '' ] );
 		} catch ( CarrierException $e ) {
 			if ( $e->retryable && $attempt < self::TRIES ) {
-				as_schedule_single_action( time() + $attempt * 10 * MINUTE_IN_SECONDS, $hook, [ $fulfillmentId, $attempt + 1 ], self::GROUP );
+				as_schedule_single_action( time() + $attempt * 10 * MINUTE_IN_SECONDS, $hook, [ $id, $attempt + 1 ], self::GROUP );
 				return;
 			}
-			$store->save( $fulfillmentId, [ 'last_error' => $gaveUp . ': ' . $e->getMessage() ] );
+			$store->save( $id, [ 'last_error' => $gaveUp . ': ' . $e->getMessage() ] );
 			throw $e;
 		}
 	}
 
-	private static function failed( WC_Order $order, int $fulfillmentId, CarrierException $e ): void {
+	private static function failed( WC_Order $order, int $id, CarrierException $e ): void {
 		self::store()->save(
-			$fulfillmentId,
+			$id,
 			[
 				'status'     => ShipmentStore::FAILED,
 				'last_error' => $e->getMessage(),
 			]
 		);
 		/* translators: %s: the carrier's message */
-		$order->add_order_note( sprintf( __( 'Shiprocket could not book the shipment: %s', 'storewright' ), $e->getMessage() ) );
-	}
-
-	/** @return list<array{item_id: int, qty: int}> */
-	private static function itemsOf( Fulfillment $fulfillment ): array {
-		return array_values(
-			array_map(
-				static fn( array $item ): array => [
-					'item_id' => (int) $item['item_id'],
-					'qty'     => (int) $item['qty'],
-				],
-				$fulfillment->get_items()
-			)
-		);
+		$order->add_order_note( sprintf( __( 'Shiprocket could not book it: %s', 'storewright' ), $e->getMessage() ) );
 	}
 
 	private static function bookingOf( array $row ): Booking {
-		return new Booking( (string) $row['reference'], (string) $row['shipment'], (string) $row['awb'], (string) $row['courier'], (string) $row['service'], (string) $row['awb'] !== '' ? 'https://shiprocket.co/tracking/' . $row['awb'] : '' );
+		return new Booking(
+			(string) $row['reference'],
+			(string) $row['shipment'],
+			(string) $row['awb'],
+			(string) $row['courier'],
+			(string) $row['service'],
+			(string) $row['awb'] !== '' ? 'https://shiprocket.co/tracking/' . $row['awb'] : '',
+			$row['kind'] === ShipmentStore::RETURN
+		);
 	}
 }

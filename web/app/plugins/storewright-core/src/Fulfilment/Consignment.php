@@ -23,11 +23,12 @@ final class Consignment {
 		public readonly float $weight,
 		public readonly float $length,
 		public readonly float $breadth,
-		public readonly float $height
+		public readonly float $height,
+		public readonly bool $reverse = false
 	) {}
 
 	/** @param list<array{item_id: int, qty: int}> $items */
-	public static function fromOrder( WC_Order $order, array $items, string $pickup, array $parcel, string $reference, float $charges = 0 ): self {
+	public static function fromOrder( WC_Order $order, array $items, string $pickup, array $parcel, string $reference, float $charges = 0, bool $reverse = false ): self {
 		$lines    = [];
 		$weight   = 0.0;
 		$size     = [ 0.0, 0.0, 0.0 ];
@@ -74,13 +75,14 @@ final class Consignment {
 				'phone'    => self::phone( $order->get_shipping_phone() !== '' ? $order->get_shipping_phone() : $order->get_billing_phone() ),
 			],
 			$lines,
-			$order->get_payment_method() === 'cod',
+			! $reverse && $order->get_payment_method() === 'cod',
 			round( $subtotal, 2 ),
-			round( $charges, 2 ),
+			$reverse ? 0.0 : round( $charges, 2 ),
 			round( max( $weight, 0.1 ), 3 ),
 			$size[0] > 0 ? $size[0] : $parcel['length'],
 			$size[1] > 0 ? $size[1] : $parcel['breadth'],
-			$size[2] > 0 ? $size[2] : $parcel['height']
+			$size[2] > 0 ? $size[2] : $parcel['height'],
+			$reverse
 		);
 	}
 
@@ -93,12 +95,12 @@ final class Consignment {
 		return strlen( $digits ) > 10 ? substr( $digits, -10 ) : $digits;
 	}
 
-	private static function stateName( string $country, string $code ): string {
+	public static function stateName( string $country, string $code ): string {
 		$states = WC()->countries->get_states( $country );
 		return is_array( $states ) && isset( $states[ $code ] ) ? html_entity_decode( (string) $states[ $code ] ) : $code;
 	}
 
-	private static function countryName( string $code ): string {
+	public static function countryName( string $code ): string {
 		$countries = WC()->countries->get_countries();
 		return isset( $countries[ $code ] ) ? html_entity_decode( (string) $countries[ $code ] ) : $code;
 	}
