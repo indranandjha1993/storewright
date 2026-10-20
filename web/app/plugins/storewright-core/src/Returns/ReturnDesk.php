@@ -6,52 +6,17 @@ namespace Storewright\Core\Returns;
 
 use InvalidArgumentException;
 use WC_Order;
-use WP_Error;
-use WP_REST_Request;
-use WP_REST_Response;
 
-final class ReturnsEndpoint {
+final class ReturnDesk {
 
-	public static function register(): void {
-		$staff = static fn(): bool => current_user_can( 'manage_woocommerce' );
-		register_rest_route(
-			'storewright/v1',
-			'/returns',
-			[
-				'methods'             => 'GET',
-				'callback'            => [ self::class, 'list' ],
-				'permission_callback' => $staff,
-			]
-		);
-		register_rest_route(
-			'storewright/v1',
-			'/returns/(?P<order>\d+)/(?P<id>[a-f0-9-]{36})',
-			[
-				'methods'             => 'POST',
-				'callback'            => [ self::class, 'move' ],
-				'permission_callback' => $staff,
-				'args'                => [
-					'status' => [
-						'type'     => 'string',
-						'enum'     => [ 'approved', 'declined', 'received', 'refunded' ],
-						'required' => true,
-					],
-					'note'   => [
-						'type' => 'string',
-					],
-				],
-			]
-		);
-	}
-
-	public static function list( WP_REST_Request $request ): WP_REST_Response {
+	public static function rows( bool $all ): array {
 		$orders = wc_get_orders(
 			[
 				'limit'      => 50,
 				'orderby'    => 'date',
 				'order'      => 'DESC',
-				'meta_key'   => $request['all'] ? ReturnRequests::META : ReturnRequests::OPEN, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_query_meta_key
-				'meta_value' => $request['all'] ? null : 'yes', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_query_meta_value
+				'meta_key'   => $all ? ReturnRequests::META : ReturnRequests::OPEN, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_query_meta_key
+				'meta_value' => $all ? null : 'yes', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_query_meta_value
 			]
 		);
 		$rows   = [];
@@ -64,26 +29,21 @@ final class ReturnsEndpoint {
 			}
 		}
 		usort( $rows, static fn( array $a, array $b ): int => strcmp( $b['created'], $a['created'] ) );
-		return new WP_REST_Response( $rows );
+		return $rows;
 	}
 
-	public static function move( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$order = wc_get_order( (int) $request['order'] );
+	public static function move( int $orderId, string $id, string $status, string $note ): array {
+		$order = wc_get_order( $orderId );
 		if ( ! $order instanceof WC_Order ) {
-			return new WP_Error( 'storewright_return_missing', __( 'That order does not exist.', 'storewright' ), [ 'status' => 404 ] );
+			throw new InvalidArgumentException( esc_html__( 'That order does not exist.', 'storewright' ) );
 		}
-		$status = (string) $request['status'];
-		try {
-			$current = array_values( array_filter( ReturnRequests::all( $order ), static fn( array $item ): bool => $item['id'] === $request['id'] ) )[0] ?? null;
-			if ( $status === 'refunded' && $current !== null ) {
-				self::refund( $order, $current );
-			}
-			$moved = ReturnRequests::move( $order, (string) $request['id'], $status, sanitize_textarea_field( (string) $request['note'] ) );
-		} catch ( InvalidArgumentException $e ) {
-			return new WP_Error( 'storewright_return_invalid', $e->getMessage(), [ 'status' => 400 ] );
+		$current = array_values( array_filter( ReturnRequests::all( $order ), static fn( array $item ): bool => $item['id'] === $id ) )[0] ?? null;
+		if ( $status === 'refunded' && $current !== null ) {
+			self::refund( $order, $current );
 		}
+		$moved = ReturnRequests::move( $order, $id, $status, $note );
 		ReturnMail::customer( $order, $moved );
-		return new WP_REST_Response( self::describe( wc_get_order( $order->get_id() ) ?: $order, $moved ) );
+		return self::describe( wc_get_order( $order->get_id() ) ?: $order, $moved );
 	}
 
 	private static function refund( WC_Order $order, array $request ): void {

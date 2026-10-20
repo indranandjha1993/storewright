@@ -6,7 +6,7 @@ namespace Storewright\Core\Admin;
 
 use InvalidArgumentException;
 use Storewright\Core\Jobs\FailedJobs;
-use Storewright\Core\Payments\HealthEndpoint;
+use Storewright\Core\Payments\Health;
 
 final class Dashboard {
 
@@ -179,7 +179,7 @@ final class Dashboard {
 	}
 
 	public static function payments(): void {
-		$health = HealthEndpoint::describe();
+		$health = Health::describe();
 		$names  = [
 			'razorpay' => 'Razorpay',
 			'stripe'   => 'Stripe',

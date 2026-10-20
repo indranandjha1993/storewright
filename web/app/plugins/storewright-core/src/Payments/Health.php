@@ -5,28 +5,10 @@ declare(strict_types=1);
 namespace Storewright\Core\Payments;
 
 use Storewright\Platform\GatewayCredentials;
-use WP_REST_Response;
-use WP_REST_Server;
 
-final class HealthEndpoint {
+final class Health {
 
 	private const STUCK_AFTER_MINUTES = 10;
-
-	public static function register(): void {
-		register_rest_route(
-			'storewright/v1',
-			'/payments/health',
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ self::class, 'show' ],
-				'permission_callback' => static fn(): bool => current_user_can( 'manage_woocommerce' ),
-			]
-		);
-	}
-
-	public static function show(): WP_REST_Response {
-		return new WP_REST_Response( self::describe() );
-	}
 
 	public static function describe(): array {
 		global $wpdb;
