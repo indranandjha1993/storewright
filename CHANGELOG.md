@@ -4,6 +4,7 @@ All notable changes are listed here. Versions follow semantic versioning once th
 
 ## Unreleased
 
+- One pipeline for every push and tag, each stage gated on the one before, so a release is only built, scanned, published and deployed after the whole suite has passed on that commit; `bin/release x.y.z` is the one command that cuts a release.
 ## 0.7.0 - 2026-10-20
 
 Taxes and charges, permission guards checked per user, and every admin field doing something.

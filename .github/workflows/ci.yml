@@ -3,21 +3,36 @@ name: ci
 on:
   push:
     branches: [main]
+    tags: ["v*"]
     paths-ignore: ["docs/**", "**/*.md", "LICENSE"]
   pull_request:
     paths-ignore: ["docs/**", "**/*.md", "LICENSE"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to release again, such as v0.7.0
+        required: true
+
+permissions:
+  contents: write
+  packages: write
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.event.inputs.tag || github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.event.inputs.tag || github.ref, 'refs/tags/') && github.event.inputs.tag == '' }}
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
-  php:
+  check:
     name: lint, analyse, test
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
@@ -34,10 +49,13 @@ jobs:
 
   stack:
     name: compose, install, seed, smoke
+    needs: check
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
       - name: write .env
         run: |
           cp .env.example .env
@@ -64,7 +82,7 @@ jobs:
       - run: npm run assets
       - name: deploy files
         run: |
-          bash -n deploy/deploy.sh bin/install
+          bash -n deploy/deploy.sh bin/install bin/release
           cp deploy/.env.example deploy/.env
           STOREWRIGHT_VERSION=ci docker compose -f deploy/docker-compose.yml --env-file deploy/.env config --quiet
           rm deploy/.env
@@ -90,3 +108,120 @@ jobs:
           retention-days: 7
       - if: failure()
         run: docker compose logs --no-color app web db | tail -200
+
+  release:
+    name: images and release
+    needs: stack
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.tag != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+      - name: version
+        id: version
+        run: |
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          grep -q "^## ${tag#v} " CHANGELOG.md || { echo "CHANGELOG.md has no heading for ${tag#v}; run bin/release" >&2; exit 1; }
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: build app
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/app/Dockerfile
+          target: app
+          load: true
+          build-args: |
+            STOREWRIGHT_VERSION=${{ steps.version.outputs.version }}
+            GIT_SHA=${{ steps.version.outputs.sha }}
+          tags: ${{ env.IMAGE }}:${{ steps.version.outputs.version }}
+          cache-from: type=gha
+      - name: build web
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/app/Dockerfile
+          target: web
+          load: true
+          build-args: |
+            STOREWRIGHT_VERSION=${{ steps.version.outputs.version }}
+            GIT_SHA=${{ steps.version.outputs.sha }}
+          tags: ${{ env.IMAGE }}-web:${{ steps.version.outputs.version }}
+          cache-from: type=gha
+      - name: start app once
+        run: docker run --rm "$IMAGE:${{ steps.version.outputs.version }}" sh -c 'sync-plugins && test -f web/app/plugins/woocommerce/.storewright-image && php-fpm -t'
+      - name: scan app
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}:${{ steps.version.outputs.version }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: scan web
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}-web:${{ steps.version.outputs.version }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: push
+        run: |
+          docker push "$IMAGE:${{ steps.version.outputs.version }}"
+          docker push "$IMAGE-web:${{ steps.version.outputs.version }}"
+      - name: release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ steps.version.outputs.tag }}"
+          version="${{ steps.version.outputs.version }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "release $tag already exists"
+            exit 0
+          fi
+          awk -v v="## $version " 'index($0, v) == 1 {on=1; next} on && /^## / {exit} on' CHANGELOG.md > notes.md
+          gh release create "$tag" --title "$version" --notes-file notes.md
+
+  deploy:
+    needs: release
+    if: vars.DEPLOY_TARGETS != ''
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        target: ${{ fromJSON(vars.DEPLOY_TARGETS || '["none"]') }}
+    environment: ${{ matrix.target }}
+    concurrency: deploy-${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+      - name: ssh key
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: update
+        env:
+          SERVER: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+          FOLDER: ${{ secrets.DEPLOY_PATH }}
+          VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          scp -q -i ~/.ssh/deploy deploy/deploy.sh deploy/docker-compose.yml deploy/Caddyfile deploy/.env.example "$SERVER:$FOLDER/"
+          ssh -i ~/.ssh/deploy "$SERVER" "cd '$FOLDER' && ./deploy.sh update '$VERSION'"

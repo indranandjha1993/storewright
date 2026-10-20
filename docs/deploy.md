@@ -15,14 +15,25 @@ A release is two images with the same tag:
 `make images VERSION=0.2.0` builds both locally; `IMAGE=` changes the name. Uploads live in a
 volume shared by both, so nothing in the images changes at run time.
 
-Before tagging, `bin/version x.y.z` writes the version into the plugin and theme headers and
-the README so every screen that shows a version agrees with the tag.
+A release is one command on a green main:
 
-Pushing a `v*` tag runs the release workflow (`.github/workflows/release.yml`): it builds both
-images, scans them with Trivy and stops on any critical issue that has a fix, pushes them to GHCR
-and creates the GitHub release from that version's section of `CHANGELOG.md` if it does not exist
-yet. It can also be started by hand for an existing tag. The images are public, so a server pulls
-them without logging in.
+```
+bin/release 0.8.0
+```
+
+It refuses to run unless main is clean, in step with origin and green in CI, and
+`CHANGELOG.md` has something under Unreleased. It then writes the version into the plugin and
+theme headers and the README (`bin/version`), turns the Unreleased section into the release
+heading, commits `release 0.8.0` as you, tags `v0.8.0` and pushes both.
+
+The one pipeline (`.github/workflows/ci.yml`) takes it from there, each stage gated on the one
+before: lint, analysis and unit tests; then the stack (image, install, seed, smoke and the whole
+browser suite); then, for a tag only, both images are built with the version baked in, scanned
+with Trivy (any critical issue with a fix stops the release), pushed to GHCR, and the GitHub
+release is created from that version's section of `CHANGELOG.md`; then the deploy job (below).
+Nothing is published that the suite has not passed on that exact commit. The pipeline can also
+be started by hand for an existing tag, to rebuild or redeploy it. The images are public, so a
+server pulls them without logging in.
 
 ## The server
 
@@ -108,7 +119,7 @@ with a nightly cron entry on the host:
 
 ## Updates from this repository
 
-A store can update itself to every release. After the release workflow publishes the images, its
+A store can update itself to every release. After the pipeline publishes the images, its
 deploy job goes through the servers listed in the repository variable `DEPLOY_TARGETS`, one at a
 time: it copies that release's `deploy.sh`, compose file and Caddyfile to the server and runs
 `./deploy.sh update <version>`, which backs up first and goes back by itself if the new version
@@ -148,8 +159,8 @@ Bump what is due in `composer.json` or `package.json`, run `composer update <pac
 and `npx playwright test`. `wp storewright templates` fails if WooCommerce changed a template the
 theme overrides, and the operator spec fails if a bump moved a selector the admin skin relies on
 (see [design.md](design.md)). Commit the bump with a short message such as
-`update woocommerce to 11.3.0`, add the change to `CHANGELOG.md`, and tag. A WordPress or
-WooCommerce security release is bumped and tagged the week it appears, on its own.
+`update woocommerce to 11.3.0`, add the change to `CHANGELOG.md`, and run `bin/release`. A
+WordPress or WooCommerce security release is bumped and released the week it appears, on its own.
 
 GitHub's security alerts stay on for the repository and name a pinned package only when a known
 vulnerability affects it; nothing else opens pull requests.
