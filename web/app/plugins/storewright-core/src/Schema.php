@@ -6,7 +6,7 @@ namespace Storewright\Core;
 
 final class Schema {
 
-	public const VERSION = '3';
+	public const VERSION = '4';
 	private const OPTION = 'storewright_schema_version';
 
 	public static function register(): void {
@@ -58,6 +58,43 @@ final class Schema {
   offices smallint(5) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY  (pin),
   KEY lat_lng (lat, lng)
+) {$charset};"
+		);
+		dbDelta(
+			"CREATE TABLE {$wpdb->prefix}storewright_shipments (
+  fulfillment_id bigint(20) unsigned NOT NULL,
+  order_id bigint(20) unsigned NOT NULL,
+  carrier varchar(20) NOT NULL,
+  reference varchar(40) NOT NULL DEFAULT '',
+  shipment varchar(40) NOT NULL DEFAULT '',
+  awb varchar(40) NOT NULL DEFAULT '',
+  courier varchar(100) NOT NULL DEFAULT '',
+  service varchar(20) NOT NULL DEFAULT '',
+  status varchar(20) NOT NULL,
+  raw_status varchar(100) NOT NULL DEFAULT '',
+  label_url text NULL,
+  pickup_at varchar(40) NOT NULL DEFAULT '',
+  tries tinyint(3) unsigned NOT NULL DEFAULT 0,
+  last_error text NULL,
+  updated_at datetime NOT NULL,
+  PRIMARY KEY  (fulfillment_id),
+  KEY order_id (order_id),
+  KEY awb (awb),
+  KEY status (status)
+) {$charset};"
+		);
+		dbDelta(
+			"CREATE TABLE {$wpdb->prefix}storewright_shipment_events (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  fulfillment_id bigint(20) unsigned NOT NULL,
+  status varchar(20) NOT NULL,
+  raw_status varchar(100) NOT NULL,
+  location varchar(191) NOT NULL DEFAULT '',
+  occurred_at datetime NOT NULL,
+  source varchar(20) NOT NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY scan (fulfillment_id, occurred_at, raw_status),
+  KEY fulfillment_id (fulfillment_id)
 ) {$charset};"
 		);
 		update_option( self::OPTION, self::VERSION, false );

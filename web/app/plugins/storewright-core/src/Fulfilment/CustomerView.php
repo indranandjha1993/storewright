@@ -105,6 +105,7 @@ final class CustomerView {
 			$shipment->get_items()
 		);
 		$online  = $carrier === '' && $number === '' && $link === '';
+		$latest  = self::latest( $shipment->get_id() );
 		?>
 		<li class="sw-order-shipment">
 			<p class="sw-order-shipment__head">
@@ -121,12 +122,24 @@ final class CustomerView {
 					<?php endif; ?>
 				</p>
 			<?php endif; ?>
+			<?php if ( $latest !== null ) : ?>
+				<p class="sw-order-shipment__status"><?php echo esc_html( $latest ); ?></p>
+			<?php endif; ?>
 			<p class="sw-order-shipment__items"><?php echo esc_html( implode( ', ', $items ) ); ?></p>
 			<?php if ( $link !== '' ) : ?>
 				<a class="wp-element-button sw-order-shipment__track" href="<?php echo esc_url( $link ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Track parcel', 'storewright' ); ?></a>
 			<?php endif; ?>
 		</li>
 		<?php
+	}
+
+	private static function latest( int $fulfillmentId ): ?string {
+		$event = Shipping::store()->latest( $fulfillmentId );
+		if ( $event === null ) {
+			return null;
+		}
+		$when = wc_format_datetime( wc_string_to_datetime( (string) $event['occurred_at'] ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
+		return TrackingEvent::words( (string) $event['status'] ) . ( $event['location'] !== '' ? ', ' . $event['location'] : '' ) . ', ' . $when;
 	}
 
 	private static function line( int $qty, string $name ): string {

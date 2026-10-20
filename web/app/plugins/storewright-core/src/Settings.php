@@ -19,6 +19,11 @@ final class Settings {
 		'gst_rate'               => 18,
 		'invoice_prefix'         => 'INV',
 		'return_days'            => 7,
+		'pickup_location'        => '',
+		'parcel_weight'          => 0.5,
+		'parcel_length'          => 10,
+		'parcel_breadth'         => 10,
+		'parcel_height'          => 10,
 	];
 
 	public static function get( string $key ): mixed {
