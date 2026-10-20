@@ -15,11 +15,7 @@ services:
     env_file: .env
     volumes:
       - uploads:/var/www/html/web/app/uploads
-      - type: volume
-        source: plugins
-        target: /var/www/html/web/app/plugins
-        volume:
-          nocopy: true
+      - plugins:/var/www/html/web/app/plugins
       - languages:/var/www/html/web/app/languages
     depends_on:
       db:
