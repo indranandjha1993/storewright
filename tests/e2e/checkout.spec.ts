@@ -90,6 +90,8 @@ async function typeAddressThenPayCash(page: Page, place: (typeof places)[keyof t
 	await shipping.getByLabel('City').fill(place.city);
 	await shipping.getByLabel('State').selectOption({ label: place.state });
 	await shipping.getByLabel(/PIN Code/).fill(place.pin);
+	// The press must land during the phone update, after the delivery for this PIN is already priced.
+	await expect(page.getByRole('group', { name: 'Shipping options' }).getByText(/delivery/)).toBeVisible();
 	await shipping.getByLabel('Phone').click();
 	await page.keyboard.type('9123456780', { delay: 50 });
 }
