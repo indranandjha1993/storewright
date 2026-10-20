@@ -30,6 +30,7 @@ final class Health {
 			'php'         => PHP_VERSION,
 			'environment' => wp_get_environment_type(),
 			'payments'    => GatewayCredentials::modes( wp_get_environment_type() ),
+			'carriers'    => CarrierCredentials::modes( wp_get_environment_type() ),
 			'plugins'     => [
 				'management' => PluginManagement::mode(),
 				'extras'     => count( PluginManagement::extras() ),

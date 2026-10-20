@@ -48,6 +48,16 @@ final class Carriers {
 		return isset( $known[ $key ] ) ? $known[ $key ]->get_name() : $key;
 	}
 
+	public static function keyFor( string $courier ): string {
+		$name = strtolower( $courier );
+		foreach ( [ 'delhivery', 'blue dart', 'bluedart', 'dtdc', 'india post', 'ekart', 'xpressbees', 'shadowfax' ] as $needle ) {
+			if ( str_contains( $name, $needle ) ) {
+				return str_replace( ' ', '', $needle === 'india post' ? 'india-post' : $needle );
+			}
+		}
+		return 'shiprocket';
+	}
+
 	private static function ownName(): string {
 		return __( 'Our own delivery', 'storewright' );
 	}
