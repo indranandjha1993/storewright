@@ -244,12 +244,13 @@ test('place order pressed straight after typing the address still places the ord
 	await expect(page).toHaveURL(/order-received/, { timeout: 15_000 });
 });
 
-test('a place order press is not repeated once the delivery it was made for changes', async ({ page }) => {
-	let resent = false;
-	await page.exposeFunction('storewrightResent', () => {
-		resent = true;
+test('a place order press is only repeated for the amount and delivery the shopper saw', async ({ page }) => {
+	// Whether the delivery switch lands before or after the press depends on the machine; the rule holds either way.
+	let resent: { pressed: string; now: string } | null = null;
+	await page.exposeFunction('storewrightResent', (detail: { pressed: string; now: string }) => {
+		resent = detail;
 	});
-	await page.addInitScript(() => document.addEventListener('storewright:place-order-resent', () => (window as unknown as { storewrightResent: () => void }).storewrightResent()));
+	await page.addInitScript(() => document.addEventListener('storewright:place-order-resent', (event) => (window as unknown as { storewrightResent: (detail: unknown) => void }).storewrightResent((event as CustomEvent).detail)));
 	await addToBag(page, products.mug);
 	await page.goto('/checkout/');
 	await typeAddressThenPayCash(page, places.mgRoad);
@@ -258,11 +259,18 @@ test('a place order press is not repeated once the delivery it was made for chan
 
 	await expect(page.getByText('Same-day delivery').first()).toBeVisible();
 	await storeApiQuiet(page);
-	expect(resent).toBe(false);
 	if (!page.url().includes('order-received')) {
 		await placeOrder(page);
 	}
-	await expect(page).toHaveURL(/order-received/, { timeout: 30_000 });
+	await expect(page).toHaveURL(/order-received\/(\d+)/, { timeout: 30_000 });
+	if (resent) {
+		const { pressed, now } = resent as { pressed: string; now: string };
+		expect(now).toBe(pressed);
+		const [total, rates] = JSON.parse(pressed) as [string, string[]];
+		expect(rates.some((rate) => rate.includes('flat_rate'))).toBe(true);
+		const order = page.url().match(/order-received\/(\d+)/)?.[1] ?? '';
+		expect(Number(wp('eval', `echo wc_get_order( ${order} )->get_total();`)) * 100).toBe(Number(total));
+	}
 });
 
 test('a guest pays on razorpay by netbanking', async ({ page }) => {

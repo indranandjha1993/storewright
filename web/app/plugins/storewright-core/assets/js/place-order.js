@@ -31,7 +31,7 @@
 			window.clearInterval( timer );
 			press = null;
 			if ( pending.target.isConnected && quote() === pending.quote ) {
-				document.dispatchEvent( new CustomEvent( 'storewright:place-order-resent' ) );
+				document.dispatchEvent( new CustomEvent( 'storewright:place-order-resent', { detail: { pressed: pending.quote, now: quote() } } ) );
 				pending.target.click();
 			}
 		}, 100 );
