@@ -22,6 +22,15 @@ final class ReturnRequests {
 		return is_array( $saved ) ? array_values( $saved ) : [];
 	}
 
+	public static function find( WC_Order $order, string $id ): ?array {
+		foreach ( self::all( $order ) as $request ) {
+			if ( $request['id'] === $id ) {
+				return $request;
+			}
+		}
+		return null;
+	}
+
 	public static function deadline( WC_Order $order ): ?int {
 		$completed = $order->get_date_completed();
 		return $completed ? $completed->getTimestamp() + (int) Settings::get( 'return_days' ) * DAY_IN_SECONDS : null;

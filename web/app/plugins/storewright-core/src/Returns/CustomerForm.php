@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Storewright\Core\Returns;
 
+use Storewright\Core\Fulfilment\ShipmentStore;
+use Storewright\Core\Fulfilment\Shipping;
 use InvalidArgumentException;
 use WC_Order;
 
@@ -33,10 +35,21 @@ final class CustomerForm {
 				'left'     => $left,
 				'deadline' => ReturnRequests::deadline( $order ),
 				'nonce'    => self::NONCE,
+				'pickups'  => self::pickups( $order ),
 			],
 			'',
 			dirname( __DIR__, 2 ) . '/templates/'
 		);
+	}
+
+	private static function pickups( WC_Order $order ): array {
+		$pickups = [];
+		foreach ( Shipping::store()->forOrder( $order->get_id() ) as $row ) {
+			if ( $row['kind'] === ShipmentStore::RETURN && $row['status'] !== ShipmentStore::CANCELLED ) {
+				$pickups[ (string) $row['return_id'] ] = $row;
+			}
+		}
+		return $pickups;
 	}
 
 	public static function handle(): void {

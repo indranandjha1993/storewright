@@ -31,6 +31,19 @@ final class ReturnMail {
 		self::send( $order->get_billing_email(), $heading, $lines );
 	}
 
+	public static function pickup( WC_Order $order, array $request, string $courier, string $awb ): void {
+		self::send(
+			$order->get_billing_email(),
+			__( 'Your return pickup is booked', 'storewright' ),
+			[
+				/* translators: 1: courier name, 2: waybill number */
+				sprintf( __( '%1$s will collect the parcel from your delivery address; the waybill is %2$s. Keep it packed and ready.', 'storewright' ), $courier, $awb ),
+				/* translators: 1: order number, 2: items */
+				sprintf( __( 'Order #%1$s: %2$s', 'storewright' ), $order->get_order_number(), ReturnRequests::summary( $order, $request['items'] ) ),
+			]
+		);
+	}
+
 	public static function staff( WC_Order $order, array $request ): void {
 		$recipients = (string) ( ( (array) get_option( 'woocommerce_new_order_settings', [] ) )['recipient'] ?? '' ) ?: (string) get_option( 'admin_email' );
 		self::send(

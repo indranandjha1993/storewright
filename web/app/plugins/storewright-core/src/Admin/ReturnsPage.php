@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Storewright\Core\Admin;
 
 use InvalidArgumentException;
+use Storewright\Core\Fulfilment\CarrierException;
+use Storewright\Core\Fulfilment\Shipping;
 use Storewright\Core\Returns\ReturnDesk;
 use Storewright\Core\Returns\ReturnRequests;
 
@@ -15,6 +17,7 @@ final class ReturnsPage {
 	public static function register(): void {
 		add_action( 'admin_menu', [ self::class, 'menu' ], 20 );
 		Action::on( 'return_move', [ self::class, 'move' ] );
+		Action::on( 'return_pickup', [ self::class, 'pickup' ] );
 	}
 
 	public static function url( bool $all = false ): string {
@@ -32,6 +35,17 @@ final class ReturnsPage {
 			/* translators: 1: order number, 2: return state */
 			Flash::success( sprintf( __( 'Return on order #%1$s is now %2$s.', 'storewright' ), $moved['number'], self::stateLabel( $moved['status'] ) ) );
 		} catch ( InvalidArgumentException $e ) {
+			Flash::error( $e->getMessage() );
+		}
+		Action::back( self::url( $all ) );
+	}
+
+	public static function pickup(): void {
+		$all = Action::query( 'view' ) === 'all';
+		try {
+			ReturnDesk::pickup( (int) Action::query( 'order' ), Action::query( 'id' ) );
+			Flash::success( __( 'Booking the pickup with Shiprocket; the waybill appears here within a minute.', 'storewright' ) );
+		} catch ( InvalidArgumentException | CarrierException $e ) {
 			Flash::error( $e->getMessage() );
 		}
 		Action::back( self::url( $all ) );
@@ -57,7 +71,7 @@ final class ReturnsPage {
 			return;
 		}
 		echo '<table class="wp-list-table widefat fixed striped"><thead><tr>';
-		foreach ( [ __( 'Order', 'storewright' ), __( 'Items', 'storewright' ), __( 'Reason', 'storewright' ), __( 'State', 'storewright' ), __( 'Next step', 'storewright' ) ] as $head ) {
+		foreach ( [ __( 'Order', 'storewright' ), __( 'Items', 'storewright' ), __( 'Reason', 'storewright' ), __( 'State', 'storewright' ), __( 'Pickup', 'storewright' ), __( 'Next step', 'storewright' ) ] as $head ) {
 			echo '<th scope="col">' . esc_html( $head ) . '</th>';
 		}
 		echo '</tr></thead><tbody>';
@@ -81,6 +95,7 @@ final class ReturnsPage {
 		printf( '<td>%s</td>', esc_html( $row['summary'] ) );
 		printf( '<td>%s%s</td>', esc_html( $row['reasonText'] ), $row['note'] ? '<br><small>' . esc_html( $row['note'] ) . '</small>' : '' );
 		printf( '<td><span class="sw-pill %s">%s</span></td>', esc_attr( $tone ), esc_html( $label ) );
+		echo '<td>' . self::pickupCell( $row, $all ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '<td>';
 		if ( $row['next'] !== [] ) {
 			printf( '<form method="post" action="%s" class="sw-returns__form">', esc_url( admin_url( 'admin-post.php' ) ) );
@@ -94,6 +109,41 @@ final class ReturnsPage {
 			echo '</span></form>';
 		}
 		echo '</td></tr>';
+	}
+
+	private static function pickupCell( array $row, bool $all ): string {
+		$pickup = $row['pickup'];
+		if ( $pickup !== null ) {
+			$text  = $pickup['awb'] !== ''
+				? '<a href="' . esc_url( 'https://shiprocket.co/tracking/' . $pickup['awb'] ) . '" target="_blank" rel="noopener">' . esc_html( (string) $pickup['awb'] ) . '</a> ' . esc_html( $pickup['courier'] )
+				: esc_html( (string) $pickup['courier'] );
+			$text .= '<br><small>' . esc_html( ShipmentsBox::where( $pickup ) ) . '</small>';
+			if ( $pickup['last_error'] !== '' && $pickup['last_error'] !== null ) {
+				$text .= ' <a href="' . esc_url(
+					Action::url(
+						'shipment_retry',
+						[
+							'id'   => (int) $pickup['id'],
+							'back' => 'admin.php?page=' . self::SLUG . ( $all ? '&view=all' : '' ),
+						]
+					)
+				) . '">' . esc_html__( 'Try again', 'storewright' ) . '</a>';
+			}
+			return $text;
+		}
+		if ( $row['status'] === 'approved' && Shipping::carrier() !== null ) {
+			return '<a href="' . esc_url(
+				Action::url(
+					'return_pickup',
+					[
+						'order' => (int) $row['order'],
+						'id'    => $row['id'],
+						'view'  => $all ? 'all' : '',
+					]
+				)
+			) . '">' . esc_html__( 'Book pickup with Shiprocket', 'storewright' ) . '</a>';
+		}
+		return $row['status'] === 'approved' ? esc_html__( 'By hand', 'storewright' ) : '&mdash;';
 	}
 
 	private static function state( string $status ): array {

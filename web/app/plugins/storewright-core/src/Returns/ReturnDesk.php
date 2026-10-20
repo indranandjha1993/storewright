@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Storewright\Core\Returns;
 
 use InvalidArgumentException;
+use Storewright\Core\Fulfilment\CarrierException;
+use Storewright\Core\Fulfilment\Shipping;
 use WC_Order;
 
 final class ReturnDesk {
@@ -43,7 +45,28 @@ final class ReturnDesk {
 		}
 		$moved = ReturnRequests::move( $order, $id, $status, $note );
 		ReturnMail::customer( $order, $moved );
+		if ( $status === 'approved' && Shipping::carrier() !== null ) {
+			self::bookPickup( $order, $moved );
+		}
 		return self::describe( wc_get_order( $order->get_id() ) ?: $order, $moved );
+	}
+
+	public static function pickup( int $orderId, string $id ): void {
+		$order   = wc_get_order( $orderId );
+		$request = $order instanceof WC_Order ? ReturnRequests::find( $order, $id ) : null;
+		if ( $request === null || $request['status'] !== 'approved' ) {
+			throw new InvalidArgumentException( esc_html__( 'Only an approved return can have a pickup booked.', 'storewright' ) );
+		}
+		Shipping::collect( $order, $id, $request['items'] );
+	}
+
+	private static function bookPickup( WC_Order $order, array $request ): void {
+		try {
+			Shipping::collect( $order, $request['id'], $request['items'] );
+		} catch ( CarrierException $e ) {
+			/* translators: %s: the carrier's message */
+			$order->add_order_note( sprintf( __( 'The return pickup could not be booked with Shiprocket: %s. Arrange it by hand or try again from Returns.', 'storewright' ), $e->getMessage() ) );
+		}
 	}
 
 	private static function refund( WC_Order $order, array $request ): void {
@@ -87,6 +110,7 @@ final class ReturnDesk {
 			'reasonText' => ReturnRequests::reason( $item['reason'] ),
 			'payment'    => $order->get_payment_method_title(),
 			'next'       => ReturnRequests::next( $item['status'] ),
+			'pickup'     => Shipping::store()->forReturn( $order->get_id(), $item['id'] ),
 		];
 	}
 }

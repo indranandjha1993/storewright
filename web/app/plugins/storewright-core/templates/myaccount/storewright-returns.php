@@ -21,6 +21,14 @@ $storewright_states = [
 				<span><?php echo esc_html( wc_format_datetime( wc_string_to_datetime( $storewright_request['created'] ) ) ); ?></span>
 			</p>
 			<p><?php echo esc_html( ReturnRequests::summary( $order, $storewright_request['items'] ) ); ?></p>
+			<?php if ( isset( $pickups[ $storewright_request['id'] ] ) && $pickups[ $storewright_request['id'] ]['awb'] !== '' ) : ?>
+				<p class="sw-return__pickup">
+					<?php
+					/* translators: 1: courier name, 2: waybill number */
+					echo esc_html( sprintf( __( '%1$s collects it, waybill %2$s.', 'storewright' ), $pickups[ $storewright_request['id'] ]['courier'], $pickups[ $storewright_request['id'] ]['awb'] ) );
+					?>
+				</p>
+			<?php endif; ?>
 			<?php if ( ( $storewright_request['answer'] ?? '' ) !== '' ) : ?>
 				<p class="sw-return__answer"><?php echo esc_html( $storewright_request['answer'] ); ?></p>
 			<?php endif; ?>
