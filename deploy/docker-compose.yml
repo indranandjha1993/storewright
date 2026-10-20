@@ -8,11 +8,7 @@ x-app: &app
   restart: unless-stopped
   volumes:
     - uploads:/var/www/html/web/app/uploads
-    - type: volume
-      source: plugins
-      target: /var/www/html/web/app/plugins
-      volume:
-        nocopy: true
+    - plugins:/var/www/html/web/app/plugins
     - languages:/var/www/html/web/app/languages
   depends_on:
     db:
@@ -24,7 +20,7 @@ services:
   app:
     <<: *app
 
-  # Only sync-plugins writes the plugins volume (nocopy above); cron still starts after the app so the first sync is the app's.
+  # Both mount the plugins volume; the app fills it first, or Docker fills it twice at once and fails.
   cron:
     <<: *app
     depends_on:
@@ -42,12 +38,7 @@ services:
       - "${WEB_BIND:-127.0.0.1:8080}:80"
     volumes:
       - uploads:/var/www/html/web/app/uploads:ro
-      - type: volume
-        source: plugins
-        target: /var/www/html/web/app/plugins
-        read_only: true
-        volume:
-          nocopy: true
+      - plugins:/var/www/html/web/app/plugins:ro
     depends_on:
       - app
 
